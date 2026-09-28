@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig/base.json",
+  "compilerOptions": {
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "lib": ["es2025", "dom", "dom.iterable"],
+    "types": ["node", "vite/client"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "@backend/app/mocks/*": ["./unit/backend/app/mocks/*"],
+      "@backend/*": ["../backend/src/*"],
+      "@frontend/*": ["../frontend/src/*"],
+      "@sut/*": ["./*"]
+    }
+  },
+  "include": ["**/*.ts"]
+}

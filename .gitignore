@@ -1,0 +1,24 @@
+node_modules/
+dist/
+
+# Local environment; each .env is a copy of its tracked .env.example
+.env
+
+# Yarn 4 (zero-install disabled)
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+# IDE
+.idea/
+
+# Claude Code: per-checkout settings and the task worktrees scripts/prepare-worktree.sh makes
+.claude/settings.local.json
+.claude/worktrees/
+
+# Per-checkout regime for Claude Code sessions (mode, goal, branch, stop condition); written per task, never shared
+.plans/regime.md

@@ -1,0 +1,18 @@
+{
+  "name": "@app/types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit -p ."
+  },
+  "exports": {
+    "./*": "./*.ts"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3"
+  }
+}

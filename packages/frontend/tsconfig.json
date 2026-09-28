@@ -1,0 +1,11 @@
+{
+  "extends": ["../../tsconfig/base.json", "../../tsconfig/paths.json"],
+  "compilerOptions": {
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "lib": ["es2025", "dom", "dom.iterable"],
+    "types": ["vite/client"],
+    "jsx": "preserve"
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue"]
+}

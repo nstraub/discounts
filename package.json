@@ -1,0 +1,39 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently --names backend,frontend \"yarn dev:backend\" \"yarn dev:frontend\"",
+    "dev:backend": "yarn workspace backend dev",
+    "dev:frontend": "yarn workspace frontend dev",
+    "build": "yarn workspaces foreach --all --topological --exclude app run build",
+    "test": "yarn workspace sut test:unit",
+    "db:generate": "yarn workspace backend drizzle-kit generate",
+    "db:migrate": "yarn workspace backend drizzle-kit migrate",
+    "test:contract": "yarn workspace sut test:contract",
+    "test:bdd": "yarn workspace sut test:bdd",
+    "postinstall": "node scripts/postinstall.mjs"
+  },
+  "engines": {
+    "node": ">=26.9.0"
+  },
+  "packageManager": "yarn@4.18.0+sha512.fcb8716fe7cd0eece141ffc18b92193a9df9204c1ba83189c288835223fc0bbe64af473bab0d5e9927a7daeb5caf2bb07eb2787cc9338ca040ea125f2a1f2f7e",
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "concurrently": "^10.0.5",
+    "eslint": "^10.11.0",
+    "eslint-plugin-import-x": "^4.17.1",
+    "eslint-plugin-jsdoc": "^64.5.4",
+    "eslint-plugin-unused-imports": "^4.4.1",
+    "eslint-plugin-vue": "^10.11.1",
+    "husky": "^9.1.7",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.70.1",
+    "vue-eslint-parser": "^10.4.1"
+  }
+}
