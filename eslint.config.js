@@ -62,5 +62,9 @@ export default defineConfig(
       'max-lines': ['warn', { max: 50, skipBlankLines: true, skipComments: true }],
     },
   },
+  {
+    files: ['packages/sut/**', '**/*.{spec,test}.*'],
+    rules: { 'max-lines': 'off' },
+  },
   boundaries,
 );
