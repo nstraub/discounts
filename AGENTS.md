@@ -95,7 +95,7 @@ sibling → index, blank line between groups; the path aliases of §4 and the
 `@app/types` package form an `internal` group between external and parent); namespace imports and re-exports (`import * as`,
 `export * as`) are errors.
 
-**Git hooks (husky):** pre-commit runs `yarn test` (unit suite); pre-push runs
+**Git hooks (husky):** pre-commit runs `yarn lint-staged` (eslint on the staged code files; a commit that stages only documentation passes); commit-msg runs commitlint (header and body lines at most 100 characters); pre-push runs
 `yarn build` in parallel with `yarn test:bdd && yarn test && yarn test:contract`. `yarn install` installs
 them (`scripts/postinstall.mjs`).
 
@@ -251,6 +251,6 @@ Features are built by the user-scope `dev-team` agent team (`claude --agent dev-
 design in `~/.claude/briefs/_COMPLETE_agent-team-development.md`, agents in
 `~/.claude/agents/`). The orchestrator is the only role that talks to the user; it
 dispatches `qa` (red-test outline), `developer` (TDD, ops and toolchain work included),
-`refactorer`, `reviewer`, `documenter` and `decider`, and makes every commit — no role
-commits. The session's mode (interactive, autonomous in a worktree, or autonomous on
+`refactorer`, `reviewer`, `documenter` and `decider`, and makes every commit in interactive
+mode; in autonomous mode the developer commits its own units. The session's mode (interactive, autonomous in a worktree, or autonomous on
 `main`) is set per checkout.
