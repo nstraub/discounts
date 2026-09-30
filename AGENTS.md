@@ -22,10 +22,7 @@ what is specific to this project.
 - **Domain model, events, factories, persistence:** skill `modelling-the-domain`.
 - **Architecture and design patterns:** skills `applying-architectural-patterns`,
   `applying-design-patterns`.
-- **Readable code:** skill `writing-readable-code`. In this project also:
-  **endpoint (controller) classes and every public method carry a JSDoc block**
-  describing purpose, parameters and outcome (public abstract methods included;
-  constructors, getters and setters exempt).
+- **Readable code:** skill `writing-readable-code`.
 - **Existing solutions before new code, adopting a package:** skill `search-first`.
 - **Class and file size:** skill `srp`.
 - **Existing code and small fixes along the way:** skills
