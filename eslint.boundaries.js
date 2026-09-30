@@ -7,10 +7,8 @@ const application = `${backend}/*/application`;
 const model = `${application}/model`;
 
 const frameworkPackages = {
-  // The model receives the event emitter through its constructor, so a type-only import stays allowed.
-  allowTypeImports: true,
-  group: ['@nestjs/*'],
-  message: 'application/model stays framework-free; the framework lives in infra/.',
+  group: ['@nestjs/*', 'eventemitter2'],
+  message: 'application/model stays framework-free, types included; it publishes through its own port, adapted in infra/.',
 };
 const databasePackages = {
   group: ['drizzle-orm', 'drizzle-orm/*', 'pg'],
