@@ -17,10 +17,7 @@ what is specific to this project.
 - **TDD** governs all development. Skills: `tdd`, `refactoring`, `code-smells`.
 - **Units of code:** skill `sizing-units-of-code`.
 - **Tell, don't ask** — skill `tell-dont-ask`. In this project also: no
-  `Object.assign`, no dynamic index access, no exported data-shape types, and no
-  database or framework import anywhere in `application/`, types included (ESLint
-  rejects `@nestjs/*`, `eventemitter2`, `drizzle-orm` and `pg` there, and any import of
-  the factory or the application service from `application/model`).
+  `Object.assign`, no dynamic index access, no exported data-shape types.
 - **Domain model, events, factories, persistence:** skill `modelling-the-domain`.
 - **Architecture and design patterns:** skills `applying-architectural-patterns`,
   `applying-design-patterns`.
@@ -108,7 +105,7 @@ build config (ESLint, tsconfig, Vite) lives at the repo root.
 
 | Workspace | Role | Stack |
 |---|---|---|
-| `packages/backend` | HTTP API + domain logic | NestJS 12, Drizzle ORM, PostgreSQL, EventEmitter2 (infra only) |
+| `packages/backend` | HTTP API + domain logic | NestJS 12, Drizzle ORM, PostgreSQL, EventEmitter2 |
 | `packages/frontend` | Web app — **the product** | Vue 3, Vite, Vue Router, Pinia, TailwindCSS |
 | `packages/types` | Shared TypeScript types | validation-result, REST-api interfaces, the REST client abstraction |
 | `packages/sut` | **System Under Test** — all tests live here | Vitest (`unit/`, `contract/`), Cucumber + Playwright (`acceptance/`), `approvals/` |
@@ -131,101 +128,17 @@ and strips the `.ts` types on the symlink's real path.
 
 ---
 
-## 5. Backend architecture (DDD / hexagonal)
+## 5. Backend
 
-The backend is split into bounded contexts under `packages/backend/src/<context>/`; the
-scaffold has one, `app`, holding only its (empty) migrations. Each context has two layers.
+The backend's source is `packages/backend/src/`. The scaffold holds `main.ts`, the
+bootstrap (CORS from `FRONTEND_URL`, port from `PORT`), `app.module.ts`, an empty root
+NestJS module, and one folder, `app/`, holding only its (empty) migrations in
+`app/infra/migrations/`.
 
-```
-<context>/
-  application/                 domain + application layer, framework-free
-    model/                     aggregate roots (<aggregate>.ts) and their entities;
-                               *-exception.ts subtypes; validators; the ports the model
-                               owns, as abstract classes (<aggregate>-repository.ts,
-                               <aggregate>-builder.ts, <context>-event-publisher.ts)
-    events/                    one class per domain event (<aggregate>-<happened>-event.ts)
-    <context>.factory.ts       builds whole aggregates: create(...) and reconstitute(state);
-                               never a repository or any infrastructure
-    <context>.service.ts       application service: load through the repository port,
-                               call the root, save through the port
-  infra/                       adapters
-    schema.ts                  Drizzle pgSchema('<context>') tables + row types
-    migrations/                generated migrations, each with a hand-written down.sql
-    <context>.module.ts        composition root: every provider built with new in useFactory
-    <context>.event-publisher-emitter2.ts   the event port's one adapter, over EventEmitter2
-    <aggregate>.controller.ts  driving adapter: HTTP to service calls and back
-    repositories/              repository adapters, one per aggregate root
-    <aggregate>-builder-drizzle.ts   persistence-side builder that receives exported entities
-```
-
-- **Composition root: the context's module** (`infra/<context>.module.ts`). It builds
-  every provider explicitly, with `new` inside a `useFactory`: the database connection
-  once, the event-publisher adapter, the factory, the repository adapter and the
-  application service. It is the only file that names a concrete infrastructure class.
-  Nest only hosts it: no domain or application class is resolved by type
-  (`@Injectable`), and ESLint rejects `@nestjs/*` anywhere in `application/`. GOOS
-  p. 201: Main "binds the domain model and infrastructure together"; p. 191: Main as a
-  "matchmaker", "finding components and introducing them to each other". Vernon,
-  *Implementing Domain-Driven Design* (IDDD), ch. 4 (Hexagonal: the application inside,
-  adapters outside). `app.module.ts` imports the context modules.
-- **Controller** (`infra/<aggregate>.controller.ts`), the driving adapter: it turns HTTP
-  into calls on the application service, which it receives in its constructor, and the
-  results back into HTTP. It never constructs infrastructure (IDDD ch. 4).
-- **Application service** (`application/<context>.service.ts`): receives the repository
-  port and the factory in its constructor (IDDD ch. 14: "inbound dependencies by way of
-  constructor parameters"; GOOS p. 53: dependencies are passed "in through the
-  constructor"). It loads the aggregate through the repository port, calls the root and
-  saves through the port. It never obtains infrastructure by subclassing: GOOS p. 67,
-  "And What about Classes?", prefers "to refactor to delegation" over class hierarchies.
-- **Repository port, owned by the model:** an abstract class
-  `application/model/<aggregate>-repository.ts`, one per aggregate root and only for
-  roots (IDDD ch. 12: "Strictly speaking, only Aggregates have Repositories"; the
-  interface goes "in the same Module as the Aggregate type that it stores"). Its adapter
-  in `infra/repositories/` implements it (IDDD ch. 4: "Repository implementations as
-  persistence Adapters") and turns rows into aggregates through
-  `factory.reconstitute(state)`. The repository using the factory is nico's rule; the
-  sources are silent on it.
-- **Factory** (`application/<context>.factory.ts`): builds the whole aggregate, root and
-  entities, in one step: `create(...)` for a new one, `reconstitute(state)` for a loaded
-  one (IDDD ch. 11, quoting Evans: "Create entire AGGREGATES as a piece, enforcing their
-  invariants"). It hands the event-publisher port to what it builds and never creates a
-  repository or any other infrastructure.
-- **Aggregates and entities** receive through the constructor only their own state,
-  their own entities and the event-publisher port (GOOS p. 53: notifications "can be
-  passed to the constructor"). An entity is reached only through its root; the root is
-  the entity that can exist without the others (nico's rule; the sources are silent).
-  Never a repository, the factory or a domain service as a field (IDDD ch. 10, "Avoid
-  Dependency Injection": "Dependency injection of a Repository or Domain Service into an
-  Aggregate should generally be viewed as harmful"); a command method may take a
-  collaborator the service looked up beforehand as an argument. An aggregate's creation
-  validates through a validator and either returns the errors or publishes its creation
-  event (`publisher.publish(new <Aggregate>CreatedEvent(...))`). Behaviour comes from
-  the stories, one event per rule.
-- **Domain events:** one class per event in `application/events/`.
-- **Publishing events goes through a port the model owns**, never through a framework
-  type (Freeman and Pryce, GOOS, ch. 8, "Only Mock Types That You Own" and "Write an
-  Adapter Layer"). The port is an abstract class in `application/model`,
-  `<context>-event-publisher.ts`, named in the domain's terms, with one method,
-  `publish(event)`; unit specs double it with `mock<<Context>EventPublisher>()`, never
-  `EventEmitter2`. Its one adapter, `infra/<context>.event-publisher-emitter2.ts`,
-  implements it with NestJS's `EventEmitter2`, so listeners in other modules
-  (`@OnEvent`) keep working and a future external bus is one bridge off `EventEmitter2`,
-  not a second publishing path. The adapter gets a focused contract test in
-  `contract/backend/<context>/infra/`: an event published through it reaches a
-  listener subscribed on `EventEmitter2`. Wiring: `EventEmitterModule.forRoot()` in
-  `app.module.ts` (added with the first event), and
-  `{ provide: <Context>EventPublisher, useFactory: (emitter: EventEmitter2) => new
-  <Context>EventPublisherEmitter2(emitter), inject: [EventEmitter2] }` in the context's
-  module; the factory hands the port to the aggregates it builds.
-- **Ports are abstract classes** in `application/model` (repositories, builders, the event
-  publisher); adapters live in `infra/`. An aggregate exports its state to persistence
-  through a builder port (`aggregate.export(builder)`).
-- **Database:** `infra/schema.ts` (a `pgSchema` per context with its table names and
-  exported row types), registered in `packages/backend/drizzle.config.ts` (which already
-  points at `src/app/infra/schema.ts`; the first table creates the file). Migrations live in
-  `infra/migrations/`: generate with `yarn db:generate`, apply with `yarn db:migrate`.
-  Skill: `database-migrations`.
-- Bootstrap: `main.ts` (CORS from `FRONTEND_URL`).
+- **Database:** `packages/backend/drizzle.config.ts` reads the Drizzle schema from
+  `src/app/infra/schema.ts` (the file does not exist yet; the first table creates it) with
+  `schemaFilter: ['app']`, and writes migrations to `src/app/infra/migrations/`: generate
+  with `yarn db:generate`, apply with `yarn db:migrate`. Skill: `database-migrations`.
 
 ---
 
