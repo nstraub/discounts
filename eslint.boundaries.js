@@ -4,6 +4,7 @@ import { createNodeResolver } from 'eslint-plugin-import-x';
 
 const backend = 'packages/backend/src';
 const application = `${backend}/*/application`;
+const model = `${application}/model`;
 
 const frameworkPackages = {
   group: ['@nestjs/*', 'eventemitter2'],
@@ -33,6 +34,7 @@ export const boundaries = [
         {
           zones: [
             { target: `${application}/**`, from: `${backend}/*/infra/**`, message: 'application/ never imports infra/.' },
+            { target: `${model}/**`, from: [`${application}/*.factory.ts`, `${application}/*.service.ts`], message: 'The model never holds the factory or the service.' },
             { target: 'packages/frontend/**', from: 'packages/backend/**', message: 'The frontend never imports the backend.' },
             { target: 'packages/backend/**', from: 'packages/frontend/**', message: 'The backend never imports the frontend.' },
             { target: 'packages/!(sut)/**', from: 'packages/sut/**', message: 'Only the system under test imports from sut.' },
