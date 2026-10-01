@@ -4,15 +4,14 @@ import { createNodeResolver } from 'eslint-plugin-import-x';
 
 const backend = 'packages/backend/src';
 const application = `${backend}/*/application`;
-const model = `${application}/model`;
 
 const frameworkPackages = {
   group: ['@nestjs/*', 'eventemitter2'],
-  message: 'application/model stays framework-free, types included; it publishes through its own port, adapted in infra/.',
+  message: 'application/ stays framework-free, types included: the context module in infra/ builds every provider with new.',
 };
 const databasePackages = {
   group: ['drizzle-orm', 'drizzle-orm/*', 'pg'],
-  message: 'application/model makes no database calls; persistence lives in infra/.',
+  message: 'application/ makes no database calls; persistence lives in infra/.',
 };
 
 /** The layer boundaries of AGENTS.md §1, §4 and §5, enforced on every import. */
@@ -43,7 +42,7 @@ export const boundaries = [
     },
   },
   {
-    files: [`${model}/**/*.ts`],
+    files: [`${application}/**/*.ts`],
     rules: {
       '@typescript-eslint/no-restricted-imports': [
         'error',
