@@ -105,7 +105,7 @@ build config (ESLint, tsconfig, Vite) lives at the repo root.
 
 | Workspace | Role | Stack |
 |---|---|---|
-| `packages/backend` | HTTP API + domain logic | NestJS 12, Drizzle ORM, PostgreSQL, EventEmitter2 |
+| `packages/backend` | HTTP API + domain logic | NestJS 12, Drizzle ORM, PostgreSQL |
 | `packages/frontend` | Web app — **the product** | Vue 3, Vite, Vue Router, Pinia, TailwindCSS |
 | `packages/types` | Shared TypeScript types | validation-result, REST-api interfaces, the REST client abstraction |
 | `packages/sut` | **System Under Test** — all tests live here | Vitest (`unit/`, `contract/`), Cucumber + Playwright (`acceptance/`), `approvals/` |
@@ -162,7 +162,8 @@ first slice.
 
 - **Unit (Vitest):** `unit/<pkg>/**`, mirroring the source tree, one spec file per
   method in a folder named after the class in kebab-case:
-  `unit/backend/<context>/application/model/<aggregate>/create.spec.ts`. Import
+  the spec for method `<method>` of a class in `packages/<pkg>/src/<path>/` is
+  `unit/<pkg>/<path>/<class-in-kebab-case>/<method>.spec.ts`. Import
   `describe, it, expect, vi` from `vitest` and write assertions in **Chai syntax**
   (`to.equal`, `to.contain`, `to.be.true`, `to.deep.equal`), not jest aliases.
   Doubles: `vitest-mock-extended` (`mock<T>()`) or hand-built fakes under
