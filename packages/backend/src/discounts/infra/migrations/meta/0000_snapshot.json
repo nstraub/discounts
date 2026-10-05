@@ -1,5 +1,5 @@
 {
-  "id": "7d9d3ecf-7b19-434f-a1b7-6cc25717f750",
+  "id": "4c16de25-1e53-44c3-a7ec-f9036a52ecde",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -31,7 +31,9 @@
     }
   },
   "enums": {},
-  "schemas": {},
+  "schemas": {
+    "app": "app"
+  },
   "sequences": {},
   "roles": {},
   "policies": {},
