@@ -2,6 +2,9 @@ import './style.css';
 
 import { createApp } from 'vue';
 
-import App from './App.vue';
+import { FetchRestApi } from '@app/types/rest-api';
 
-createApp(App).mount('#app');
+import App from './App.vue';
+import { restApiKey } from './rest-api-key';
+
+createApp(App).provide(restApiKey, new FetchRestApi(import.meta.env.VITE_API_URL)).mount('#app');

@@ -6,6 +6,8 @@ RUN npm install --global corepack@0.36.0 && corepack enable
 COPY . .
 
 FROM yarn AS build
+# The web app calls the API on the origin that serves it.
+ENV VITE_API_URL=''
 RUN yarn install --immutable --mode=skip-build \
   && yarn workspace backend build \
   && yarn workspace frontend build
