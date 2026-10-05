@@ -1,8 +1,20 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { spicesDiscount } from '@sut/support/example-discounts';
+
+import { setupSut } from '../support/app';
 
 describe('POST /discounts', () => {
   describe('success', () => {
-    it.todo('should answer 201 with the published discount as JSON and a Location naming it');
+    it('should answer 201 with the published discount as JSON and a Location naming it', async () => {
+      const { http } = await setupSut();
+
+      const response = await http.post('/discounts').send(spicesDiscount);
+
+      expect(response.status).to.equal(201);
+      expect(response.body).to.deep.equal({ id: response.body.id, ...spicesDiscount });
+      expect(response.headers.location).to.equal(`/discounts/${response.body.id}`);
+    });
     it.todo('should answer with a body matching the discount response schema');
     it.todo('should publish DiscountPublished on the application event emitter for the discount published');
   });

@@ -1,5 +1,6 @@
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
+import { onTestFinished } from 'vitest';
 
 import { AppModule } from '@backend/app.module';
 import { resetTestDatabase } from '@sut/support/test-database';
@@ -16,4 +17,14 @@ export const setupSutThatTheTestShutsDown = async () => {
   const module = await Test.createTestingModule({ imports: [AppModule] }).compile();
   const app = await module.createNestApplication().init();
   return { app, client, http: request(app.getHttpServer()) };
+};
+
+/**
+ * The wired app over an empty test database, shut down when the test finishes.
+ * @returns the app, the database client and an HTTP client for the app.
+ */
+export const setupSut = async () => {
+  const sut = await setupSutThatTheTestShutsDown();
+  onTestFinished(() => sut.app.close());
+  return sut;
 };
