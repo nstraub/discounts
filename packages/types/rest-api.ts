@@ -11,7 +11,7 @@ export class FetchRestApi implements RestApi {
 
   async get<Response>(path: string): Promise<Response> {
     const response = await fetch(`${this.baseUrl}${path}`);
-    return (await response.json()) as Response;
+    return this.bodyOfAnOkAnswer<Response>(`GET ${path}`, response);
   }
 
   async put(path: string, body: unknown): Promise<void> {

@@ -49,4 +49,14 @@ describe('class FetchRestApi', () => {
       expect(outcome).to.equal('POST /nowhere answered 404');
     });
   });
+
+  describe('getting', () => {
+    it('should reject when the answer is not ok', async () => {
+      const { restApi } = await setupSut();
+
+      const outcome = await outcomeOf(restApi.get('/nowhere'));
+
+      expect(outcome).to.equal('GET /nowhere answered 404');
+    });
+  });
 });
