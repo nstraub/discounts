@@ -51,6 +51,14 @@ describe('POST /discounts', () => {
       expect(response.status).to.equal(400);
       expect(requestRejection.parse(response.body).fields).to.have.members(['rate', 'storeName', 'storeAddress']);
     });
+    it('should answer 400 naming only the field that is missing when the others are given', async () => {
+      const { http } = await setupSut();
+      const { rate, storeName, storeAddress } = spicesDiscount;
+
+      const response = await http.post('/discounts').send({ rate, storeName, storeAddress });
+
+      expect(requestRejection.parse(response.body).fields).to.deep.equal(['item']);
+    });
     it.todo('should answer 400 for a JSON body that is an array, a string, a number or null');
     it.todo('should answer 400 for a body that is not valid JSON');
     it.todo('should answer every error with a body matching the error schema');

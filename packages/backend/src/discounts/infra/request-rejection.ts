@@ -9,7 +9,7 @@ export class ParsedBy<Request> implements PipeTransform<unknown, Request> {
   transform(value: unknown): Request {
     const parsed = this.schema.safeParse(value);
     if (!parsed.success) {
-      const rejection: RequestRejection = { fields: ['rate', 'storeName', 'storeAddress'] };
+      const rejection: RequestRejection = { fields: parsed.error.issues.map((issue) => issue.path.join('.')) };
       throw new BadRequestException(rejection);
     }
     return parsed.data;
