@@ -10,8 +10,10 @@ const discounts = useDiscountsStore();
 const nothingTyped = () => ({ item: '', rate: '', storeName: '', storeAddress: '' });
 const discount = ref(nothingTyped());
 
+const rateGiven = (rate: string): number | undefined => (rate === '' ? undefined : Number(rate));
+
 const publish = async (): Promise<void> => {
-  await discounts.publish({ ...discount.value, rate: Number(discount.value.rate) });
+  await discounts.publish({ ...discount.value, rate: rateGiven(discount.value.rate) });
   discount.value = nothingTyped();
 };
 </script>

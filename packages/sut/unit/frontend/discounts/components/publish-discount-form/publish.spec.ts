@@ -73,7 +73,13 @@ describe('Component PublishDiscountForm', () => {
     });
 
     describe('empty', () => {
-      it.todo('should publish a blank rate as left out, never as a rate of zero');
+      it('should publish a blank rate as left out, never as a rate of zero', async () => {
+        const { form, discounts } = setupSut();
+
+        await publishThroughTheForm(form, { ...spicesDiscount, rate: '' });
+
+        expect(vi.mocked(discounts.publish).mock.lastCall?.at(0)?.rate).to.equal(undefined);
+      });
     });
 
     describe('state', () => {
