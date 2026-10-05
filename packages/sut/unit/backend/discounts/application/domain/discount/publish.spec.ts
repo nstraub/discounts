@@ -2,6 +2,7 @@ import { mock } from 'vitest-mock-extended';
 import { describe, expect, it } from 'vitest';
 
 import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
+import { DiscountPublished } from '@backend/discounts/application/domain/discount-published';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
 
@@ -23,7 +24,16 @@ describe('class Discount', () => {
 
         expect(discount.toJSON()).to.deep.include(spicesDiscount);
       });
-      it.todo('should raise DiscountPublished carrying the item, rate, store name and store address');
+      it('should raise DiscountPublished carrying the item, rate, store name and store address', () => {
+        const { events, factory } = setupSut();
+        const discount = factory.create(new DiscountDetails(spicesDiscount));
+
+        discount.publish();
+
+        const [published] = events.publish.mock.lastCall ?? [];
+        expect(published).to.be.instanceOf(DiscountPublished);
+        expect((published as DiscountPublished).discount).to.deep.include(spicesDiscount);
+      });
       it.todo('should give each published discount an identity of its own, two identical discounts included');
     });
 
