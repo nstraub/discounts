@@ -1,10 +1,21 @@
 import { describe, expect, it } from 'vitest';
 
+import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
+
 import { setupSut } from '../support/app';
 
 describe('GET /discounts', () => {
   describe('success', () => {
-    it.todo('should answer 200 with every published discount as JSON');
+    it('should answer 200 with every published discount as JSON', async () => {
+      const { http } = await setupSut();
+      const spices = await http.post('/discounts').send(spicesDiscount);
+      const produce = await http.post('/discounts').send(produceDiscount);
+
+      const response = await http.get('/discounts');
+
+      expect(response.status).to.equal(200);
+      expect(response.body).to.have.deep.members([spices.body, produce.body]);
+    });
     it('should answer 200 with an empty list when nothing is published', async () => {
       const { http } = await setupSut();
 

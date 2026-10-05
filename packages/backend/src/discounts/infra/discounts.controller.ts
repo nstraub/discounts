@@ -22,7 +22,8 @@ export class DiscountsController {
   }
 
   @Get()
-  published() {
-    return [];
+  async published() {
+    const discounts = await this.discounts.published();
+    return discounts.map((discount) => discount.toJSON());
   }
 }
