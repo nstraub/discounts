@@ -7,7 +7,10 @@ defineProps<{ discounts: DiscountResponse[] }>();
 </script>
 
 <template>
-  <p data-testid="nothing-published">
+  <p
+    v-if="discounts.length === 0"
+    data-testid="nothing-published"
+  >
     {{ discountTexts.nothingPublished }}
   </p>
   <ul>

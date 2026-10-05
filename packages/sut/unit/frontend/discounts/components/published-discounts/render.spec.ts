@@ -57,6 +57,11 @@ describe('Component PublishedDiscounts', () => {
 
       expect(list.get('[data-testid="nothing-published"]').text()).to.equal(discountTexts.nothingPublished);
     });
+    it('should not say that nothing is published when a discount is', () => {
+      const list = setupSut({ discounts: [spicesDiscount] });
+
+      expect(list.find('[data-testid="nothing-published"]').exists()).to.equal(false);
+    });
     it.todo('should show one entry per discount when several are published, two identical discounts included');
   });
 
