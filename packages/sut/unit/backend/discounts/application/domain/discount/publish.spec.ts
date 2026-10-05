@@ -50,7 +50,15 @@ describe('class Discount', () => {
     });
 
     describe('type', () => {
-      it.todo('should keep an item, store name and store address written with accents, apostrophes and emoji exactly as written');
+      it('should keep an item, store name and store address written with accents, apostrophes and emoji exactly as written', () => {
+        const { discountWith } = setupSut();
+        const writtenWithAccents = { item: 'Ají panca 🌶️', storeName: "D'Ángelo's Bodega", storeAddress: 'Calle Ñuñoa 4, piso 2' };
+        const discount = discountWith({ ...spicesDiscount, ...writtenWithAccents });
+
+        discount.publish();
+
+        expect(discount.toJSON()).to.deep.include(writtenWithAccents);
+      });
     });
 
     describe('empty', () => {

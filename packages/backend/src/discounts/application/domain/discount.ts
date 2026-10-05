@@ -14,6 +14,6 @@ export class Discount {
   }
 
   toJSON(): { id: string; item: string; rate: number; storeName: string; storeAddress: string } {
-    return { id: this.id, item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
+    return { id: this.id, ...this.details.toJSON() };
   }
 }
