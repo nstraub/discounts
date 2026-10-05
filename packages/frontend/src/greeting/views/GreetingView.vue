@@ -10,9 +10,16 @@ const restApi = useRestApi();
 const greeting = ref('');
 const newGreeting = ref('');
 
-onMounted(async () => {
+const showLatestGreeting = async (): Promise<void> => {
   greeting.value = (await restApi.get<Greeting>('/greeting')).text;
-});
+};
+
+const saveNewGreeting = async (): Promise<void> => {
+  await restApi.put('/greeting', { text: newGreeting.value });
+  await showLatestGreeting();
+};
+
+onMounted(showLatestGreeting);
 </script>
 
 <template>
@@ -33,6 +40,7 @@ onMounted(async () => {
     <button
       type="button"
       data-testid="save-greeting"
+      @click="saveNewGreeting"
     >
       {{ greetingTexts.save }}
     </button>
