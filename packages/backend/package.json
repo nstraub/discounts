@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --incremental --tsBuildInfoFile dist/tsconfig.build.tsbuildinfo && concurrently --names tsc,node \"tsc -p tsconfig.build.json --incremental --tsBuildInfoFile dist/tsconfig.build.tsbuildinfo --watch --preserveWatchOutput\" \"node --watch --env-file-if-exists=.env dist/main.js\""
   },
   "dependencies": {
