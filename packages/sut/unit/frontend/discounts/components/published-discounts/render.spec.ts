@@ -5,20 +5,22 @@ import PublishedDiscounts from '@frontend/discounts/components/PublishedDiscount
 
 const spicesDiscount = { id: 'spices-id', item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
+const setupSut = ({ discounts = [spicesDiscount] } = {}) => mount(PublishedDiscounts, { props: { discounts } });
+
 describe('Component PublishedDiscounts', () => {
   describe('showing a published discount', () => {
     it('should show its item', () => {
-      const list = mount(PublishedDiscounts, { props: { discounts: [spicesDiscount] } });
+      const list = setupSut();
 
       expect(list.get('[data-testid="published-item"]').text()).to.equal('Peruvian spices');
     });
     it('should show its rate as a percentage', () => {
-      const list = mount(PublishedDiscounts, { props: { discounts: [spicesDiscount] } });
+      const list = setupSut();
 
       expect(list.get('[data-testid="published-rate"]').text()).to.equal('20%');
     });
     it('should show its store name', () => {
-      const list = mount(PublishedDiscounts, { props: { discounts: [spicesDiscount] } });
+      const list = setupSut();
 
       expect(list.get('[data-testid="published-store-name"]').text()).to.equal("Mike's Groceries");
     });
