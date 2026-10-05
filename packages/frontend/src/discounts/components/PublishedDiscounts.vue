@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import type { DiscountResponse } from '@app/types/discounts';
 
+import { discountTexts } from '../texts';
+
 defineProps<{ discounts: DiscountResponse[] }>();
 </script>
 
 <template>
+  <p data-testid="nothing-published">
+    {{ discountTexts.nothingPublished }}
+  </p>
   <ul>
     <li
       v-for="discount in discounts"

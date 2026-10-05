@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 
 import PublishedDiscounts from '@frontend/discounts/components/PublishedDiscounts.vue';
+import { discountTexts } from '@frontend/discounts/texts';
 
 const spicesDiscount = { id: 'spices-id', item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
@@ -51,7 +52,11 @@ describe('Component PublishedDiscounts', () => {
   });
 
   describe('empty', () => {
-    it.todo('should say in one short line that nothing is published when there is no discount');
+    it('should say in one short line that nothing is published when there is no discount', () => {
+      const list = setupSut({ discounts: [] });
+
+      expect(list.get('[data-testid="nothing-published"]').text()).to.equal(discountTexts.nothingPublished);
+    });
     it.todo('should show one entry per discount when several are published, two identical discounts included');
   });
 
