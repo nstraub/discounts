@@ -2,7 +2,6 @@ import type pg from 'pg';
 import { describe, expect, it } from 'vitest';
 
 import { setupSut } from '../support/discount-repository';
-import { insertOutcome } from '../support/migrations';
 
 const aDiscountRow = { id: "'constraint-id'", item: "'Peruvian spices'", rate: '20', store_name: "'Mike''s Groceries'", store_address: "'12 Market Street'" };
 
@@ -10,7 +9,10 @@ const insertADiscountWithout = (client: pg.Client, missing: keyof typeof aDiscou
   const given = Object.entries(aDiscountRow).filter(([column]) => column !== missing);
   const columns = given.map(([column]) => column).join(', ');
   const values = given.map(([, value]) => value).join(', ');
-  return insertOutcome(client, `INSERT INTO app.discounts (${columns}) VALUES (${values})`);
+  return client.query(`INSERT INTO app.discounts (${columns}) VALUES (${values})`).then(
+    () => 'accepted',
+    (refusal: { code: string }) => refusal.code,
+  );
 };
 
 describe('the discounts table refusing what Discount refuses', () => {
