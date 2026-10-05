@@ -1,6 +1,6 @@
 {
   "path": ["packages"],
-  "ignore": ["tests/fixtures/**", "**/dist/**", "**/node_modules/**"],
+  "ignore": ["tests/fixtures/**", "**/dist/**", "**/node_modules/**", "**/migrations/meta/**"],
   "threshold": 0,
   "minLines": 5,
   "minTokens": 50
