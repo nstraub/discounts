@@ -10,6 +10,7 @@ defineProps<{ discounts: DiscountResponse[] }>();
       <span data-testid="published-item">Peruvian spices</span>
       <span data-testid="published-rate">20%</span>
       <span data-testid="published-store-name">Mike's Groceries</span>
+      <span data-testid="published-store-address">12 Market Street</span>
     </li>
   </ul>
 </template>

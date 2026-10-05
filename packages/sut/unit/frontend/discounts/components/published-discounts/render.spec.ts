@@ -24,7 +24,11 @@ describe('Component PublishedDiscounts', () => {
 
       expect(list.get('[data-testid="published-store-name"]').text()).to.equal("Mike's Groceries");
     });
-    it.todo('should show its store address');
+    it('should show its store address', () => {
+      const list = setupSut();
+
+      expect(list.get('[data-testid="published-store-address"]').text()).to.equal('12 Market Street');
+    });
     it.todo('should show the item, store name and store address without their surrounding spaces');
   });
 
