@@ -3,22 +3,27 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { mock } from 'vitest-mock-extended';
 
+import type { DiscountResponse } from '@app/types/discounts';
 import type { RestApi } from '@app/types/rest-api';
 import DiscountsView from '@frontend/discounts/views/DiscountsView.vue';
 import { restApiKey } from '@frontend/rest-api-key';
 
+const openThePageWhenPublished = async (published: DiscountResponse[]) => {
+  const restApi = mock<RestApi>();
+  restApi.get.mockResolvedValue(published);
+  const view = mount(DiscountsView, {
+    global: { plugins: [createTestingPinia({ createSpy: vi.fn, stubActions: false })], provide: { [restApiKey]: restApi } },
+  });
+  await flushPromises();
+  return view;
+};
+
 describe('View DiscountsView', () => {
   describe('opening the page', () => {
     it('should show the published discounts when the page opens', async () => {
-      const restApi = mock<RestApi>();
-      restApi.get.mockResolvedValue([
+      const view = await openThePageWhenPublished([
         { id: 'spices-id', item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' },
       ]);
-      const view = mount(DiscountsView, {
-        global: { plugins: [createTestingPinia({ createSpy: vi.fn, stubActions: false })], provide: { [restApiKey]: restApi } },
-      });
-
-      await flushPromises();
 
       expect(view.findAll('[data-testid="published-item"]').map((item) => item.text())).to.deep.equal(['Peruvian spices']);
     });
