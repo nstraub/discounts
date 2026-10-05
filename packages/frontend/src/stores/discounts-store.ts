@@ -11,6 +11,8 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const publish = async (discount: Partial<PublishDiscountRequest>): Promise<void> => {
     await restApi.post('/discounts', discount);
   };
-  const load = async (): Promise<void> => {};
+  const load = async (): Promise<void> => {
+    published.value = await restApi.get<DiscountResponse[]>('/discounts');
+  };
   return { published, publish, load };
 });
