@@ -1,3 +1,5 @@
+import { isDeepStrictEqual } from 'node:util';
+
 import type pg from 'pg';
 import { describe, expect, it } from 'vitest';
 
@@ -26,7 +28,7 @@ const outcomeOfTheDiscountLines = async (client: pg.Client, databaseUrl: string)
   }
   return {
     listedWhenNoneKept,
-    loadedBackAsKept: JSON.stringify(loaded?.toJSON()) === JSON.stringify(kept.toJSON()),
+    loadedBackAsKept: isDeepStrictEqual(loaded?.toJSON(), kept.toJSON()),
     refusedWithoutEachPiece,
   };
 };
