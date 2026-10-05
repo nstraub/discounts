@@ -27,8 +27,10 @@ COPY --from=production-modules /app/node_modules node_modules
 COPY --from=build /app/packages/types packages/types
 COPY --from=build /app/packages/backend/package.json packages/backend/package.json
 COPY --from=build /app/packages/backend/dist packages/backend/dist
+COPY --from=build /app/packages/backend/src/discounts/infra/migrations packages/backend/src/discounts/infra/migrations
 COPY --from=build /app/packages/frontend/dist packages/frontend/dist
 WORKDIR /app/packages/backend
 USER node
 EXPOSE 3000
-CMD ["node", "dist/main.js"]
+# Each deploy brings the database to the latest schema before the app starts.
+CMD ["sh", "-c", "node dist/migrate.js && exec node dist/main.js"]
