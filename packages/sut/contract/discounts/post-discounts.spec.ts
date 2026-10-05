@@ -14,6 +14,8 @@ const longTextInAnyCharacters = {
   storeAddress: 'Calle Ñuñoa 4; piso 2 '.repeat(500),
 };
 
+const aDiscountAboveTheTransportLimit = { ...spicesDiscount, item: 'x'.repeat(200_000) };
+
 const postWrittenAsJson = (http: Http, body: string) => http.post('/discounts').set('Content-Type', 'application/json').send(body);
 
 describe('POST /discounts', () => {
@@ -97,7 +99,7 @@ describe('POST /discounts', () => {
         await postWrittenAsJson(http, '20'),
         await postWrittenAsJson(http, 'null'),
         await postWrittenAsJson(http, '{"item": "Peruvian spices",'),
-        await http.post('/discounts').send({ ...spicesDiscount, item: 'x'.repeat(200_000) }),
+        await http.post('/discounts').send(aDiscountAboveTheTransportLimit),
       ];
 
       const unmatched = errors.map((response) => response.body).filter((body) => !requestRejection.safeParse(body).success);
@@ -160,7 +162,7 @@ describe('POST /discounts', () => {
     it('should answer 413 for a body above the transport limit and keep answering afterwards', async () => {
       const { http } = await setupSut();
 
-      const oversized = await http.post('/discounts').send({ ...spicesDiscount, item: 'x'.repeat(200_000) });
+      const oversized = await http.post('/discounts').send(aDiscountAboveTheTransportLimit);
       const afterwards = await http.post('/discounts').send(spicesDiscount);
 
       expect(oversized.status).to.equal(413);
