@@ -15,6 +15,13 @@
       "when": 1791237315311,
       "tag": "0001_store_the_first_greeting",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791241843321,
+      "tag": "0002_create_discounts",
+      "breakpoints": true
     }
   ]
 }

@@ -3,6 +3,7 @@ import type { DiscountFactory } from '../application/domain/discount-factory.js'
 import type { DiscountRepository } from '../application/domain/discount-repository.js';
 
 import type { Database } from './database.module.js';
+import { discounts } from './schema.js';
 
 export class DiscountDrizzleRepository implements DiscountRepository {
   constructor(
@@ -10,11 +11,12 @@ export class DiscountDrizzleRepository implements DiscountRepository {
     private readonly factory: DiscountFactory,
   ) {}
 
-  async save(): Promise<void> {
-    throw new Error('not implemented: DiscountDrizzleRepository.save');
+  async save(discount: Discount): Promise<void> {
+    await this.database.insert(discounts).values(discount.toJSON());
   }
 
   async all(): Promise<Discount[]> {
-    return [];
+    const rows = await this.database.select().from(discounts);
+    return rows.map((row) => this.factory.reconstitute(row));
   }
 }
