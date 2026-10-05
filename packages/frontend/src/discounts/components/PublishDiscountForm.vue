@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import { discountTexts } from '../texts';
+
+import CaptionedInput from './CaptionedInput.vue';
 </script>
 
 <template>
   <form @submit.prevent>
-    <label data-testid="discount-item-field">
-      {{ discountTexts.item }}
-      <input data-testid="discount-item">
-    </label>
-    <label data-testid="discount-rate-field">
-      {{ discountTexts.rate }}
-      <input data-testid="discount-rate">
-    </label>
-    <label data-testid="discount-store-name-field">
-      {{ discountTexts.storeName }}
-      <input data-testid="discount-store-name">
-    </label>
+    <CaptionedInput
+      :caption="discountTexts.item"
+      test-id="discount-item"
+    />
+    <CaptionedInput
+      :caption="discountTexts.rate"
+      test-id="discount-rate"
+    />
+    <CaptionedInput
+      :caption="discountTexts.storeName"
+      test-id="discount-store-name"
+    />
     <input data-testid="discount-store-address">
     <button
       type="submit"
