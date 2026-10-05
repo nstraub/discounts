@@ -1,10 +1,11 @@
+import { createTestingPinia } from '@pinia/testing';
 import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import PublishDiscountForm from '@frontend/discounts/components/PublishDiscountForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
 
-const setupSut = () => mount(PublishDiscountForm);
+const setupSut = () => mount(PublishDiscountForm, { global: { plugins: [createTestingPinia({ createSpy: vi.fn })] } });
 
 describe('Component PublishDiscountForm', () => {
   describe('what the form asks for', () => {

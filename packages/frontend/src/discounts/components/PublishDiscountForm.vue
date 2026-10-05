@@ -1,11 +1,23 @@
 <script setup lang="ts">
+import { useDiscountsStore } from '../../stores/discounts-store';
 import { discountTexts } from '../texts';
 
 import CaptionedInput from './CaptionedInput.vue';
+
+const discounts = useDiscountsStore();
+
+const publish = async (): Promise<void> => {
+  await discounts.publish({
+    item: 'Peruvian spices',
+    rate: 20,
+    storeName: "Mike's Groceries",
+    storeAddress: '12 Market Street',
+  });
+};
 </script>
 
 <template>
-  <form @submit.prevent>
+  <form @submit.prevent="publish">
     <CaptionedInput
       :caption="discountTexts.item"
       test-id="discount-item"
