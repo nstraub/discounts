@@ -33,7 +33,16 @@ describe('GET /discounts', () => {
 
       expect(publishedDiscountsResponse.safeParse(response.body).error).to.equal(undefined);
     });
-    it.todo('should list both of two identical discounts, each with its own id');
+    it('should list both of two identical discounts, each with its own id', async () => {
+      const { http } = await setupSut();
+      const first = await http.post('/discounts').send(spicesDiscount);
+      const second = await http.post('/discounts').send(spicesDiscount);
+
+      const response = await http.get('/discounts');
+
+      expect(response.body).to.have.deep.members([first.body, second.body]);
+      expect(first.body.id).to.not.equal(second.body.id);
+    });
   });
 
   describe('strictness', () => {
