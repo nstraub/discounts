@@ -132,7 +132,14 @@ describe('POST /discounts', () => {
   });
 
   describe('A3 handle guessing (no accounts)', () => {
-    it.todo('should give the published discount an id of its own, ignoring an id sent in the request');
+    it('should give the published discount an id of its own, ignoring an id sent in the request', async () => {
+      const { http } = await setupSut();
+
+      const response = await http.post('/discounts').send({ ...spicesDiscount, id: 'chosen-by-the-caller' });
+
+      expect(response.body.id).to.not.equal('chosen-by-the-caller');
+      expect(response.headers.location).to.equal(`/discounts/${response.body.id}`);
+    });
   });
 
   describe('A4 concurrency', () => {
