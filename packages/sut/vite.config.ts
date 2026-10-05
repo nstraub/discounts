@@ -32,7 +32,23 @@ export default defineConfig({
       {
         extends: true,
         // Every contract test shares the one test database, so contract files run one at a time.
-        test: { name: 'contract', include: ['contract/**/*.spec.ts'], environment: 'node', fileParallelism: false },
+        test: {
+          name: 'contract',
+          include: ['contract/**/*.spec.ts'],
+          exclude: ['contract/walking-skeleton/**'],
+          environment: 'node',
+          fileParallelism: false,
+        },
+      },
+      {
+        extends: true,
+        // Drives the deployed app, so only scripts/ci.sh runs it, after the deploy.
+        test: {
+          name: 'skeleton',
+          include: ['contract/walking-skeleton/**/*.spec.ts'],
+          environment: 'node',
+          testTimeout: 60_000,
+        },
       },
     ],
   },

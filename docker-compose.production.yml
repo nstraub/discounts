@@ -1,0 +1,13 @@
+# The production-like environment scripts/ci.sh deploys the one production image to.
+name: app-production
+
+services:
+  app:
+    build: .
+    ports:
+      - '127.0.0.1:${APP_HOST_PORT:-8080}:3000'
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://localhost:3000/').then(() => process.exit(0), () => process.exit(1))"]
+      interval: 2s
+      timeout: 5s
+      retries: 15

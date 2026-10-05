@@ -16,6 +16,7 @@
     "db:migrate": "yarn workspace backend drizzle-kit migrate",
     "test:contract": "yarn workspace sut test:contract",
     "test:bdd": "yarn workspace sut test:bdd",
+    "test:skeleton": "yarn workspace sut test:skeleton",
     "postinstall": "node scripts/postinstall.mjs"
   },
   "engines": {
