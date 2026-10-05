@@ -17,6 +17,6 @@ export class DiscountService {
   }
 
   async published(): Promise<Discount[]> {
-    throw new Error('not implemented: DiscountService.published');
+    return [];
   }
 }
