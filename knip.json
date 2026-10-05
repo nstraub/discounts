@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "ignoreDependencies": ["jscpd", "ts-morph"]
+    },
+    "packages/backend": {
+      "entry": ["src/main.ts", "src/migrate.ts"]
+    }
+  }
+}
