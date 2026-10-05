@@ -1,0 +1,25 @@
+import { describe, expect, it } from 'vitest';
+
+import { FetchRestApi } from '@app/types/rest-api';
+import { spicesDiscount } from '@sut/support/example-discounts';
+
+import { setupSut as setupTheApp } from '../../support/app';
+
+const setupSut = async () => {
+  const { app, client } = await setupTheApp();
+  await app.listen(0);
+  return { client, restApi: new FetchRestApi(await app.getUrl()) };
+};
+
+describe('class FetchRestApi', () => {
+  describe('posting', () => {
+    it('should post the body as JSON to the path', async () => {
+      const { client, restApi } = await setupSut();
+
+      await restApi.post('/discounts', spicesDiscount);
+
+      const { rows } = await client.query('SELECT item, rate, store_name, store_address FROM app.discounts');
+      expect(rows).to.deep.equal([{ item: spicesDiscount.item, rate: spicesDiscount.rate, store_name: spicesDiscount.storeName, store_address: spicesDiscount.storeAddress }]);
+    });
+  });
+});
