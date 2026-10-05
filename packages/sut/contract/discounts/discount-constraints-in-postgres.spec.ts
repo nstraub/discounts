@@ -37,6 +37,12 @@ describe('the discounts table refusing what Discount refuses', () => {
 
     expect(outcome).to.equal('23502');
   });
-  it.todo('should refuse a discount without a store address: 23502, NOT NULL mirrors "a discount names its store\'s address"');
+  it('should refuse a discount without a store address: 23502, NOT NULL mirrors "a discount names its store\'s address"', async () => {
+    const { client } = await setupSut();
+
+    const outcome = await insertADiscountWithout(client, 'store_address');
+
+    expect(outcome).to.equal('23502');
+  });
   it.todo('should trace every constraint to a rule of Discount: no length cap on text, no CHECK on the rate');
 });
