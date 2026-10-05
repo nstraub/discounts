@@ -18,7 +18,7 @@ const openDeployedApp = async () => {
   onTestFinished(() => browser.close());
   const page = await browser.newPage();
   page.setDefaultTimeout(pageTimeoutBelowTheTestTimeout);
-  await page.goto(deployedAppUrlFromEnv());
+  await page.goto(`${deployedAppUrlFromEnv()}/#/walking-skeleton`);
   return page;
 };
 

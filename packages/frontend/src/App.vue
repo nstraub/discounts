@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import GreetingView from './greeting/views/GreetingView.vue';
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
   <main class="p-4">
-    <GreetingView />
+    <RouterView />
   </main>
 </template>
