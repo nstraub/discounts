@@ -8,3 +8,5 @@ export const publishDiscountRequest = z.object({
 });
 
 export type PublishDiscountRequest = z.infer<typeof publishDiscountRequest>;
+
+export type DiscountResponse = PublishDiscountRequest & { id: string };
