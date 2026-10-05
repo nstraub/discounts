@@ -27,6 +27,14 @@ describe('View DiscountsView', () => {
 
       expect(view.findAll('[data-testid="published-item"]').map((item) => item.text())).to.deep.equal(['Peruvian spices']);
     });
+    it('should show other published discounts when others are published', async () => {
+      const view = await openThePageWhenPublished([
+        { id: 'produce-id', item: 'Fresh produce', rate: 10, storeName: 'Corner Grocery', storeAddress: '3 Hill Road' },
+        { id: 'herbs-id', item: 'Andean herbs', rate: 15, storeName: 'Corner Grocery', storeAddress: '3 Hill Road' },
+      ]);
+
+      expect(view.findAll('[data-testid="published-item"]').map((item) => item.text())).to.deep.equal(['Fresh produce', 'Andean herbs']);
+    });
     it.todo('should offer the form to publish a discount beside them');
   });
 });

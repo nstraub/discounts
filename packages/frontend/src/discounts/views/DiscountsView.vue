@@ -1,11 +1,16 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
+
+import { useDiscountsStore } from '../../stores/discounts-store';
 import PublishDiscountForm from '../components/PublishDiscountForm.vue';
 import PublishedDiscounts from '../components/PublishedDiscounts.vue';
 
-const published = [{ id: 'spices-id', item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' }];
+const discounts = useDiscountsStore();
+
+onMounted(discounts.load);
 </script>
 
 <template>
-  <PublishedDiscounts :discounts="published" />
+  <PublishedDiscounts :discounts="discounts.published" />
   <PublishDiscountForm />
 </template>
