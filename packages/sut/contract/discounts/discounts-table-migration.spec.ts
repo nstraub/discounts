@@ -1,4 +1,3 @@
-// Contract tests: forward on app_test; backward on a database of its own.
 import { describe, it } from 'vitest';
 
 describe('the migration that adds the discounts table', () => {

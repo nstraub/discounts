@@ -1,4 +1,3 @@
-// Schema: the publish request, discount response and error schemas in @app/types, imported by the route too.
 import { describe, it } from 'vitest';
 
 describe('POST /discounts', () => {

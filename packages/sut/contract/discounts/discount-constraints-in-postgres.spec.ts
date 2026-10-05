@@ -1,4 +1,3 @@
-// Contract tests: the real app_test database, raw inserts below the repository.
 import { describe, it } from 'vitest';
 
 describe('the discounts table refusing what Discount refuses', () => {

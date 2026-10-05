@@ -1,4 +1,3 @@
-// Contract tests: the real app_test database.
 import { describe, it } from 'vitest';
 
 describe('the published discounts read from PostgreSQL', () => {

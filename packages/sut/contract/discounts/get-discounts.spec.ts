@@ -1,4 +1,3 @@
-// Schema: the published-discounts response schema in @app/types, imported by the route too.
 import { describe, it } from 'vitest';
 
 describe('GET /discounts', () => {
