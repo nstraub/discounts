@@ -26,19 +26,24 @@ onMounted(showLatestGreeting);
   <h1 class="text-2xl font-semibold">
     {{ greetingTexts.heading }}
   </h1>
-  <p data-testid="greeting">
+  <p
+    class="mt-2"
+    data-testid="greeting"
+  >
     {{ greeting }}
   </p>
-  <form>
-    <label>
+  <form class="mt-4 flex items-end gap-2">
+    <label class="flex flex-col">
       {{ greetingTexts.newGreetingLabel }}
       <input
         v-model="newGreeting"
+        class="rounded border px-2 py-1"
         data-testid="new-greeting"
       >
     </label>
     <button
       type="button"
+      class="rounded border px-3 py-1"
       data-testid="save-greeting"
       @click="saveNewGreeting"
     >
