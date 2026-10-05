@@ -157,7 +157,15 @@ describe('POST /discounts', () => {
   });
 
   describe('A5 resource exhaustion', () => {
-    it.todo('should answer 413 for a body above the transport limit and keep answering afterwards');
+    it('should answer 413 for a body above the transport limit and keep answering afterwards', async () => {
+      const { http } = await setupSut();
+
+      const oversized = await http.post('/discounts').send({ ...spicesDiscount, item: 'x'.repeat(200_000) });
+      const afterwards = await http.post('/discounts').send(spicesDiscount);
+
+      expect(oversized.status).to.equal(413);
+      expect(afterwards.status).to.equal(201);
+    });
     it.todo('should throttle publishing from one source far faster than any store owner publishes');
   });
 
