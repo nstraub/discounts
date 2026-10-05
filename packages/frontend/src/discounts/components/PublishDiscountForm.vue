@@ -7,40 +7,32 @@ import { discountTexts } from '../texts';
 import CaptionedInput from './CaptionedInput.vue';
 
 const discounts = useDiscountsStore();
-const item = ref('');
-const rate = ref('');
-const storeName = ref('');
-const storeAddress = ref('');
+const discount = ref({ item: '', rate: '', storeName: '', storeAddress: '' });
 
 const publish = async (): Promise<void> => {
-  await discounts.publish({
-    item: item.value,
-    rate: Number(rate.value),
-    storeName: storeName.value,
-    storeAddress: storeAddress.value,
-  });
+  await discounts.publish({ ...discount.value, rate: Number(discount.value.rate) });
 };
 </script>
 
 <template>
   <form @submit.prevent="publish">
     <CaptionedInput
-      v-model="item"
+      v-model="discount.item"
       :caption="discountTexts.item"
       test-id="discount-item"
     />
     <CaptionedInput
-      v-model="rate"
+      v-model="discount.rate"
       :caption="discountTexts.rate"
       test-id="discount-rate"
     />
     <CaptionedInput
-      v-model="storeName"
+      v-model="discount.storeName"
       :caption="discountTexts.storeName"
       test-id="discount-store-name"
     />
     <CaptionedInput
-      v-model="storeAddress"
+      v-model="discount.storeAddress"
       :caption="discountTexts.storeAddress"
       test-id="discount-store-address"
     />
