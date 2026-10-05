@@ -172,6 +172,15 @@ describe('POST /discounts', () => {
   });
 
   describe('A6 business-logic abuse', () => {
-    it.todo('should keep nothing the request sends beyond the item, rate, store name and store address');
+    it('should keep nothing the request sends beyond the item, rate, store name and store address', async () => {
+      const { client, http } = await setupSut();
+
+      const response = await http.post('/discounts').send({ ...spicesDiscount, publishedBy: 'Mike', featured: true });
+
+      const { rows } = await client.query('SELECT * FROM app.discounts');
+      const { item, rate, storeName, storeAddress } = spicesDiscount;
+      expect(rows).to.deep.equal([{ id: response.body.id, item, rate, store_name: storeName, store_address: storeAddress }]);
+      expect(response.body, 'the discount published').to.deep.equal({ id: response.body.id, ...spicesDiscount });
+    });
   });
 });
