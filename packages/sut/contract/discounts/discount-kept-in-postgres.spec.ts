@@ -15,6 +15,14 @@ describe('a discount kept in PostgreSQL', () => {
 
     expect(loaded?.toJSON()).to.deep.equal(discount.toJSON());
   });
-  it.todo('should keep an item, store name and store address with quotes, semicolons and SQL keywords verbatim');
+  it('should keep an item, store name and store address with quotes, semicolons and SQL keywords verbatim', async () => {
+    const { factory, repository, repositoryOnItsOwnConnection } = await setupSut();
+    const writtenAsSql = { item: "Spices'; DROP TABLE app.discounts; --", storeName: '"Mike" OR 1=1', storeAddress: '12 Market St; SELECT * FROM app.greetings' };
+    await repository.save(factory.create(new DiscountDetails({ ...spicesDiscount, ...writtenAsSql })));
+
+    const [loaded] = await (await repositoryOnItsOwnConnection()).all();
+
+    expect(loaded?.toJSON()).to.deep.include(writtenAsSql);
+  });
   it.todo('should keep an item, store name and store address with accents, apostrophes and emoji verbatim');
 });
