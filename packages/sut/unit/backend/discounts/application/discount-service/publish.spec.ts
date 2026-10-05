@@ -38,6 +38,13 @@ describe('class DiscountService', () => {
       expect(events.publish).to.have.been.calledWith(expect.any(DiscountPublished));
       expect(keptWhenAnnounced).to.deep.equal([{ id: 'test-uuid', ...spicesDiscount }]);
     });
-    it.todo('should answer with the discount it published');
+    it('should answer with the discount it published', async () => {
+      const { repository, service } = setupSut();
+
+      const answered = await service.publish(new DiscountDetails(spicesDiscount));
+
+      const [published] = await repository.all();
+      expect(answered).to.equal(published);
+    });
   });
 });
