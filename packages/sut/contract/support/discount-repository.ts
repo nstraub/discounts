@@ -12,5 +12,6 @@ export const setupSut = async () => {
   const client = await connectToTestDatabase();
   await resetTestDatabase(client);
   const factory = new DiscountFactory(mock<DomainEventPublisher>());
-  return { client, factory, repository: new DiscountDrizzleRepository(drizzle(client), factory) };
+  const repositoryOnItsOwnConnection = async () => new DiscountDrizzleRepository(drizzle(await connectToTestDatabase()), factory);
+  return { client, factory, repository: new DiscountDrizzleRepository(drizzle(client), factory), repositoryOnItsOwnConnection };
 };
