@@ -99,7 +99,15 @@ describe('POST /discounts', () => {
   });
 
   describe('strictness', () => {
-    it.todo('should keep the publish request schema no stricter than Discount: no length cap, any characters');
+    it('should keep the publish request schema no stricter than Discount: no length cap, any characters', async () => {
+      const { http } = await setupSut();
+      const longTextInAnyCharacters = { item: 'Ají panca 🌶️ '.repeat(1_000), storeName: "D'Ángelo's <b>Bodega</b>", storeAddress: 'Calle Ñuñoa 4; piso 2 '.repeat(500) };
+
+      const response = await http.post('/discounts').send({ ...spicesDiscount, ...longTextInAnyCharacters });
+
+      expect(response.status).to.equal(201);
+      expect(response.body).to.deep.include(longTextInAnyCharacters);
+    });
     it.todo('should keep the discount response schema no stricter than Discount');
   });
 
