@@ -59,7 +59,18 @@ describe('POST /discounts', () => {
 
       expect(requestRejection.parse(response.body).fields).to.deep.equal(['item']);
     });
-    it.todo('should answer 400 for a JSON body that is an array, a string, a number or null');
+    it('should answer 400 for a JSON body that is an array, a string, a number or null', async () => {
+      const { http } = await setupSut();
+      const bodiesThatAreNotObjects = ['[]', '"Peruvian spices"', '20', 'null'];
+
+      const statuses = [];
+      for (const body of bodiesThatAreNotObjects) {
+        const response = await http.post('/discounts').set('Content-Type', 'application/json').send(body);
+        statuses.push(response.status);
+      }
+
+      expect(statuses).to.deep.equal([400, 400, 400, 400]);
+    });
     it.todo('should answer 400 for a body that is not valid JSON');
     it.todo('should answer every error with a body matching the error schema');
   });
