@@ -29,7 +29,7 @@ export class FetchRestApi implements RestApi {
       body: JSON.stringify(body),
     });
     if (!response.ok) {
-      throw new RestApiException('POST /discounts answered 400');
+      throw new RestApiException(`POST ${path} answered ${response.status}`);
     }
     return (await response.json()) as Response;
   }

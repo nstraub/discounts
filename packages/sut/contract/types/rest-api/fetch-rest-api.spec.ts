@@ -38,5 +38,15 @@ describe('class FetchRestApi', () => {
 
       expect(outcome).to.equal('POST /discounts answered 400');
     });
+    it('should name the path and the status of the answer in the rejection', async () => {
+      const { restApi } = await setupSut();
+
+      const outcome = await restApi.post('/nowhere', spicesDiscount).then(
+        () => 'resolved',
+        (error: Error) => error.message,
+      );
+
+      expect(outcome).to.equal('POST /nowhere answered 404');
+    });
   });
 });
