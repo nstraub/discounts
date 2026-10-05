@@ -75,6 +75,13 @@ describe('Component PublishedDiscounts', () => {
   });
 
   describe('A2 injection', () => {
-    it.todo('should show an item, store name and store address written as markup as plain text, never as markup');
+    it('should show an item, store name and store address written as markup as plain text, never as markup', () => {
+      const markup = { item: '<b>Peruvian spices</b>', storeName: '<i>Mike</i>', storeAddress: '<script>alert(1)</script>' };
+      const list = setupSut({ discounts: [{ ...spicesDiscount, ...markup }] });
+
+      expect(list.get('[data-testid="published-item"]').text()).to.equal(markup.item);
+      expect(list.get('[data-testid="published-store-name"]').text()).to.equal(markup.storeName);
+      expect(list.get('[data-testid="published-store-address"]').text()).to.equal(markup.storeAddress);
+    });
   });
 });
