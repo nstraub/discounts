@@ -11,3 +11,11 @@ export const insertADiscountWithout = (client: pg.Client, missing: keyof typeof 
     (refusal: { code: string }) => refusal.code,
   );
 };
+
+export const constraintsAndColumnsOfTheDiscountsTable = async (client: pg.Client) => {
+  const constraints = await client.query("SELECT contype AS kind FROM pg_constraint WHERE conrelid = 'app.discounts'::regclass");
+  const columns = await client.query(
+    "SELECT column_name AS name, data_type AS type, is_nullable AS nullable FROM information_schema.columns WHERE table_schema = 'app' AND table_name = 'discounts'",
+  );
+  return { constraints: constraints.rows, columns: columns.rows };
+};
