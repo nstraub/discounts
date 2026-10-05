@@ -1,4 +1,4 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Put } from '@nestjs/common';
 import { desc } from 'drizzle-orm';
 
 import type { Greeting } from '@app/types/greeting';
@@ -18,5 +18,10 @@ export class GreetingController {
       .orderBy(desc(greetings.id))
       .limit(1);
     return latest;
+  }
+
+  @Put()
+  async save(@Body() greeting: Greeting): Promise<void> {
+    await this.database.insert(greetings).values({ text: greeting.text });
   }
 }
