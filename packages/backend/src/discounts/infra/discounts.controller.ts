@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Res } from '@nestjs/common';
 
 import { publishDiscountRequest, type PublishDiscountRequest } from '@app/types/discounts';
 
@@ -19,5 +19,10 @@ export class DiscountsController {
     const published = discount.toJSON();
     response.location(`/discounts/${published.id}`);
     return published;
+  }
+
+  @Get()
+  published() {
+    return [];
   }
 }
