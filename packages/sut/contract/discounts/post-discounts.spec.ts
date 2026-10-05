@@ -1,3 +1,4 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { spicesDiscount } from '@sut/support/example-discounts';
@@ -16,7 +17,15 @@ describe('POST /discounts', () => {
       expect(response.headers.location).to.equal(`/discounts/${response.body.id}`);
     });
     it.todo('should answer with a body matching the discount response schema');
-    it.todo('should publish DiscountPublished on the application event emitter for the discount published');
+    it('should publish DiscountPublished on the application event emitter for the discount published', async () => {
+      const { app, http } = await setupSut();
+      const published: unknown[] = [];
+      app.get(EventEmitter2).on('discount.published', (event: { discount: unknown }) => published.push(event.discount));
+
+      const response = await http.post('/discounts').send(spicesDiscount);
+
+      expect(published).to.deep.equal([{ id: response.body.id, ...spicesDiscount }]);
+    });
   });
 
   describe('malformed request', () => {
