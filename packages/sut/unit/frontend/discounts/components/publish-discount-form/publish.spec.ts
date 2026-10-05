@@ -58,7 +58,19 @@ describe('Component PublishDiscountForm', () => {
       expect(form.get<HTMLInputElement>('[data-testid="discount-store-name"]').element.value).to.equal('');
       expect(form.get<HTMLInputElement>('[data-testid="discount-store-address"]').element.value).to.equal('');
     });
-    it.todo('should stay on the page, ready for the next discount, once the discount is published');
+    it('should stay on the page, ready for the next discount, once the discount is published', async () => {
+      const { form, discounts } = setupSut();
+      await publishThroughTheForm(form, spicesDiscount);
+
+      await publishThroughTheForm(form, { item: 'Fresh produce', rate: '10', storeName: "Mike's Groceries", storeAddress: '12 Market Street' });
+
+      expect(discounts.publish).to.have.been.lastCalledWith({
+        item: 'Fresh produce',
+        rate: 10,
+        storeName: "Mike's Groceries",
+        storeAddress: '12 Market Street',
+      });
+    });
 
     describe('empty', () => {
       it.todo('should publish a blank rate as left out, never as a rate of zero');
