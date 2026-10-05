@@ -11,6 +11,7 @@ let browser: Browser;
 export class PlaywrightWorld extends World {
   context!: BrowserContext;
   page!: Page;
+  someoneElsesContext?: BrowserContext;
 
   /**
    * Opens a fresh browser context and page for one scenario, aimed at the app under test.
@@ -23,11 +24,23 @@ export class PlaywrightWorld extends World {
   }
 
   /**
-   * Closes the scenario's browser context, so no state leaks into the next scenario.
-   * @returns resolves once the context is closed.
+   * Opens a page in a browser context of its own, as someone else on another device would.
+   * @returns that page, aimed at the app under test.
+   */
+  async openSomeoneElsesPage(): Promise<Page> {
+    this.someoneElsesContext = await browser.newContext({ baseURL: `http://localhost:${acceptancePort}` });
+    const page = await this.someoneElsesContext.newPage();
+    page.setDefaultTimeout(pageTimeout);
+    return page;
+  }
+
+  /**
+   * Closes the scenario's browser contexts, so no state leaks into the next scenario.
+   * @returns resolves once the contexts are closed.
    */
   async closePage(): Promise<void> {
     await this.context.close();
+    await this.someoneElsesContext?.close();
   }
 }
 
