@@ -10,6 +10,8 @@ import type { DomainEventPublisher } from '@backend/discounts/application/domain
 
 const spicesDiscount = { item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
+const spicesDetails = new DiscountDetails(spicesDiscount);
+
 const setupSut = () => {
   const events = mock<DomainEventPublisher>();
   const repository = new InMemoryDiscountRepository();
@@ -21,7 +23,7 @@ describe('class DiscountService', () => {
     it('should keep the discount Mike publishes among the published discounts', async () => {
       const { repository, service } = setupSut();
 
-      await service.publish(new DiscountDetails(spicesDiscount));
+      await service.publish(spicesDetails);
 
       const kept = await repository.all();
       expect(kept.map((discount) => discount.toJSON())).to.deep.equal([{ id: 'test-uuid', ...spicesDiscount }]);
@@ -33,7 +35,7 @@ describe('class DiscountService', () => {
         keptWhenAnnounced.push(...(await repository.all()).map((discount) => discount.toJSON()));
       });
 
-      await service.publish(new DiscountDetails(spicesDiscount));
+      await service.publish(spicesDetails);
 
       expect(events.publish).to.have.been.calledWith(expect.any(DiscountPublished));
       expect(keptWhenAnnounced).to.deep.equal([{ id: 'test-uuid', ...spicesDiscount }]);
@@ -41,7 +43,7 @@ describe('class DiscountService', () => {
     it('should answer with the discount it published', async () => {
       const { repository, service } = setupSut();
 
-      const answered = await service.publish(new DiscountDetails(spicesDiscount));
+      const answered = await service.publish(spicesDetails);
 
       const [published] = await repository.all();
       expect(answered).to.equal(published);
