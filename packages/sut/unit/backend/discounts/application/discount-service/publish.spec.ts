@@ -7,8 +7,7 @@ import { DiscountDetails } from '@backend/discounts/application/domain/discount-
 import { DiscountPublished } from '@backend/discounts/application/domain/discount-published';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
-
-const spicesDiscount = { item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
+import { spicesDiscount } from '@sut/support/example-discounts';
 
 const spicesDetails = new DiscountDetails(spicesDiscount);
 

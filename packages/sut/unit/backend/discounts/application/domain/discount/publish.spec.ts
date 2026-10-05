@@ -5,10 +5,9 @@ import { DiscountDetails } from '@backend/discounts/application/domain/discount-
 import { DiscountPublished } from '@backend/discounts/application/domain/discount-published';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
+import { spicesDiscount } from '@sut/support/example-discounts';
 
 vi.unmock('uuid');
-
-const spicesDiscount = { item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
 const setupSut = () => {
   const events = mock<DomainEventPublisher>();

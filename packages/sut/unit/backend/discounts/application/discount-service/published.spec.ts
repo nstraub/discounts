@@ -6,8 +6,7 @@ import { DiscountService } from '@backend/discounts/application/discount-service
 import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
-
-const spicesDiscount = { item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
+import { spicesDiscount } from '@sut/support/example-discounts';
 
 const setupSut = () => {
   const factory = new DiscountFactory(mock<DomainEventPublisher>());
