@@ -94,6 +94,8 @@ describe('POST /discounts', () => {
         await http.post('/discounts').send({ item: spicesDiscount.item }),
         await postWrittenAsJson(http, '[]'),
         await postWrittenAsJson(http, '"Peruvian spices"'),
+        await postWrittenAsJson(http, '20'),
+        await postWrittenAsJson(http, 'null'),
         await postWrittenAsJson(http, '{"item": "Peruvian spices",'),
         await http.post('/discounts').send({ ...spicesDiscount, item: 'x'.repeat(200_000) }),
       ];
