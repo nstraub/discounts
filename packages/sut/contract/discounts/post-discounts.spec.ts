@@ -8,6 +8,12 @@ import { setupSut } from '../support/app';
 
 type Http = Awaited<ReturnType<typeof setupSut>>['http'];
 
+const longTextInAnyCharacters = {
+  item: 'Ají panca 🌶️ '.repeat(1_000),
+  storeName: "D'Ángelo's <b>Bodega</b>",
+  storeAddress: 'Calle Ñuñoa 4; piso 2 '.repeat(500),
+};
+
 const postWrittenAsJson = (http: Http, body: string) => http.post('/discounts').set('Content-Type', 'application/json').send(body);
 
 describe('POST /discounts', () => {
@@ -101,7 +107,6 @@ describe('POST /discounts', () => {
   describe('strictness', () => {
     it('should keep the publish request schema no stricter than Discount: no length cap, any characters', async () => {
       const { http } = await setupSut();
-      const longTextInAnyCharacters = { item: 'Ají panca 🌶️ '.repeat(1_000), storeName: "D'Ángelo's <b>Bodega</b>", storeAddress: 'Calle Ñuñoa 4; piso 2 '.repeat(500) };
 
       const response = await http.post('/discounts').send({ ...spicesDiscount, ...longTextInAnyCharacters });
 
@@ -110,7 +115,6 @@ describe('POST /discounts', () => {
     });
     it('should keep the discount response schema no stricter than Discount', async () => {
       const { http } = await setupSut();
-      const longTextInAnyCharacters = { item: 'Ají panca 🌶️ '.repeat(1_000), storeName: "D'Ángelo's <b>Bodega</b>", storeAddress: 'Calle Ñuñoa 4; piso 2 '.repeat(500) };
 
       const response = await http.post('/discounts').send({ ...spicesDiscount, ...longTextInAnyCharacters });
 
