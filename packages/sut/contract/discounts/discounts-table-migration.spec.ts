@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { discountRepositoryOn } from '../support/discount-repository';
-import { insertADiscountWithout } from '../support/discounts-table';
+import { constraintsAndColumnsOfTheDiscountsTable, insertADiscountWithout } from '../support/discounts-table';
 import { migrateBackward, setupSut, tableStatus } from '../support/migrations';
 
 const theMigration = '0002_create_discounts';
@@ -15,6 +15,14 @@ const theDiscountLinesPassing = {
   listedWhenNoneKept: [],
   loadedBackAsKept: true,
   refusedWithoutEachPiece: ['23502', '23502', '23502', '23502'],
+  constraints: [{ kind: 'p' }],
+  columns: [
+    { name: 'id', type: 'text', nullable: 'NO' },
+    { name: 'item', type: 'text', nullable: 'NO' },
+    { name: 'rate', type: 'double precision', nullable: 'NO' },
+    { name: 'store_address', type: 'text', nullable: 'NO' },
+    { name: 'store_name', type: 'text', nullable: 'NO' },
+  ],
 };
 
 const outcomeOfTheDiscountLines = async (client: pg.Client, databaseUrl: string) => {
@@ -26,15 +34,24 @@ const outcomeOfTheDiscountLines = async (client: pg.Client, databaseUrl: string)
   for (const piece of ['item', 'rate', 'store_name', 'store_address'] as const) {
     refusedWithoutEachPiece.push(await insertADiscountWithout(client, piece));
   }
+  const { constraints, columns } = await constraintsAndColumnsOfTheDiscountsTable(client);
   return {
     listedWhenNoneKept,
     loadedBackAsKept: isDeepStrictEqual(loaded?.toJSON(), kept.toJSON()),
     refusedWithoutEachPiece,
+    constraints,
+    columns: columns.toSorted((one, other) => one.name.localeCompare(other.name)),
   };
 };
 
 describe('the migration that adds the discounts table', () => {
-  it.todo('should migrate forward from empty, the discount round-trip, query and constraint lines passing on the result');
+  it('should migrate forward from empty, the discount round-trip, query and constraint lines passing on the result', async () => {
+    const { client, databaseUrl, migrateForward } = await setupSut();
+
+    await migrateForward();
+
+    expect(await outcomeOfTheDiscountLines(client, databaseUrl)).to.deep.equal(theDiscountLinesPassing);
+  });
   it('should run backward to the walking skeleton\'s schema, its greeting lines passing, and forward again, the discount lines passing: lossy, every discount is lost', async () => {
     const { client, databaseUrl, migrateForward } = await setupSut();
     await migrateForward();
