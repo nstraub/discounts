@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { publishedDiscountsResponse } from '@app/types/discounts';
-import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
+import { longTextInAnyCharacters, produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
 
@@ -46,6 +46,13 @@ describe('GET /discounts', () => {
   });
 
   describe('strictness', () => {
-    it.todo('should keep the published-discounts response schema no stricter than Discount');
+    it('should keep the published-discounts response schema no stricter than Discount', async () => {
+      const { http } = await setupSut();
+      await http.post('/discounts').send({ ...spicesDiscount, ...longTextInAnyCharacters });
+
+      const response = await http.get('/discounts');
+
+      expect(publishedDiscountsResponse.safeParse(response.body).error).to.equal(undefined);
+    });
   });
 });
