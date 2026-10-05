@@ -3,8 +3,11 @@ import { describe, expect, it } from 'vitest';
 
 import { InMemoryDiscountRepository } from '@backend/app/mocks/in-memory-discount-repository';
 import { DiscountService } from '@backend/discounts/application/discount-service';
+import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
+
+const spicesDiscount = { item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
 const setupSut = () => {
   const factory = new DiscountFactory(mock<DomainEventPublisher>());
@@ -22,7 +25,14 @@ describe('class DiscountService', () => {
 
         expect(published).to.deep.equal([]);
       });
-      it.todo('should answer with the one discount published');
+      it('should answer with the one discount published', async () => {
+        const { factory, repository, service } = setupSut();
+        await repository.save(factory.create(new DiscountDetails(spicesDiscount)));
+
+        const published = await service.published();
+
+        expect(published.map((discount) => discount.toJSON())).to.deep.equal([{ id: 'test-uuid', ...spicesDiscount }]);
+      });
       it.todo('should answer with every discount published when there are several');
     });
   });

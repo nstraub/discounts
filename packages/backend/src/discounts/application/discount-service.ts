@@ -17,6 +17,6 @@ export class DiscountService {
   }
 
   async published(): Promise<Discount[]> {
-    return [];
+    return this.repository.all();
   }
 }
