@@ -28,9 +28,13 @@ export class FetchRestApi implements RestApi {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
+    return this.bodyOfAnOkAnswer<Response>(`POST ${path}`, response);
+  }
+
+  private async bodyOfAnOkAnswer<Body>(request: string, response: Response): Promise<Body> {
     if (!response.ok) {
-      throw new RestApiException(`POST ${path} answered ${response.status}`);
+      throw new RestApiException(`${request} answered ${response.status}`);
     }
-    return (await response.json()) as Response;
+    return (await response.json()) as Body;
   }
 }
