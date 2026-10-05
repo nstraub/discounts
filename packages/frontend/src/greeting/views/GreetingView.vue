@@ -8,6 +8,7 @@ import { greetingTexts } from '../texts';
 
 const restApi = useRestApi();
 const greeting = ref('');
+const newGreeting = ref('');
 
 onMounted(async () => {
   greeting.value = (await restApi.get<Greeting>('/greeting')).text;
@@ -21,4 +22,19 @@ onMounted(async () => {
   <p data-testid="greeting">
     {{ greeting }}
   </p>
+  <form>
+    <label>
+      {{ greetingTexts.newGreetingLabel }}
+      <input
+        v-model="newGreeting"
+        data-testid="new-greeting"
+      >
+    </label>
+    <button
+      type="button"
+      data-testid="save-greeting"
+    >
+      {{ greetingTexts.save }}
+    </button>
+  </form>
 </template>
