@@ -16,4 +16,7 @@ jobs:
       - run: npm install --global corepack@0.36.0 && corepack enable
       - run: yarn install --immutable
       - run: yarn workspace sut playwright install --with-deps chromium
+      # Ubuntu 24.04 forbids unprivileged user namespaces, which the backend-process contract test
+      # needs to start the backend as PID 1, as the image does.
+      - run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - run: scripts/ci.sh
