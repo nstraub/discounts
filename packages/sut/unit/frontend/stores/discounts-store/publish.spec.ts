@@ -1,18 +1,6 @@
-import { createPinia } from 'pinia';
 import { describe, expect, it } from 'vitest';
-import { mock } from 'vitest-mock-extended';
-import { createApp } from 'vue';
 
-import type { RestApi } from '@app/types/rest-api';
-import { restApiKey } from '@frontend/rest-api-key';
-import { useDiscountsStore } from '@frontend/stores/discounts-store';
-
-const setupSut = () => {
-  const restApi = mock<RestApi>();
-  const pinia = createPinia();
-  createApp({}).provide(restApiKey, restApi).use(pinia);
-  return { restApi, discounts: useDiscountsStore(pinia) };
-};
+import { setupSut } from './discounts-store-of-an-app';
 
 describe('Store discounts', () => {
   describe('publishing a discount', () => {
