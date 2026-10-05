@@ -26,6 +26,8 @@ import CaptionedInput from './CaptionedInput.vue';
       type="submit"
       class="rounded border px-3 py-1"
       data-testid="publish-discount"
-    />
+    >
+      {{ discountTexts.publish }}
+    </button>
   </form>
 </template>

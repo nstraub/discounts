@@ -3,4 +3,5 @@ export const discountTexts = {
   rate: 'Rate (%)',
   storeName: 'Store name',
   storeAddress: 'Store address',
+  publish: 'Publish',
 };
