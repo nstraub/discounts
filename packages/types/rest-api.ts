@@ -4,6 +4,8 @@ export interface RestApi {
   post<Response>(path: string, body: unknown): Promise<Response>;
 }
 
+class RestApiException extends Error {}
+
 export class FetchRestApi implements RestApi {
   constructor(private readonly baseUrl: string) {}
 
@@ -26,6 +28,9 @@ export class FetchRestApi implements RestApi {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
+    if (!response.ok) {
+      throw new RestApiException('POST /discounts answered 400');
+    }
     return (await response.json()) as Response;
   }
 }

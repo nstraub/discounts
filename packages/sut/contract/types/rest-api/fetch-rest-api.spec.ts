@@ -28,5 +28,15 @@ describe('class FetchRestApi', () => {
 
       expect(answer?.item).to.equal(spicesDiscount.item);
     });
+    it('should reject when the answer is not ok', async () => {
+      const { restApi } = await setupSut();
+
+      const outcome = await restApi.post('/discounts', { item: spicesDiscount.item }).then(
+        () => 'resolved',
+        (error: Error) => error.message,
+      );
+
+      expect(outcome).to.equal('POST /discounts answered 400');
+    });
   });
 });
