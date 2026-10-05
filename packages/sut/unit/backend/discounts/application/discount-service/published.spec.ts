@@ -11,7 +11,8 @@ import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts'
 const setupSut = () => {
   const factory = new DiscountFactory(mock<DomainEventPublisher>());
   const repository = new InMemoryDiscountRepository();
-  return { factory, repository, service: new DiscountService(factory, repository) };
+  const keep = (details: typeof spicesDiscount) => repository.save(factory.create(new DiscountDetails(details)));
+  return { keep, service: new DiscountService(factory, repository) };
 };
 
 describe('class DiscountService', () => {
@@ -25,17 +26,17 @@ describe('class DiscountService', () => {
         expect(published).to.deep.equal([]);
       });
       it('should answer with the one discount published', async () => {
-        const { factory, repository, service } = setupSut();
-        await repository.save(factory.create(new DiscountDetails(spicesDiscount)));
+        const { keep, service } = setupSut();
+        await keep(spicesDiscount);
 
         const published = await service.published();
 
         expect(published.map((discount) => discount.toJSON())).to.deep.equal([{ id: 'test-uuid', ...spicesDiscount }]);
       });
       it('should answer with every discount published when there are several', async () => {
-        const { factory, repository, service } = setupSut();
-        await repository.save(factory.create(new DiscountDetails(spicesDiscount)));
-        await repository.save(factory.create(new DiscountDetails(produceDiscount)));
+        const { keep, service } = setupSut();
+        await keep(spicesDiscount);
+        await keep(produceDiscount);
 
         const published = await service.published();
 
