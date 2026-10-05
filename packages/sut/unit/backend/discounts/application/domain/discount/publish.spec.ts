@@ -1,10 +1,12 @@
 import { mock } from 'vitest-mock-extended';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
 import { DiscountPublished } from '@backend/discounts/application/domain/discount-published';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
+
+vi.unmock('uuid');
 
 const spicesDiscount = { item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
@@ -34,7 +36,16 @@ describe('class Discount', () => {
         expect(published).to.be.instanceOf(DiscountPublished);
         expect((published as DiscountPublished).discount).to.deep.include(spicesDiscount);
       });
-      it.todo('should give each published discount an identity of its own, two identical discounts included');
+      it('should give each published discount an identity of its own, two identical discounts included', () => {
+        const { factory } = setupSut();
+        const first = factory.create(new DiscountDetails(spicesDiscount));
+        const second = factory.create(new DiscountDetails(spicesDiscount));
+
+        first.publish();
+        second.publish();
+
+        expect(first.toJSON().id).to.not.equal(second.toJSON().id);
+      });
     });
 
     describe('type', () => {
