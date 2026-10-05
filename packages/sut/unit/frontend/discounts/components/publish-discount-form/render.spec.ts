@@ -14,7 +14,12 @@ describe('Component PublishDiscountForm', () => {
       expect(field.text()).to.equal(discountTexts.item);
       expect(field.find('[data-testid="discount-item"]').exists()).to.equal(true);
     });
-    it.todo('should ask for the rate under its caption');
+    it('should ask for the rate under its caption', () => {
+      const field = setupSut().get('[data-testid="discount-rate-field"]');
+
+      expect(field.text()).to.equal(discountTexts.rate);
+      expect(field.find('[data-testid="discount-rate"]').exists()).to.equal(true);
+    });
     it.todo('should ask for the store name under its caption');
     it.todo('should ask for the store address under its caption');
     it.todo('should offer to publish under its caption');

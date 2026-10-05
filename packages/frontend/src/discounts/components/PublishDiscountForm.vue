@@ -8,7 +8,10 @@ import { discountTexts } from '../texts';
       {{ discountTexts.item }}
       <input data-testid="discount-item">
     </label>
-    <input data-testid="discount-rate">
+    <label data-testid="discount-rate-field">
+      {{ discountTexts.rate }}
+      <input data-testid="discount-rate">
+    </label>
     <input data-testid="discount-store-name">
     <input data-testid="discount-store-address">
     <button
