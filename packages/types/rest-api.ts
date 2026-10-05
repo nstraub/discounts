@@ -21,11 +21,11 @@ export class FetchRestApi implements RestApi {
   }
 
   async post<Response>(path: string, body: unknown): Promise<Response> {
-    await fetch(`${this.baseUrl}${path}`, {
+    const response = await fetch(`${this.baseUrl}${path}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
-    return undefined as Response;
+    return (await response.json()) as Response;
   }
 }

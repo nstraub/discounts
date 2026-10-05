@@ -21,5 +21,12 @@ describe('class FetchRestApi', () => {
       const { rows } = await client.query('SELECT item, rate, store_name, store_address FROM app.discounts');
       expect(rows).to.deep.equal([{ item: spicesDiscount.item, rate: spicesDiscount.rate, store_name: spicesDiscount.storeName, store_address: spicesDiscount.storeAddress }]);
     });
+    it('should resolve to the body of the answer', async () => {
+      const { restApi } = await setupSut();
+
+      const answer = await restApi.post<{ item: string }>('/discounts', spicesDiscount);
+
+      expect(answer?.item).to.equal(spicesDiscount.item);
+    });
   });
 });
