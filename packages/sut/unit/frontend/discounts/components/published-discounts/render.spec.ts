@@ -1,8 +1,17 @@
-import { describe, it } from 'vitest';
+import { mount } from '@vue/test-utils';
+import { describe, expect, it } from 'vitest';
+
+import PublishedDiscounts from '@frontend/discounts/components/PublishedDiscounts.vue';
+
+const spicesDiscount = { id: 'spices-id', item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
 describe('Component PublishedDiscounts', () => {
   describe('showing a published discount', () => {
-    it.todo('should show its item');
+    it('should show its item', () => {
+      const list = mount(PublishedDiscounts, { props: { discounts: [spicesDiscount] } });
+
+      expect(list.get('[data-testid="published-item"]').text()).to.equal('Peruvian spices');
+    });
     it.todo('should show its rate as a percentage');
     it.todo('should show its store name');
     it.todo('should show its store address');
