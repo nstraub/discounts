@@ -52,7 +52,9 @@ repository up by hand.
 `.env` when there is none (`packages/backend`, `packages/frontend`, `packages/sut`), installs the
 git hooks and the Playwright browser (chromium). After the DB is up: `yarn db:migrate`. Drizzle local defaults
 (`packages/backend/drizzle.config.ts`): db `app_dev`, user/pass
-`app_user` / `app_password`, port 5432. Test DBs are configured in
+`app_user` / `app_password`, host port `POSTGRES_HOST_PORT` (default 5432; a local root `.env` may
+set another, which `docker-compose.yml`, `drizzle.config.ts` and `scripts/ci.sh` all read). The deployed
+app (`docker-compose.production.yml`) is published on `127.0.0.1:${APP_HOST_PORT:-8080}`. Test DBs are configured in
 `packages/sut/.env`; the local `app_dev` database is **disposable by
 design** — tests wiping it is expected, not a problem to report.
 
@@ -70,13 +72,30 @@ Key backend env vars: `DATABASE_URL` / `DB_*`, `FRONTEND_URL`
 | `yarn dev:frontend` | Vite dev server, port 5173 |
 | `yarn test` | All unit tests (`vitest run` in `packages/sut`) |
 | `yarn test:contract` | All contract tests (`vitest run --project contract` in `packages/sut`: supertest and the real `app_test`, one file at a time) |
-| `yarn test:bdd` | All Cucumber acceptance tests |
+| `yarn test:bdd` | All Cucumber acceptance tests, except the scenarios tagged `@wip` or `@todo` |
+| `yarn test:wip` | The Cucumber scenarios tagged `@wip` |
+| `yarn test:skeleton` | The walking-skeleton test against the deployed app (needs `DEPLOYED_APP_URL`; `scripts/ci.sh` sets it) |
+| `scripts/ci.sh` | The deployment pipeline: commit stage, deploy, acceptance stage (below) |
 | `yarn build` | Builds every workspace |
 | `yarn db:generate` | Generate a Drizzle migration from the registered schemas |
 | `yarn db:migrate` | Apply pending migrations |
 
 A script is added to the root `package.json` together with the first workspace
 that needs it; the table is the contract each one honours.
+
+**`scripts/ci.sh`** is the pipeline, run by `.github/workflows/ci.yml` on every push and pull request
+and locally from the repo root. It reads the root `.env` and runs three stages:
+`--- commit stage` (`yarn install --immutable`, `yarn build`, `yarn eslint .`, `yarn test`, the
+development database up, `yarn test:contract`), `--- deploy` (`docker-compose.production.yml`: the one
+image from the `Dockerfile` and its own Postgres on the kept volume `production-data`; the container
+runs `migrate.js`, then `main.js`) and `--- acceptance stage` (`yarn test:skeleton` and `yarn test:bdd`
+against the deployed app on `APP_HOST_PORT`, default 8080).
+
+`yarn test:contract` needs `unshare` (util-linux), `pgrep` and unprivileged user namespaces:
+`contract/backend-process/termination.spec.ts` starts the built backend as PID 1 in a new PID
+namespace to send it SIGTERM. The workflow lifts Ubuntu 24.04's restriction with
+`sysctl kernel.apparmor_restrict_unprivileged_userns=0`. The specs that count `pg_stat_activity`
+connections fail if anything else holds a connection to `app_test`.
 
 **Run a single unit test:** `yarn workspace sut test:unit <path/to/file.spec.ts>`
 (add `-t "test name"` to filter by name). **Run a single feature:**
@@ -121,8 +140,8 @@ import across packages via an alias, never a deep relative path.
 is npm's DefinitelyTyped scope and would shadow it), one module per file through its
 `exports` map (`./*` → `./*.ts`). Every package that uses it declares
 `"@app/types": "workspace:*"` and imports it as a package, without an extension:
-`import type { SampleType } from '@app/types/sample'`. `sample.ts` is a placeholder that
-keeps the package type-checkable; replace it with the first real type. It is not a path alias: the
+`import type { RestApi } from '@app/types/rest-api'`. Today it holds `rest-api` (the `RestApi`
+abstraction and `FetchRestApi`) and `greeting` (the wire type). It is not a path alias: the
 backend runs its compiled output, and Node resolves the package through `node_modules`
 and strips the `.ts` types on the symlink's real path.
 
@@ -130,17 +149,24 @@ and strips the `.ts` types on the symlink's real path.
 
 ## 5. Backend
 
-The backend's source is `packages/backend/src/`. The scaffold holds `main.ts`, the
-bootstrap (CORS from `FRONTEND_URL`, port from `PORT`), `app.module.ts`, an empty root
-NestJS module, and one folder, `app/`, holding only its (empty) migrations in
-`app/infra/migrations/`.
+The backend's source is `packages/backend/src/`. It has one bounded context, `src/discounts/`, with
+`application/`, `application/domain/` and `infra/` (no `app/` level between `src/` and the context).
 
+- **`src/main.ts`:** the bootstrap. CORS from `FRONTEND_URL`, port from `PORT`, `enableShutdownHooks()`
+  (a SIGTERM closes the connections and exits), and it serves the built web app
+  (`packages/frontend/dist`) beside the API, so one process answers both.
+- **`src/app.module.ts`:** the root NestJS module; it imports the context's module.
+- **`src/migrate.ts`:** the deploy-time migrator. It applies the migrations in
+  `src/discounts/infra/migrations/` to `DATABASE_URL`; the image runs it before `main.js`.
+- **`src/discounts/infra/database.module.ts`:** the one connection pool, exported as the Drizzle
+  `database` provider and closed in `onApplicationShutdown`.
 - **Database:** `packages/backend/drizzle.config.ts` reads the Drizzle schema from
-  `src/app/infra/schema.ts` (the file does not exist yet; the first table creates it) with
-  `schemaFilter: ['app']`, and writes migrations to `src/app/infra/migrations/`: generate
-  with `yarn db:generate`, apply with `yarn db:migrate`. Skill: `database-migrations`.
-
----
+  `src/discounts/infra/schema.ts`, with `schemaFilter: ['app']` (the Postgres schema `app`, not a
+  folder), and writes migrations to `src/discounts/infra/migrations/`: generate
+  with `yarn db:generate` (`--name <name>`; `--custom` for a data migration), apply with
+  `yarn db:migrate`. A new table is declared in `schema.ts` and exported from it, or drizzle-kit does
+  not see it. A migration a deploy has applied is never edited (Drizzle skips older ones and the
+  production volume is kept): add a new one. Skill: `database-migrations`.
 
 ## 6. Frontend architecture
 
@@ -176,6 +202,12 @@ first slice.
   Skills: `writing-unit-tests`, `naming-tests-by-behaviour`.
 - **Contract tests (`contract/`):** supertest against the wired app and a real
   database. Skill: `contract-testing`.
+- **Tags:** `@wip` marks the scenario being built (run it with `yarn test:wip`); `@todo` marks a
+  recorded missing case whose steps are written and whose step definitions are not. Both are
+  excluded from `yarn test:bdd`.
+- **Walking skeleton:** `contract/walking-skeleton/walking-skeleton.spec.ts`, in its own Vitest
+  project, `skeleton`, which the `contract` project excludes. It drives the deployed app (page,
+  backend, database; a read path and a write path), so `scripts/ci.sh` runs it after the deploy.
 - **Acceptance (Cucumber):** Gherkin `.feature` files under
   `acceptance/features/`, step definitions in `acceptance/features/steps/**` and
   `acceptance/steps/**`, driven with Playwright. Test data is seeded by
@@ -189,6 +221,7 @@ first slice.
 ## 8. Where to look for context
 
 - `README.md` — setting the repository up and the everyday commands.
+- `docs/architecture.md` — the containers of the deployed app and the deployment pipeline (C4, Mermaid).
 
 ---
 
