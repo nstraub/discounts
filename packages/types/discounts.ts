@@ -9,4 +9,6 @@ export const publishDiscountRequest = z.object({
 
 export type PublishDiscountRequest = z.infer<typeof publishDiscountRequest>;
 
-export type DiscountResponse = PublishDiscountRequest & { id: string };
+export const discountResponse = publishDiscountRequest.extend({ id: z.string() });
+
+export type DiscountResponse = z.infer<typeof discountResponse>;
