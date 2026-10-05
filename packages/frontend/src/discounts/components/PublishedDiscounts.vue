@@ -11,10 +11,10 @@ defineProps<{ discounts: DiscountResponse[] }>();
       :key="discount.id"
       data-testid="published-discount"
     >
-      <span data-testid="published-item">{{ discount.item }}</span>
+      <span data-testid="published-item">{{ discount.item.trim() }}</span>
       <span data-testid="published-rate">{{ discount.rate }}%</span>
-      <span data-testid="published-store-name">{{ discount.storeName }}</span>
-      <span data-testid="published-store-address">{{ discount.storeAddress }}</span>
+      <span data-testid="published-store-name">{{ discount.storeName.trim() }}</span>
+      <span data-testid="published-store-address">{{ discount.storeAddress.trim() }}</span>
     </li>
   </ul>
 </template>

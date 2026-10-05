@@ -39,7 +39,15 @@ describe('Component PublishedDiscounts', () => {
       expect(list.get('[data-testid="published-store-name"]').text()).to.equal('Corner Grocery');
       expect(list.get('[data-testid="published-store-address"]').text()).to.equal('3 Hill Road');
     });
-    it.todo('should show the item, store name and store address without their surrounding spaces');
+    it('should show the item, store name and store address without their surrounding spaces', () => {
+      const list = setupSut({
+        discounts: [{ ...spicesDiscount, item: '  Peruvian spices ', storeName: " Mike's Groceries  ", storeAddress: '\t12 Market Street\n' }],
+      });
+
+      expect(list.get('[data-testid="published-item"]').element.textContent).to.equal('Peruvian spices');
+      expect(list.get('[data-testid="published-store-name"]').element.textContent).to.equal("Mike's Groceries");
+      expect(list.get('[data-testid="published-store-address"]').element.textContent).to.equal('12 Market Street');
+    });
   });
 
   describe('empty', () => {
