@@ -2,17 +2,11 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { discountResponse, requestRejection } from '@app/types/discounts';
-import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
+import { longTextInAnyCharacters, produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
 
 type Http = Awaited<ReturnType<typeof setupSut>>['http'];
-
-const longTextInAnyCharacters = {
-  item: 'Ají panca 🌶️ '.repeat(1_000),
-  storeName: "D'Ángelo's <b>Bodega</b>",
-  storeAddress: 'Calle Ñuñoa 4; piso 2 '.repeat(500),
-};
 
 const aDiscountAboveTheTransportLimit = { ...spicesDiscount, item: 'x'.repeat(200_000) };
 
