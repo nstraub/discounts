@@ -10,7 +10,7 @@ import { resetTestDatabase, testDatabaseUrl } from '@sut/support/test-database';
 
 import { connectToTestDatabase } from './test-database';
 
-const discountRepositoryOn = (client: pg.Client, databaseUrl: string) => {
+export const discountRepositoryOn = (client: pg.Client, databaseUrl: string) => {
   const factory = new DiscountFactory(mock<DomainEventPublisher>());
   const repository = new DiscountDrizzleRepository(drizzle(client), factory);
   const keep = async (details: ConstructorParameters<typeof DiscountDetails>[0]) => {
