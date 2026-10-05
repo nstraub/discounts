@@ -11,6 +11,12 @@ const setupSut = async () => {
   return { client, restApi: new FetchRestApi(await app.getUrl()) };
 };
 
+const outcomeOf = (answer: Promise<unknown>): Promise<string> =>
+  answer.then(
+    () => 'resolved',
+    (error: Error) => error.message,
+  );
+
 describe('class FetchRestApi', () => {
   describe('posting', () => {
     it('should post the body as JSON to the path', async () => {
@@ -31,20 +37,14 @@ describe('class FetchRestApi', () => {
     it('should reject when the answer is not ok', async () => {
       const { restApi } = await setupSut();
 
-      const outcome = await restApi.post('/discounts', { item: spicesDiscount.item }).then(
-        () => 'resolved',
-        (error: Error) => error.message,
-      );
+      const outcome = await outcomeOf(restApi.post('/discounts', { item: spicesDiscount.item }));
 
       expect(outcome).to.equal('POST /discounts answered 400');
     });
     it('should name the path and the status of the answer in the rejection', async () => {
       const { restApi } = await setupSut();
 
-      const outcome = await restApi.post('/nowhere', spicesDiscount).then(
-        () => 'resolved',
-        (error: Error) => error.message,
-      );
+      const outcome = await outcomeOf(restApi.post('/nowhere', spicesDiscount));
 
       expect(outcome).to.equal('POST /nowhere answered 404');
     });
