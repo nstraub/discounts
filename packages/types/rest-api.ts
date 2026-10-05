@@ -1,6 +1,7 @@
 export interface RestApi {
   get<Response>(path: string): Promise<Response>;
   put(path: string, body: unknown): Promise<void>;
+  post<Response>(path: string, body: unknown): Promise<Response>;
 }
 
 export class FetchRestApi implements RestApi {
@@ -17,5 +18,9 @@ export class FetchRestApi implements RestApi {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
+  }
+
+  async post<Response>(path: string, body: unknown): Promise<Response> {
+    throw new Error(`not implemented: posting ${JSON.stringify(body)} to ${this.baseUrl}${path}`);
   }
 }

@@ -1,13 +1,19 @@
 import { createTestingPinia } from '@pinia/testing';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { mock } from 'vitest-mock-extended';
 
+import type { RestApi } from '@app/types/rest-api';
 import PublishDiscountForm from '@frontend/discounts/components/PublishDiscountForm.vue';
+import { restApiKey } from '@frontend/rest-api-key';
 import { useDiscountsStore } from '@frontend/stores/discounts-store';
 
 const setupSut = () => {
   const pinia = createTestingPinia({ createSpy: vi.fn });
-  const form = mount(PublishDiscountForm, { attachTo: document.body, global: { plugins: [pinia] } });
+  const form = mount(PublishDiscountForm, {
+    attachTo: document.body,
+    global: { plugins: [pinia], provide: { [restApiKey]: mock<RestApi>() } },
+  });
   onTestFinished(() => form.unmount());
   return { form, discounts: useDiscountsStore(pinia) };
 };
