@@ -30,6 +30,22 @@ describe('Component PublishDiscountForm', () => {
         storeAddress: '12 Market Street',
       });
     });
+    it('should publish other pieces when Mike gives others', async () => {
+      const { form, discounts } = setupSut();
+
+      await form.get('[data-testid="discount-item"]').setValue('Fresh produce');
+      await form.get('[data-testid="discount-rate"]').setValue('10');
+      await form.get('[data-testid="discount-store-name"]').setValue('Corner Grocery');
+      await form.get('[data-testid="discount-store-address"]').setValue('3 Hill Road');
+      await form.get('[data-testid="publish-discount"]').trigger('click');
+
+      expect(discounts.publish).to.have.been.calledWith({
+        item: 'Fresh produce',
+        rate: 10,
+        storeName: 'Corner Grocery',
+        storeAddress: '3 Hill Road',
+      });
+    });
     it.todo('should clear every field once the discount is published');
     it.todo('should stay on the page, ready for the next discount, once the discount is published');
 
