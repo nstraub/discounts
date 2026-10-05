@@ -7,10 +7,12 @@ import { discountTexts } from '../texts';
 import CaptionedInput from './CaptionedInput.vue';
 
 const discounts = useDiscountsStore();
-const discount = ref({ item: '', rate: '', storeName: '', storeAddress: '' });
+const nothingTyped = () => ({ item: '', rate: '', storeName: '', storeAddress: '' });
+const discount = ref(nothingTyped());
 
 const publish = async (): Promise<void> => {
   await discounts.publish({ ...discount.value, rate: Number(discount.value.rate) });
+  discount.value = nothingTyped();
 };
 </script>
 

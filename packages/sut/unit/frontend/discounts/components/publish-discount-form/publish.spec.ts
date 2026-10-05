@@ -48,7 +48,16 @@ describe('Component PublishDiscountForm', () => {
         storeAddress: '3 Hill Road',
       });
     });
-    it.todo('should clear every field once the discount is published');
+    it('should clear every field once the discount is published', async () => {
+      const { form } = setupSut();
+
+      await publishThroughTheForm(form, spicesDiscount);
+
+      expect(form.get<HTMLInputElement>('[data-testid="discount-item"]').element.value).to.equal('');
+      expect(form.get<HTMLInputElement>('[data-testid="discount-rate"]').element.value).to.equal('');
+      expect(form.get<HTMLInputElement>('[data-testid="discount-store-name"]').element.value).to.equal('');
+      expect(form.get<HTMLInputElement>('[data-testid="discount-store-address"]').element.value).to.equal('');
+    });
     it.todo('should stay on the page, ready for the next discount, once the discount is published');
 
     describe('empty', () => {
