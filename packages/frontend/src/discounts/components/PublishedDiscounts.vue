@@ -8,6 +8,7 @@ defineProps<{ discounts: DiscountResponse[] }>();
   <ul>
     <li data-testid="published-discount">
       <span data-testid="published-item">Peruvian spices</span>
+      <span data-testid="published-rate">20%</span>
     </li>
   </ul>
 </template>

@@ -12,7 +12,11 @@ describe('Component PublishedDiscounts', () => {
 
       expect(list.get('[data-testid="published-item"]').text()).to.equal('Peruvian spices');
     });
-    it.todo('should show its rate as a percentage');
+    it('should show its rate as a percentage', () => {
+      const list = mount(PublishedDiscounts, { props: { discounts: [spicesDiscount] } });
+
+      expect(list.get('[data-testid="published-rate"]').text()).to.equal('20%');
+    });
     it.todo('should show its store name');
     it.todo('should show its store address');
     it.todo('should show the item, store name and store address without their surrounding spaces');
