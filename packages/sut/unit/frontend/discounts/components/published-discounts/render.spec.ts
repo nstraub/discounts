@@ -62,7 +62,16 @@ describe('Component PublishedDiscounts', () => {
 
       expect(list.find('[data-testid="nothing-published"]').exists()).to.equal(false);
     });
-    it.todo('should show one entry per discount when several are published, two identical discounts included');
+    it('should show one entry per discount when several are published, two identical discounts included', () => {
+      const produceDiscount = { id: 'produce-id', item: 'Fresh produce', rate: 10, storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
+      const list = setupSut({ discounts: [spicesDiscount, produceDiscount, { ...produceDiscount, id: 'produce-again-id' }] });
+
+      expect(list.findAll('[data-testid="published-discount"]').map((entry) => entry.get('[data-testid="published-item"]').text())).to.deep.equal([
+        'Peruvian spices',
+        'Fresh produce',
+        'Fresh produce',
+      ]);
+    });
   });
 
   describe('A2 injection', () => {
