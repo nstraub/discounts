@@ -1,7 +1,7 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
 
@@ -15,6 +15,13 @@ describe('POST /discounts', () => {
       expect(response.status).to.equal(201);
       expect(response.body).to.deep.equal({ id: response.body.id, ...spicesDiscount });
       expect(response.headers.location).to.equal(`/discounts/${response.body.id}`);
+    });
+    it('should publish the item, rate, store name and store address the request gives', async () => {
+      const { http } = await setupSut();
+
+      const response = await http.post('/discounts').send(produceDiscount);
+
+      expect(response.body, 'the discount published').to.deep.equal({ id: response.body.id, ...produceDiscount });
     });
     it.todo('should answer with a body matching the discount response schema');
     it('should publish DiscountPublished on the application event emitter for the discount published', async () => {
