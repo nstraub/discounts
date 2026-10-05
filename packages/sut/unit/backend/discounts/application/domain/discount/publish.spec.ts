@@ -12,23 +12,24 @@ const spicesDiscount = { item: 'Peruvian spices', rate: 20, storeName: "Mike's G
 
 const setupSut = () => {
   const events = mock<DomainEventPublisher>();
-  return { events, factory: new DiscountFactory(events) };
+  const factory = new DiscountFactory(events);
+  return { events, discountWith: (details: typeof spicesDiscount) => factory.create(new DiscountDetails(details)) };
 };
 
 describe('class Discount', () => {
   describe('publishing a discount', () => {
     describe('the discount published', () => {
       it('should hold the item, rate, store name and store address it was published with', () => {
-        const { factory } = setupSut();
-        const discount = factory.create(new DiscountDetails(spicesDiscount));
+        const { discountWith } = setupSut();
+        const discount = discountWith(spicesDiscount);
 
         discount.publish();
 
         expect(discount.toJSON()).to.deep.include(spicesDiscount);
       });
       it('should raise DiscountPublished carrying the item, rate, store name and store address', () => {
-        const { events, factory } = setupSut();
-        const discount = factory.create(new DiscountDetails(spicesDiscount));
+        const { events, discountWith } = setupSut();
+        const discount = discountWith(spicesDiscount);
 
         discount.publish();
 
@@ -37,9 +38,9 @@ describe('class Discount', () => {
         expect((published as DiscountPublished).discount).to.deep.include(spicesDiscount);
       });
       it('should give each published discount an identity of its own, two identical discounts included', () => {
-        const { factory } = setupSut();
-        const first = factory.create(new DiscountDetails(spicesDiscount));
-        const second = factory.create(new DiscountDetails(spicesDiscount));
+        const { discountWith } = setupSut();
+        const first = discountWith(spicesDiscount);
+        const second = discountWith(spicesDiscount);
 
         first.publish();
         second.publish();
