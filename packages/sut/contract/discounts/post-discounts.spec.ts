@@ -143,7 +143,14 @@ describe('POST /discounts', () => {
   });
 
   describe('A4 concurrency', () => {
-    it.todo('should keep both of two discounts published at the same moment');
+    it('should keep both of two discounts published at the same moment', async () => {
+      const { client, http } = await setupSut();
+
+      await Promise.all([http.post('/discounts').send(spicesDiscount), http.post('/discounts').send(produceDiscount)]);
+
+      const { rows } = await client.query('SELECT item FROM app.discounts');
+      expect(rows.map((row) => row.item)).to.have.members([spicesDiscount.item, produceDiscount.item]);
+    });
     it.todo('should create one discount when the same publish request arrives twice');
   });
 
