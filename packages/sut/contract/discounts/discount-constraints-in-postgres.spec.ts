@@ -1,7 +1,26 @@
-import { describe, it } from 'vitest';
+import type pg from 'pg';
+import { describe, expect, it } from 'vitest';
+
+import { setupSut } from '../support/discount-repository';
+import { insertOutcome } from '../support/migrations';
+
+const aDiscountRow = { id: "'constraint-id'", item: "'Peruvian spices'", rate: '20', store_name: "'Mike''s Groceries'", store_address: "'12 Market Street'" };
+
+const insertADiscountWithout = (client: pg.Client, missing: keyof typeof aDiscountRow): Promise<string> => {
+  const given = Object.entries(aDiscountRow).filter(([column]) => column !== missing);
+  const columns = given.map(([column]) => column).join(', ');
+  const values = given.map(([, value]) => value).join(', ');
+  return insertOutcome(client, `INSERT INTO app.discounts (${columns}) VALUES (${values})`);
+};
 
 describe('the discounts table refusing what Discount refuses', () => {
-  it.todo('should refuse a discount without an item: 23502, NOT NULL mirrors "a discount has an item"');
+  it('should refuse a discount without an item: 23502, NOT NULL mirrors "a discount has an item"', async () => {
+    const { client } = await setupSut();
+
+    const outcome = await insertADiscountWithout(client, 'item');
+
+    expect(outcome).to.equal('23502');
+  });
   it.todo('should refuse a discount without a rate: 23502, NOT NULL mirrors "a discount has a rate"');
   it.todo('should refuse a discount without a store name: 23502, NOT NULL mirrors "a discount names its store"');
   it.todo('should refuse a discount without a store address: 23502, NOT NULL mirrors "a discount names its store\'s address"');
