@@ -4040,6 +4040,7 @@ __metadata:
     rxjs: "npm:^7.8.2"
     typescript: "npm:~6.0.3"
     uuid: "npm:^14.0.2"
+    zod: "npm:^4.6.5"
   languageName: unknown
   linkType: soft
 

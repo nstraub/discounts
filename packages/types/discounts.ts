@@ -12,3 +12,7 @@ export type PublishDiscountRequest = z.infer<typeof publishDiscountRequest>;
 export const discountResponse = publishDiscountRequest.extend({ id: z.string() });
 
 export type DiscountResponse = z.infer<typeof discountResponse>;
+
+export const requestRejection = z.object({ fields: z.array(z.string()) });
+
+export type RequestRejection = z.infer<typeof requestRejection>;

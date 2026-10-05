@@ -1,9 +1,11 @@
 import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
 
-import type { PublishDiscountRequest } from '@app/types/discounts';
+import { publishDiscountRequest, type PublishDiscountRequest } from '@app/types/discounts';
 
 import { DiscountService } from '../application/discount-service.js';
 import { DiscountDetails } from '../application/domain/discount-details.js';
+
+import { ParsedBy } from './request-rejection.js';
 
 type Located = { location(url: string): unknown };
 
@@ -12,7 +14,7 @@ export class DiscountsController {
   constructor(@Inject(DiscountService) private readonly discounts: DiscountService) {}
 
   @Post()
-  async publish(@Body() request: PublishDiscountRequest, @Res({ passthrough: true }) response: Located) {
+  async publish(@Body(new ParsedBy(publishDiscountRequest)) request: PublishDiscountRequest, @Res({ passthrough: true }) response: Located) {
     const discount = await this.discounts.publish(new DiscountDetails(request));
     const published = discount.toJSON();
     response.location(`/discounts/${published.id}`);

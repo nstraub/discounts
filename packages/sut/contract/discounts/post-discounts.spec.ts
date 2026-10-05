@@ -1,7 +1,7 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
-import { discountResponse } from '@app/types/discounts';
+import { discountResponse, requestRejection } from '@app/types/discounts';
 import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
@@ -43,7 +43,14 @@ describe('POST /discounts', () => {
   });
 
   describe('malformed request', () => {
-    it.todo('should answer 400 naming every missing or mistyped field at once');
+    it('should answer 400 naming every missing or mistyped field at once', async () => {
+      const { http } = await setupSut();
+
+      const response = await http.post('/discounts').send({ item: spicesDiscount.item, rate: '20' });
+
+      expect(response.status).to.equal(400);
+      expect(requestRejection.parse(response.body).fields).to.have.members(['rate', 'storeName', 'storeAddress']);
+    });
     it.todo('should answer 400 for a JSON body that is an array, a string, a number or null');
     it.todo('should answer 400 for a body that is not valid JSON');
     it.todo('should answer every error with a body matching the error schema');
