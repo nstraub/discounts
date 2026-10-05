@@ -1,35 +1,33 @@
 import { describe, expect, it } from 'vitest';
 
-import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/discount-repository';
 
 describe('a discount kept in PostgreSQL', () => {
   it('should save a discount and load it back equal, in a separate transaction, its events excepted (not persisted)', async () => {
-    const { factory, repository, repositoryOnItsOwnConnection } = await setupSut();
-    const discount = factory.create(new DiscountDetails(spicesDiscount));
-    await repository.save(discount);
+    const { keep, loadOnItsOwnConnection } = await setupSut();
+    const discount = await keep(spicesDiscount);
 
-    const [loaded] = await (await repositoryOnItsOwnConnection()).all();
+    const [loaded] = await loadOnItsOwnConnection();
 
     expect(loaded?.toJSON()).to.deep.equal(discount.toJSON());
   });
   it('should keep an item, store name and store address with quotes, semicolons and SQL keywords verbatim', async () => {
-    const { factory, repository, repositoryOnItsOwnConnection } = await setupSut();
+    const { keep, loadOnItsOwnConnection } = await setupSut();
     const writtenAsSql = { item: "Spices'; DROP TABLE app.discounts; --", storeName: '"Mike" OR 1=1', storeAddress: '12 Market St; SELECT * FROM app.greetings' };
-    await repository.save(factory.create(new DiscountDetails({ ...spicesDiscount, ...writtenAsSql })));
+    await keep({ ...spicesDiscount, ...writtenAsSql });
 
-    const [loaded] = await (await repositoryOnItsOwnConnection()).all();
+    const [loaded] = await loadOnItsOwnConnection();
 
     expect(loaded?.toJSON()).to.deep.include(writtenAsSql);
   });
   it('should keep an item, store name and store address with accents, apostrophes and emoji verbatim', async () => {
-    const { factory, repository, repositoryOnItsOwnConnection } = await setupSut();
+    const { keep, loadOnItsOwnConnection } = await setupSut();
     const writtenWithAccents = { item: 'Ají panca 🌶️', storeName: "D'Ángelo's Bodega", storeAddress: 'Calle Ñuñoa 4, piso 2' };
-    await repository.save(factory.create(new DiscountDetails({ ...spicesDiscount, ...writtenWithAccents })));
+    await keep({ ...spicesDiscount, ...writtenWithAccents });
 
-    const [loaded] = await (await repositoryOnItsOwnConnection()).all();
+    const [loaded] = await loadOnItsOwnConnection();
 
     expect(loaded?.toJSON()).to.deep.include(writtenWithAccents);
   });
