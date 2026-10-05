@@ -1,6 +1,5 @@
 Feature: Mike publishes a discount on what he is famous for
 
-  @wip
   Scenario: Mike publishes a new discount
     When Mike publishes a discount on an item
     Then people can see it immediately
