@@ -13,7 +13,7 @@ export class Discount {
     this.events.publish(new DiscountPublished(this.toJSON()));
   }
 
-  toJSON(): { id: string; item: string; rate: number; storeName: string; storeAddress: string } {
+  toJSON(): { id: string } & ReturnType<DiscountDetails['toJSON']> {
     return { id: this.id, ...this.details.toJSON() };
   }
 }
