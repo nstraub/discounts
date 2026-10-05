@@ -7,13 +7,7 @@ import { useRestApi } from '../rest-api-key';
 export const useDiscountsStore = defineStore('discounts', () => {
   const restApi = useRestApi();
   const publish = async (discount: Partial<PublishDiscountRequest>): Promise<void> => {
-    await restApi.post('/discounts', {
-      ...discount,
-      item: 'Peruvian spices',
-      rate: 20,
-      storeName: "Mike's Groceries",
-      storeAddress: '12 Market Street',
-    });
+    await restApi.post('/discounts', discount);
   };
   return { publish };
 });
