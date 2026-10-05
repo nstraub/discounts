@@ -6,11 +6,15 @@ defineProps<{ discounts: DiscountResponse[] }>();
 
 <template>
   <ul>
-    <li data-testid="published-discount">
-      <span data-testid="published-item">Peruvian spices</span>
-      <span data-testid="published-rate">20%</span>
-      <span data-testid="published-store-name">Mike's Groceries</span>
-      <span data-testid="published-store-address">12 Market Street</span>
+    <li
+      v-for="discount in discounts"
+      :key="discount.id"
+      data-testid="published-discount"
+    >
+      <span data-testid="published-item">{{ discount.item }}</span>
+      <span data-testid="published-rate">{{ discount.rate }}%</span>
+      <span data-testid="published-store-name">{{ discount.storeName }}</span>
+      <span data-testid="published-store-address">{{ discount.storeAddress }}</span>
     </li>
   </ul>
 </template>
