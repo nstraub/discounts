@@ -78,7 +78,21 @@ describe('POST /discounts', () => {
 
       expect(response.status).to.equal(400);
     });
-    it.todo('should answer every error with a body matching the error schema');
+    it('should answer every error with a body matching the error schema', async () => {
+      const { http } = await setupSut();
+      const asJson = (body: string) => http.post('/discounts').set('Content-Type', 'application/json').send(body);
+      const errors = [
+        await http.post('/discounts').send({ item: spicesDiscount.item }),
+        await asJson('[]'),
+        await asJson('"Peruvian spices"'),
+        await asJson('{"item": "Peruvian spices",'),
+        await http.post('/discounts').send({ ...spicesDiscount, item: 'x'.repeat(200_000) }),
+      ];
+
+      const unmatched = errors.map((response) => response.body).filter((body) => !requestRejection.safeParse(body).success);
+
+      expect(unmatched).to.deep.equal([]);
+    });
   });
 
   describe('strictness', () => {
