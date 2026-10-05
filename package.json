@@ -17,6 +17,7 @@
     "test:contract": "yarn workspace sut test:contract",
     "test:bdd": "yarn workspace sut test:bdd",
     "test:skeleton": "yarn workspace sut test:skeleton",
+    "test:wip": "yarn workspace sut test:wip",
     "postinstall": "node scripts/postinstall.mjs"
   },
   "engines": {

@@ -8,7 +8,8 @@
     "test:unit": "vitest run --project unit",
     "test:contract": "vitest run --project contract",
     "test:skeleton": "vitest run --project skeleton",
-    "test:bdd": "NODE_OPTIONS=--import=tsx cucumber-js"
+    "test:bdd": "NODE_OPTIONS=--import=tsx cucumber-js",
+    "test:wip": "NODE_OPTIONS=--import=tsx cucumber-js --profile wip"
   },
   "devDependencies": {
     "@app/types": "workspace:*",
