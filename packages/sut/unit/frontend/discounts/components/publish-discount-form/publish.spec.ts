@@ -1,5 +1,5 @@
 import { createTestingPinia } from '@pinia/testing';
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import PublishDiscountForm from '@frontend/discounts/components/PublishDiscountForm.vue';
@@ -12,16 +12,22 @@ const setupSut = () => {
   return { form, discounts: useDiscountsStore(pinia) };
 };
 
+const spicesDiscount = { item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
+
+const publishThroughTheForm = async (form: VueWrapper, discount: typeof spicesDiscount): Promise<void> => {
+  await form.get('[data-testid="discount-item"]').setValue(discount.item);
+  await form.get('[data-testid="discount-rate"]').setValue(discount.rate);
+  await form.get('[data-testid="discount-store-name"]').setValue(discount.storeName);
+  await form.get('[data-testid="discount-store-address"]').setValue(discount.storeAddress);
+  await form.get('[data-testid="publish-discount"]').trigger('click');
+};
+
 describe('Component PublishDiscountForm', () => {
   describe('publishing a discount', () => {
     it('should publish the item, rate, store name and store address as Mike gave them', async () => {
       const { form, discounts } = setupSut();
 
-      await form.get('[data-testid="discount-item"]').setValue('Peruvian spices');
-      await form.get('[data-testid="discount-rate"]').setValue('20');
-      await form.get('[data-testid="discount-store-name"]').setValue("Mike's Groceries");
-      await form.get('[data-testid="discount-store-address"]').setValue('12 Market Street');
-      await form.get('[data-testid="publish-discount"]').trigger('click');
+      await publishThroughTheForm(form, spicesDiscount);
 
       expect(discounts.publish).to.have.been.calledWith({
         item: 'Peruvian spices',
@@ -33,11 +39,7 @@ describe('Component PublishDiscountForm', () => {
     it('should publish other pieces when Mike gives others', async () => {
       const { form, discounts } = setupSut();
 
-      await form.get('[data-testid="discount-item"]').setValue('Fresh produce');
-      await form.get('[data-testid="discount-rate"]').setValue('10');
-      await form.get('[data-testid="discount-store-name"]').setValue('Corner Grocery');
-      await form.get('[data-testid="discount-store-address"]').setValue('3 Hill Road');
-      await form.get('[data-testid="publish-discount"]').trigger('click');
+      await publishThroughTheForm(form, { item: 'Fresh produce', rate: '10', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' });
 
       expect(discounts.publish).to.have.been.calledWith({
         item: 'Fresh produce',
