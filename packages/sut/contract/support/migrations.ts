@@ -35,9 +35,3 @@ export const tableStatus = async (client: pg.Client, table: string) => {
   const { rows } = await client.query(`SELECT to_regclass($1)::text AS "table"`, [table]);
   return rows.at(0).table as string | null;
 };
-
-export const insertOutcome = async (client: pg.Client, insert: string): Promise<string> =>
-  client.query(insert).then(
-    () => 'accepted',
-    (refusal: { code: string }) => refusal.code,
-  );
