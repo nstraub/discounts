@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { publishedDiscountsResponse } from '@app/types/discounts';
 import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
@@ -24,7 +25,14 @@ describe('GET /discounts', () => {
       expect(response.status).to.equal(200);
       expect(response.body).to.deep.equal([]);
     });
-    it.todo('should answer with a body matching the published-discounts response schema');
+    it('should answer with a body matching the published-discounts response schema', async () => {
+      const { http } = await setupSut();
+      await http.post('/discounts').send(spicesDiscount);
+
+      const response = await http.get('/discounts');
+
+      expect(publishedDiscountsResponse.safeParse(response.body).error).to.equal(undefined);
+    });
     it.todo('should list both of two identical discounts, each with its own id');
   });
 

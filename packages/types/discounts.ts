@@ -13,6 +13,8 @@ export const discountResponse = publishDiscountRequest.extend({ id: z.string() }
 
 export type DiscountResponse = z.infer<typeof discountResponse>;
 
+export const publishedDiscountsResponse = z.array(discountResponse);
+
 export const requestRejection = z.object({
   statusCode: z.number(),
   message: z.string(),
