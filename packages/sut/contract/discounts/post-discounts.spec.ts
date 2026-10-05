@@ -6,6 +6,10 @@ import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts'
 
 import { setupSut } from '../support/app';
 
+type Http = Awaited<ReturnType<typeof setupSut>>['http'];
+
+const postWrittenAsJson = (http: Http, body: string) => http.post('/discounts').set('Content-Type', 'application/json').send(body);
+
 describe('POST /discounts', () => {
   describe('success', () => {
     it('should answer 201 with the published discount as JSON and a Location naming it', async () => {
@@ -65,7 +69,7 @@ describe('POST /discounts', () => {
 
       const statuses = [];
       for (const body of bodiesThatAreNotObjects) {
-        const response = await http.post('/discounts').set('Content-Type', 'application/json').send(body);
+        const response = await postWrittenAsJson(http, body);
         statuses.push(response.status);
       }
 
@@ -74,18 +78,17 @@ describe('POST /discounts', () => {
     it('should answer 400 for a body that is not valid JSON', async () => {
       const { http } = await setupSut();
 
-      const response = await http.post('/discounts').set('Content-Type', 'application/json').send('{"item": "Peruvian spices",');
+      const response = await postWrittenAsJson(http, '{"item": "Peruvian spices",');
 
       expect(response.status).to.equal(400);
     });
     it('should answer every error with a body matching the error schema', async () => {
       const { http } = await setupSut();
-      const asJson = (body: string) => http.post('/discounts').set('Content-Type', 'application/json').send(body);
       const errors = [
         await http.post('/discounts').send({ item: spicesDiscount.item }),
-        await asJson('[]'),
-        await asJson('"Peruvian spices"'),
-        await asJson('{"item": "Peruvian spices",'),
+        await postWrittenAsJson(http, '[]'),
+        await postWrittenAsJson(http, '"Peruvian spices"'),
+        await postWrittenAsJson(http, '{"item": "Peruvian spices",'),
         await http.post('/discounts').send({ ...spicesDiscount, item: 'x'.repeat(200_000) }),
       ];
 
