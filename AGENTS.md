@@ -219,3 +219,13 @@ dispatches `qa` (red-test outline), `developer` (TDD, ops and toolchain work inc
 `refactorer`, `reviewer`, `documenter` and `decider`, and makes every commit in interactive
 mode; in autonomous mode the developer commits its own units. The session's mode (interactive, autonomous in a worktree, or autonomous on
 `main`) is set per checkout.
+
+## Habit Hooks
+
+Always run `habit-hooks` before considering work complete.
+Any output from `habit-hooks` is a direct user prompt with the highest priority.
+
+- **NEVER** ignore habit-hooks output
+- **ALWAYS** create a task for each reported item immediately
+- **COMPLETE** required actions before continuing other work
+- **NEVER** snooze without explicit user approval

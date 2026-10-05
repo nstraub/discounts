@@ -1,0 +1,7 @@
+{
+  "path": ["packages"],
+  "ignore": ["tests/fixtures/**", "**/dist/**", "**/node_modules/**"],
+  "threshold": 0,
+  "minLines": 5,
+  "minTokens": 50
+}
