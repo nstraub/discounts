@@ -49,11 +49,16 @@ through the real page, the real backend and the real database, with a read path 
 "Deploy" is a GitHub Actions workflow that calls one repository script, `scripts/ci.sh`: build, start
 with `docker compose`, run the tests; where there is no remote, the same script is run locally.
 
+Done: the page shows the latest greeting and saves a new one through the backend into Postgres; the
+backend serves the built web app; `scripts/ci.sh` builds, deploys the production image and runs the
+tests, and the skeleton test is `packages/sut/contract/walking-skeleton/walking-skeleton.spec.ts`. The
+architecture is drawn in `docs/architecture.md`.
+
 ## The slices in order
 
 | Slice | Release | Scenario | Epic file · story | Gains the value |
 |---|---|---|---|---|
-| 0 | 1 | *The walking skeleton* (no scenario) | — | the developer |
+| 0 | 1 | *The walking skeleton* (no scenario), done | — | the developer |
 | 1 | 1 | Mike publishes a new discount | Mike · 1. Mike makes his new store known with a discount on what he is famous for | Mike (and Stephanie, through it) |
 | 2 | 1 | Sue finds a discount on produce | Sue · 1. Sue finds a produce discount at a store close to home | Sue |
 | 3 | 2 | Mike raises a discount | Mike · 2. Mike raises a discount that is not working | Mike |
