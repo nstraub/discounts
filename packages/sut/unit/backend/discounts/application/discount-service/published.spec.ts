@@ -6,7 +6,7 @@ import { DiscountService } from '@backend/discounts/application/discount-service
 import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 const setupSut = () => {
   const factory = new DiscountFactory(mock<DomainEventPublisher>());
@@ -32,7 +32,18 @@ describe('class DiscountService', () => {
 
         expect(published.map((discount) => discount.toJSON())).to.deep.equal([{ id: 'test-uuid', ...spicesDiscount }]);
       });
-      it.todo('should answer with every discount published when there are several');
+      it('should answer with every discount published when there are several', async () => {
+        const { factory, repository, service } = setupSut();
+        await repository.save(factory.create(new DiscountDetails(spicesDiscount)));
+        await repository.save(factory.create(new DiscountDetails(produceDiscount)));
+
+        const published = await service.published();
+
+        expect(published.map((discount) => discount.toJSON())).to.deep.equal([
+          { id: 'test-uuid', ...spicesDiscount },
+          { id: 'test-uuid', ...produceDiscount },
+        ]);
+      });
     });
   });
 });
