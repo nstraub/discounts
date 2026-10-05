@@ -24,5 +24,13 @@ describe('a discount kept in PostgreSQL', () => {
 
     expect(loaded?.toJSON()).to.deep.include(writtenAsSql);
   });
-  it.todo('should keep an item, store name and store address with accents, apostrophes and emoji verbatim');
+  it('should keep an item, store name and store address with accents, apostrophes and emoji verbatim', async () => {
+    const { factory, repository, repositoryOnItsOwnConnection } = await setupSut();
+    const writtenWithAccents = { item: 'Ají panca 🌶️', storeName: "D'Ángelo's Bodega", storeAddress: 'Calle Ñuñoa 4, piso 2' };
+    await repository.save(factory.create(new DiscountDetails({ ...spicesDiscount, ...writtenWithAccents })));
+
+    const [loaded] = await (await repositoryOnItsOwnConnection()).all();
+
+    expect(loaded?.toJSON()).to.deep.include(writtenWithAccents);
+  });
 });
