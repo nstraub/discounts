@@ -5,6 +5,7 @@ import { mock } from 'vitest-mock-extended';
 
 import type { DiscountResponse } from '@app/types/discounts';
 import type { RestApi } from '@app/types/rest-api';
+import PublishDiscountForm from '@frontend/discounts/components/PublishDiscountForm.vue';
 import DiscountsView from '@frontend/discounts/views/DiscountsView.vue';
 import { restApiKey } from '@frontend/rest-api-key';
 
@@ -35,6 +36,10 @@ describe('View DiscountsView', () => {
 
       expect(view.findAll('[data-testid="published-item"]').map((item) => item.text())).to.deep.equal(['Fresh produce', 'Andean herbs']);
     });
-    it.todo('should offer the form to publish a discount beside them');
+    it('should offer the form to publish a discount beside them', async () => {
+      const view = await openThePageWhenPublished([]);
+
+      expect(view.findComponent(PublishDiscountForm).exists()).to.equal(true);
+    });
   });
 });
