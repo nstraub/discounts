@@ -18,7 +18,7 @@ const databaseUrlFromEnv = (): string => {
 export const testDatabaseUrl = databaseUrlFromEnv();
 
 export const migrationsFolder = fileURLToPath(
-  new URL('../../backend/src/app/infra/migrations', import.meta.url),
+  new URL('../../backend/src/discounts/infra/migrations', import.meta.url),
 );
 
 // Names no table, so it holds from before the first migration on. CASCADE because Postgres refuses to
