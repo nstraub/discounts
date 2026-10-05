@@ -18,7 +18,10 @@ import CaptionedInput from './CaptionedInput.vue';
       :caption="discountTexts.storeName"
       test-id="discount-store-name"
     />
-    <input data-testid="discount-store-address">
+    <CaptionedInput
+      :caption="discountTexts.storeAddress"
+      test-id="discount-store-address"
+    />
     <button
       type="submit"
       class="rounded border px-3 py-1"
