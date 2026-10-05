@@ -8,6 +8,13 @@
       "when": 1791237246728,
       "tag": "0000_create_greetings",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791237315311,
+      "tag": "0001_store_the_first_greeting",
+      "breakpoints": true
     }
   ]
 }
