@@ -10,7 +10,8 @@ RUN yarn install --immutable --mode=skip-build \
   && yarn workspace backend build \
   && yarn workspace frontend build
 
-FROM yarn AS production-modules
+# From the build's install, so the dependencies are fetched once, not by two installs at the same time.
+FROM build AS production-modules
 RUN yarn workspaces focus backend --production
 
 FROM node:26.9.0-alpine
