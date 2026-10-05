@@ -3,17 +3,15 @@ import { ref } from 'vue';
 
 import { useDiscountsStore } from '../../stores/discounts-store';
 import { discountTexts } from '../texts';
+import { discountToPublish, nothingTyped } from '../typed-discount';
 
 import CaptionedInput from './CaptionedInput.vue';
 
 const discounts = useDiscountsStore();
-const nothingTyped = () => ({ item: '', rate: '', storeName: '', storeAddress: '' });
 const discount = ref(nothingTyped());
 
-const rateGiven = (rate: string): number | undefined => (rate === '' ? undefined : Number(rate));
-
 const publish = async (): Promise<void> => {
-  await discounts.publish({ ...discount.value, rate: rateGiven(discount.value.rate) });
+  await discounts.publish(discountToPublish(discount.value));
   discount.value = nothingTyped();
 };
 </script>
