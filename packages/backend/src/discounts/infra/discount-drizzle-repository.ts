@@ -39,8 +39,9 @@ export class DiscountDrizzleRepository implements DiscountRepository {
     return owner === undefined ? undefined : this.withId(owner);
   }
 
-  async ofStore(): Promise<Discount[]> {
-    return [];
+  async ofStore({ storeName }: Parameters<DiscountRepository['ofStore']>[0]): Promise<Discount[]> {
+    const rows = await this.database.select(theColumnsOfADiscount).from(discounts).where(eq(discounts.storeName, storeName));
+    return rows.map((row) => this.rebuilt(row, []));
   }
 
   private rebuilt(row: typeof discounts.$inferSelect, issued: ReturnType<Discount['toJSON']>['coupons']): Discount {
