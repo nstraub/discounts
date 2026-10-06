@@ -1,6 +1,7 @@
 import type { VueWrapper } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import type { CountResponse } from '@app/types/discounts';
 import CountDiscountedSalesForm from '@frontend/discounts/components/CountDiscountedSalesForm.vue';
 import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
@@ -9,6 +10,18 @@ import { aFormOfferingTheStores } from '../a-form-offering-the-stores';
 const theStoreOf = ({ storeName, storeAddress }: typeof spicesDiscount) => ({ storeName, storeAddress });
 
 const setupSut = () => aFormOfferingTheStores(CountDiscountedSalesForm, [theStoreOf(spicesDiscount), theStoreOf(stephaniesProduceDiscount)]);
+
+const setupSutCountingTo = (counted: CountResponse) => {
+  const sut = setupSut();
+  vi.mocked(sut.discounts.countDiscountedSales).mockImplementation(async () => {
+    sut.discounts.counted = counted;
+  });
+  return sut;
+};
+
+const stephaniesProduceCounted = { id: 'produce-id', item: stephaniesProduceDiscount.item, rate: stephaniesProduceDiscount.rate, discountedSales: 3 };
+
+const whatTheCountShowsFor = (form: VueWrapper, testId: string) => form.findAll(`[data-testid="${testId}"]`).map((shown) => shown.text());
 
 const countThroughTheForm = async (form: VueWrapper, storeShown: string): Promise<void> => {
   const picker = form.get<HTMLSelectElement>('select');
@@ -33,7 +46,13 @@ describe('Component CountDiscountedSalesForm', () => {
 
       expect(discounts.countDiscountedSales).to.have.been.calledWith({ storeName: "Stephanie's Market", storeAddress: '8 Orchard Lane' });
     });
-    it.todo('should name the item of each discount counted');
+    it('should name the item of each discount counted', async () => {
+      const { form } = setupSutCountingTo([stephaniesProduceCounted]);
+
+      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+
+      expect(whatTheCountShowsFor(form, 'counted-item'), 'the items counted').to.deep.equal(['Organic produce']);
+    });
     it.todo('should show the rate of each discount counted');
     it.todo('should show the number of discounted sales counted for each discount under its caption');
 
