@@ -18,9 +18,8 @@ export const useDiscountsStore = defineStore('discounts', () => {
     await restApi.patch(`/discounts/${id}`, change);
     await load();
   };
-  // eslint-disable-next-line unused-imports/no-unused-vars
   const getCoupon = async (id: string): Promise<void> => {
-    await restApi.post('/discounts/spices-id/coupons', {});
+    await restApi.post(`/discounts/${id}/coupons`, {});
   };
   return { published, publish, load, changeRate, getCoupon };
 });

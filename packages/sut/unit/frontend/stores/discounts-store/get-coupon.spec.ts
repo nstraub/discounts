@@ -11,6 +11,13 @@ describe('Store discounts', () => {
 
       expect(restApi.post).to.have.been.calledWith('/discounts/spices-id/coupons', {});
     });
+    it('should hand another discount over to get a coupon for that one', async () => {
+      const { restApi, discounts } = setupSut();
+
+      await discounts.getCoupon('produce-id');
+
+      expect(restApi.post).to.have.been.calledWith('/discounts/produce-id/coupons', {});
+    });
     it.todo('should hold the coupon got once it is issued');
     it.todo('should keep the coupon got when the page is opened again');
 
