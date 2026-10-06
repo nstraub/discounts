@@ -5,9 +5,9 @@ import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-
 
 import { setupSut } from './discounts-store-of-an-app';
 
-const aRefusalListingAsMissing = (pieces: string[]) => new BadRequestException('POST /discounts answered 400', pieces);
+const aRefusalListingAsMissing = (pieces: string[]) => new BadRequestException('POST /discounts answered 400', pieces, pieces);
 
-const aRefusalOfTheRate = aRefusalListingAsMissing([]);
+const aRefusalOfTheRate = new BadRequestException('POST /discounts answered 400', [], ['rate']);
 
 const setupSutRefusing = (refusal: Error) => {
   const sut = setupSut();

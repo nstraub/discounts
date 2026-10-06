@@ -95,6 +95,11 @@ describe('class FetchRestApi', () => {
 
       expect(refusal).to.deep.include({ missing: [] });
     });
+    it('should carry the fields a 400 names in the rejection', async () => {
+      const refusal = await theRefusalOfARateNotValid();
+
+      expect(refusal).to.deep.include({ fields: ['rate'] });
+    });
   });
 
   describe('getting', () => {
