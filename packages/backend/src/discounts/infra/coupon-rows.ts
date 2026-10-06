@@ -14,6 +14,11 @@ export const tokensIssuedByEachDiscount = async (database: Database): Promise<Ma
   return new Map(byDiscount.entries().map(([discountId, issued]) => [discountId, issued.map((row) => row.token)]));
 };
 
+export const idsOfTheDiscountsThatIssued = async (database: Database, token: string): Promise<string[]> => {
+  const rows = await database.select({ discountId: coupons.discountId }).from(coupons).where(eq(coupons.token, token));
+  return rows.map((row) => row.discountId);
+};
+
 export const keepTheNewlyIssued = async (database: Database, discountId: string, tokens: string[]): Promise<void> => {
   const kept = await tokensIssuedBy(database, discountId);
   const newlyIssued = tokens.filter((token) => !kept.includes(token));

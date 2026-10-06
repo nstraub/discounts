@@ -5,7 +5,7 @@ import type { Discount } from '../application/domain/discount.js';
 import type { DiscountFactory } from '../application/domain/discount-factory.js';
 import type { DiscountRepository } from '../application/domain/discount-repository.js';
 
-import { keepTheNewlyIssued, tokensIssuedBy, tokensIssuedByEachDiscount } from './coupon-rows.js';
+import { idsOfTheDiscountsThatIssued, keepTheNewlyIssued, tokensIssuedBy, tokensIssuedByEachDiscount } from './coupon-rows.js';
 import type { Database } from './database.module.js';
 import { discounts } from './schema.js';
 
@@ -44,9 +44,10 @@ export class DiscountDrizzleRepository implements DiscountRepository {
     return rows.map((row) => this.rebuilt(row, issued)).at(0);
   }
 
-  // eslint-disable-next-line unused-imports/no-unused-vars -- the coupon's token picks the discount found
   async withCouponToken(token: CouponToken): Promise<Discount | undefined> {
-    return (await this.all()).at(-1);
+    const owners = await idsOfTheDiscountsThatIssued(this.database, token.toJSON());
+    const [found] = await Promise.all(owners.map((id) => this.withId(id)));
+    return found;
   }
 
   private rebuilt(row: typeof discounts.$inferSelect, issued: string[]): Discount {
