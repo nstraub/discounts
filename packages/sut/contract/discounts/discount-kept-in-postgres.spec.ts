@@ -5,6 +5,12 @@ import { produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut
 
 import { setupSut } from '../support/discount-repository';
 
+const keepWithACouponIssued = async ({ keep }: Awaited<ReturnType<typeof setupSut>>) => {
+  const discount = await keep(spicesDiscount);
+  discount.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+  return discount;
+};
+
 describe('a discount kept in PostgreSQL', () => {
   it('should save a discount and load it back equal, in a separate transaction, its events excepted (not persisted)', async () => {
     const { keep, loadOnItsOwnConnection } = await setupSut();
@@ -86,13 +92,12 @@ describe('a discount kept in PostgreSQL', () => {
   });
   describe('with its coupons', () => {
     it('should save a discount with its coupons and load it back equal, in a separate transaction', async () => {
-      const { keep, repository, loadOnItsOwnConnection } = await setupSut();
-      const discount = await keep(spicesDiscount);
-      discount.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+      const sut = await setupSut();
+      const discount = await keepWithACouponIssued(sut);
 
-      await repository.save(discount);
+      await sut.repository.save(discount);
 
-      const [loaded] = await loadOnItsOwnConnection();
+      const [loaded] = await sut.loadOnItsOwnConnection();
       expect(loaded?.toJSON(), 'the discount loaded back with its coupons').to.deep.equal(discount.toJSON());
     });
     it.todo('should keep a discount\'s earlier coupons when another is issued and it is saved again');
