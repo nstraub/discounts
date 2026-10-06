@@ -73,7 +73,7 @@ architecture is drawn in `docs/architecture.md`.
 | 12 | 5 | Mike's earlier discounts stay published, done | Mike · 1. Mike makes his new store known with a discount on what he is famous for | Mike |
 | 13 | 5 | A coupon counts only once, done | Stephanie · 2. Stephanie takes the coupon at the till | Stephanie |
 | 14 | 6 | Mike gives an invalid rate, done | Mike · 1. Mike makes his new store known with a discount on what he is famous for | Mike |
-| 15 | 6 | A coupon for another store's discount | Stephanie · 2. Stephanie takes the coupon at the till | Stephanie |
+| 15 | 6 | A coupon for another store's discount, done | Stephanie · 2. Stephanie takes the coupon at the till | Stephanie |
 | 16 | 7 | Mike leaves out required information | Mike · 1. Mike makes his new store known with a discount on what he is famous for | Mike |
 | 17 | 7 | A coupon nobody issued | Stephanie · 2. Stephanie takes the coupon at the till | Stephanie |
 | 18 | 8 | Mike leaves out all the required information | Mike · 1. Mike makes his new store known with a discount on what he is famous for | Mike |
