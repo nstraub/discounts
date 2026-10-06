@@ -2,7 +2,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { couponResponse } from '@app/types/discounts';
-import { longTextInAnyCharacters, spicesDiscount } from '@sut/support/example-discounts';
+import { anIdNoDiscountHas, longTextInAnyCharacters, spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
 
@@ -79,7 +79,7 @@ describe('POST /discounts/:id/coupons', () => {
       const issued: unknown[] = [];
       app.get(EventEmitter2).on('coupon.issued', (event: unknown) => issued.push(event));
 
-      const response = await getACouponFor(http, 'an-id-no-discount-has');
+      const response = await getACouponFor(http, anIdNoDiscountHas);
 
       expect(response.status).to.equal(404);
       expect(issued, 'the coupons issued').to.deep.equal([]);

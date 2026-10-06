@@ -1,6 +1,8 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
+import { anIdNoDiscountHas } from '@sut/support/example-discounts';
+
 import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
 import { statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
 import { bodiesNotMatchingTheErrorSchema, theFieldsNamedBy } from '../support/error-schema';
@@ -79,7 +81,7 @@ describe('PATCH /discounts/:id', () => {
         await patchWrittenAsJson(http, published.id, '25'),
         await patchWrittenAsJson(http, published.id, 'null'),
         await patchWrittenAsJson(http, published.id, '{"rate": "25",'),
-        await patchTheDiscount(http, 'an-id-no-discount-has').send({ rate: '25' }),
+        await patchTheDiscount(http, anIdNoDiscountHas).send({ rate: '25' }),
       ];
 
       expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
@@ -112,7 +114,7 @@ describe('PATCH /discounts/:id', () => {
       const { http } = await setupSut();
       const published = await publishTheSpicesDiscount(http);
 
-      const response = await patchTheDiscount(http, 'an-id-no-discount-has').send({ rate: '25' });
+      const response = await patchTheDiscount(http, anIdNoDiscountHas).send({ rate: '25' });
 
       expect(response.status).to.equal(404);
       expect((await http.get('/discounts')).body, 'the discounts listed after the change').to.deep.equal([published]);

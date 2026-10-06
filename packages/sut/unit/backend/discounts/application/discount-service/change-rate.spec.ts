@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { DiscountRateChanged } from '@backend/discounts/application/domain/discount-rate-changed';
 import { NoSuchDiscountException } from '@backend/discounts/application/domain/no-such-discount-exception';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { anIdNoDiscountHas, spicesDiscount } from '@sut/support/example-discounts';
 
 import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
 
@@ -29,7 +29,7 @@ describe('class DiscountService', () => {
       it('should report that there is no such discount when no discount has that id, changing nothing', async () => {
         const { repository, service } = setupSut();
 
-        await expect(service.changeRate('an-id-no-discount-has', '25')).rejects.to.be.instanceOf(NoSuchDiscountException);
+        await expect(service.changeRate(anIdNoDiscountHas, '25')).rejects.to.be.instanceOf(NoSuchDiscountException);
         expect(repository.save.mock.calls, 'the discounts saved').to.deep.equal([]);
       });
     });
