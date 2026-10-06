@@ -67,7 +67,9 @@ describe('class CouponToken', () => {
     });
 
     describe('type', () => {
-      it.todo('should read no token from a code with a letter U, which no token has');
+      it('should read no token from a code with a letter U, which no token has', () => {
+        expect(() => CouponToken.read('7K3QX9M2PU')).to.throw(NoCouponHasTheCodeException);
+      });
       it.todo('should read no token from a code with a symbol, an accented letter or an emoji');
     });
   });

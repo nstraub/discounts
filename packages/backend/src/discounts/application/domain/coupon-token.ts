@@ -6,6 +6,7 @@ const charactersInAToken = 10;
 const separatorsTypedBetweenOrAroundTheGroups = /[\s-]/g;
 const theLetterTypedForAZero = 'O';
 const theLettersTypedForAOne = /[IL]/g;
+const theLetterNoTokenHas = 'U';
 
 export class CouponToken {
   private constructor(private readonly characters: string) {}
@@ -21,7 +22,7 @@ export class CouponToken {
 
   static read(typed: string): CouponToken {
     const withoutSeparators = typed.toUpperCase().replaceAll(separatorsTypedBetweenOrAroundTheGroups, '');
-    if (withoutSeparators.length !== charactersInAToken) {
+    if (withoutSeparators.length !== charactersInAToken || withoutSeparators.includes(theLetterNoTokenHas)) {
       throw new NoCouponHasTheCodeException();
     }
     return new CouponToken(withoutSeparators.replaceAll(theLetterTypedForAZero, '0').replaceAll(theLettersTypedForAOne, '1'));
