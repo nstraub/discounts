@@ -1,6 +1,5 @@
 Feature: Sue finds a produce discount close to home
 
-  @wip
   Scenario: Sue finds a discount on produce
     Given Mike has published a discount on produce
     When Sue looks for a new store with fresh produce

@@ -33,6 +33,17 @@ export class DiscountsPage {
     assert.equal(await shown.getByTestId('published-store-address').textContent(), discount.storeAddress);
   }
 
+  async verifyShowsTheStoreOf(discount: ExampleDiscount): Promise<void> {
+    const shown = await this.publishedEntryOn(discount);
+    assert.equal(await shown.getByTestId('published-store-name').textContent(), discount.storeName);
+  }
+
+  async verifyShowsTheDiscount(discount: ExampleDiscount): Promise<void> {
+    const shown = await this.publishedEntryOn(discount);
+    assert.equal(await shown.getByTestId('published-item').textContent(), discount.item);
+    assert.equal(await shown.getByTestId('published-rate').textContent(), `${discount.rate}%`);
+  }
+
   private async publishedEntryOn(discount: ExampleDiscount): Promise<Locator> {
     const shown = this.page.getByTestId('published-discount').filter({ hasText: discount.item });
     await shown.waitFor().catch(() => assert.fail(`the page shows no published discount on ${discount.item}`));
