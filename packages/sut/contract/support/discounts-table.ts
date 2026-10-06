@@ -19,3 +19,10 @@ export const constraintsAndColumnsOfTheDiscountsTable = async (client: pg.Client
   );
   return { constraints: constraints.rows, columns: columns.rows };
 };
+
+export const aDiscountKeptBefore = { id: 'kept-before', item: 'Saffron', rate: '12.5', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' };
+
+export const insertADiscountKeptBefore = async (client: pg.Client): Promise<void> => {
+  const { id, item, rate, storeName, storeAddress } = aDiscountKeptBefore;
+  await client.query('INSERT INTO app.discounts (id, item, rate, store_name, store_address) VALUES ($1, $2, $3, $4, $5)', [id, item, rate, storeName, storeAddress]);
+};
