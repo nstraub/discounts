@@ -1,0 +1,15 @@
+import { mock } from 'vitest-mock-extended';
+
+import { DiscountService } from '@backend/discounts/application/discount-service';
+import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
+import type { DiscountRepository } from '@backend/discounts/application/domain/discount-repository';
+import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
+import { spicesDiscount } from '@sut/support/example-discounts';
+
+export const aServiceOverTheKeptSpicesDiscount = () => {
+  const events = mock<DomainEventPublisher>();
+  const factory = new DiscountFactory(events);
+  const repository = mock<DiscountRepository>();
+  repository.withId.calledWith('spices-id').mockResolvedValue(factory.reconstitute({ id: 'spices-id', ...spicesDiscount, coupons: [] }));
+  return { events, repository, service: new DiscountService(factory, repository) };
+};
