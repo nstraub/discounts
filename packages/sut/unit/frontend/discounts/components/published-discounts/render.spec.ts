@@ -84,4 +84,14 @@ describe('Component PublishedDiscounts', () => {
       expect(list.get('[data-testid="published-store-address"]').text()).to.equal(markup.storeAddress);
     });
   });
+
+  describe('dependency failure', () => {
+    it.todo('should say in one short line that the discounts cannot be shown right now and to try again');
+    it.todo('should not say that nothing is published when the discounts cannot be shown');
+  });
+
+  describe('accessibility', () => {
+    it.todo('should keep every discount readable in full with the text enlarged');
+    it.todo('should present each discount to a screen reader as one entry with its item, rate, store name and store address');
+  });
 });

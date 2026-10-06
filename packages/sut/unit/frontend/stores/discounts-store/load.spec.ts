@@ -26,5 +26,9 @@ describe('Store discounts', () => {
         expect(discounts.published).to.deep.equal(everyDiscount);
       });
     });
+
+    describe('dependency failure', () => {
+      it.todo('should hold that the discounts cannot be shown when they cannot be loaded');
+    });
   });
 });

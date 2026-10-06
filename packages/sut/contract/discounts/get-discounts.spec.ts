@@ -63,4 +63,17 @@ describe('GET /discounts', () => {
       expect(publishedDiscountsResponse.safeParse(response.body).error).to.equal(undefined);
     });
   });
+
+  describe('which discounts', () => {
+    it.todo('should list a discount on any item, produce or not');
+    it.todo('should list the discounts in the order the product promises');
+  });
+
+  describe('dependency failure', () => {
+    it.todo('should answer 503 with a body matching the error schema when the discounts cannot be read');
+  });
+
+  describe('A5 resource exhaustion', () => {
+    it.todo('should answer every published discount when a very large number are published, without failing');
+  });
 });

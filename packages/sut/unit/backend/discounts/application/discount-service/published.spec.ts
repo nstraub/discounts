@@ -46,5 +46,9 @@ describe('class DiscountService', () => {
         ]);
       });
     });
+
+    describe('dependency failure', () => {
+      it.todo('should report that the discounts cannot be read when they cannot be read');
+    });
   });
 });
