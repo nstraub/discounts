@@ -1,8 +1,36 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { spicesDiscount } from '@sut/support/example-discounts';
+
+import { type Http, setupSut } from '../support/app';
+
+type ExampleDiscount = typeof spicesDiscount;
+
+const useACouponFor = async (http: Http, published: { id: string }, discount: ExampleDiscount) => {
+  const code: string = (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
+  await http.post('/redemptions').send({ code, storeName: discount.storeName, storeAddress: discount.storeAddress });
+};
+
+const setupSutWithACouponUsedFor = async (discount: ExampleDiscount = spicesDiscount) => {
+  const sut = await setupSut();
+  const published: { id: string } = (await sut.http.post('/discounts').send(discount)).body;
+  await useACouponFor(sut.http, published, discount);
+  return { ...sut, published };
+};
+
+const countTheStoreOf = (http: Http, discount: ExampleDiscount = spicesDiscount) =>
+  http.post('/stores/counts').send({ storeName: discount.storeName, storeAddress: discount.storeAddress });
 
 describe('POST /stores/counts', () => {
   describe('success', () => {
-    it.todo('should answer 201 with the discount\'s id, item and rate and the number of its coupons redeemed since the last count');
+    it('should answer 201 with the discount\'s id, item and rate and the number of its coupons redeemed since the last count', async () => {
+      const { http, published } = await setupSutWithACouponUsedFor();
+
+      const response = await countTheStoreOf(http);
+
+      expect(response.status).to.equal(201);
+      expect(response.body).to.deep.equal([{ id: published.id, item: spicesDiscount.item, rate: spicesDiscount.rate, discountedSales: 1 }]);
+    });
     it.todo('should answer with a body matching the count response schema');
     it.todo('should publish DiscountedSalesCounted on the application event emitter for the discount counted');
     it.todo('should answer a count made after another with only the coupons redeemed since that one');

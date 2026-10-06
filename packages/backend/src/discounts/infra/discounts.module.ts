@@ -10,10 +10,11 @@ import { DiscountsController } from './discounts.controller.js';
 import { EventEmitterDomainEventPublisher } from './event-emitter-domain-event-publisher.js';
 import { GreetingController } from './greeting.controller.js';
 import { RedemptionsController } from './redemptions.controller.js';
+import { StoreCountsController } from './store-counts.controller.js';
 
 @Module({
   imports: [DatabaseModule, EventEmitterModule.forRoot()],
-  controllers: [GreetingController, DiscountsController, RedemptionsController],
+  controllers: [GreetingController, DiscountsController, RedemptionsController, StoreCountsController],
   providers: [
     {
       provide: DiscountFactory,
