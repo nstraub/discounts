@@ -5,18 +5,13 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { discountRepositoryOn } from '../support/discount-repository';
 import { aDiscountKeptBefore, aDiscountKeptBeforeAsReadAfterMigratingForward, constraintsAndColumnsOfTheDiscountsTable } from '../support/discounts-table';
-import { migrateBackward, setupSut } from '../support/migrations';
+import { migrateBackward, migrateBackwardPast, setupSut } from '../support/migrations';
 
 const theMigration = '0003_rate_as_written';
 
 const theMigrationsAfterIt = ['0004_add_discount_hook'];
 
-const migrateBackwardPastIt = async (client: pg.Client): Promise<void> => {
-  for (const later of theMigrationsAfterIt.toReversed()) {
-    await migrateBackward(client, later);
-  }
-  await migrateBackward(client, theMigration);
-};
+const migrateBackwardPastIt = (client: pg.Client): Promise<void> => migrateBackwardPast(client, theMigration, theMigrationsAfterIt);
 
 const setupSutMigratedForward = async () => {
   const sut = await setupSut();

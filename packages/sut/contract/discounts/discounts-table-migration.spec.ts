@@ -7,7 +7,7 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { discountRepositoryOn } from '../support/discount-repository';
 import { constraintsAndColumnsOfTheDiscountsTable, insertADiscountWithout } from '../support/discounts-table';
-import { migrateBackward, setupSut, tableStatus } from '../support/migrations';
+import { migrateBackwardPast, setupSut, tableStatus } from '../support/migrations';
 
 const theMigration = '0002_create_discounts';
 
@@ -60,10 +60,7 @@ describe('the migration that adds the discounts table', () => {
     await migrateForward();
     await discountRepositoryOn(client, databaseUrl).keep(spicesDiscount);
 
-    for (const later of theMigrationsAfterIt.toReversed()) {
-      await migrateBackward(client, later);
-    }
-    await migrateBackward(client, theMigration);
+    await migrateBackwardPast(client, theMigration, theMigrationsAfterIt);
 
     expect(await tableStatus(client, 'app.discounts'), 'the discounts table, backward').to.equal(null);
     const greetings = await client.query('SELECT text FROM app.greetings');
