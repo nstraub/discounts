@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { DiscountPublicationRejected } from '@backend/discounts/application/domain/discount-publication-rejected';
 import { DiscountPublished } from '@backend/discounts/application/domain/discount-published';
+import { RateNotValidException } from '@backend/discounts/application/domain/rate-not-valid-exception';
 
 import { lastEventOf, lastRejectionOf, setupSut } from './publishing-a-discount';
 
@@ -24,7 +25,7 @@ describe('class Discount', () => {
         const { events, discountAt } = setupSut();
         const computersNotations = ['1e2', '0x14', 'Infinity'];
 
-        computersNotations.forEach((rate) => discountAt(rate).publish());
+        computersNotations.forEach((rate) => expect(() => discountAt(rate).publish()).to.throw(RateNotValidException));
 
         expect(events.publish.mock.calls.map(([event]) => event)).to.deep.equal(
           computersNotations.map((rate) => new DiscountPublicationRejected(rate, 'not valid')),
@@ -36,18 +37,16 @@ describe('class Discount', () => {
     describe('the rejection', () => {
       it('should raise DiscountPublicationRejected carrying the rate and that it is not valid', () => {
         const { events, discountAt } = setupSut();
-        const discount = discountAt('150');
 
-        discount.publish();
+        expect(() => discountAt('150').publish()).to.throw(RateNotValidException);
 
         expect(lastRejectionOf(events)).to.be.instanceOf(DiscountPublicationRejected);
         expect(lastRejectionOf(events)).to.include({ rate: '150', reason: 'not valid' });
       });
       it('should not raise DiscountPublished when its rate is refused', () => {
         const { events, discountAt } = setupSut();
-        const discount = discountAt('150');
 
-        discount.publish();
+        expect(() => discountAt('150').publish()).to.throw(RateNotValidException);
 
         expect(events.publish).to.not.have.been.calledWith(expect.any(DiscountPublished));
       });
@@ -88,41 +87,36 @@ describe('class Discount', () => {
       });
       it('should refuse a rate of 0, its rejection naming the rate as not valid', () => {
         const { events, discountAt } = setupSut();
-        const discount = discountAt('0');
 
-        discount.publish();
+        expect(() => discountAt('0').publish()).to.throw(RateNotValidException);
 
         expect(lastRejectionOf(events)).to.include({ rate: '0', reason: 'not valid' });
       });
       it('should refuse a negative rate such as -10, its rejection naming the rate as not valid', () => {
         const { events, discountAt } = setupSut();
-        const discount = discountAt('-10');
 
-        discount.publish();
+        expect(() => discountAt('-10').publish()).to.throw(RateNotValidException);
 
         expect(lastRejectionOf(events)).to.include({ rate: '-10', reason: 'not valid' });
       });
       it('should refuse a rate of 100.1, just above 100, its rejection naming the rate as not valid', () => {
         const { events, discountAt } = setupSut();
-        const discount = discountAt('100.1');
 
-        discount.publish();
+        expect(() => discountAt('100.1').publish()).to.throw(RateNotValidException);
 
         expect(lastRejectionOf(events)).to.include({ rate: '100.1', reason: 'not valid' });
       });
       it('should refuse a rate of 150, its rejection naming the rate as not valid', () => {
         const { events, discountAt } = setupSut();
-        const discount = discountAt('150');
 
-        discount.publish();
+        expect(() => discountAt('150').publish()).to.throw(RateNotValidException);
 
         expect(lastRejectionOf(events)).to.include({ rate: '150', reason: 'not valid' });
       });
       it('should refuse a rate of 12.25, with two decimal places, its rejection naming the rate as not valid', () => {
         const { events, discountAt } = setupSut();
-        const discount = discountAt('12.25');
 
-        discount.publish();
+        expect(() => discountAt('12.25').publish()).to.throw(RateNotValidException);
 
         expect(lastRejectionOf(events)).to.include({ rate: '12.25', reason: 'not valid' });
       });
@@ -131,25 +125,22 @@ describe('class Discount', () => {
     describe('type', () => {
       it('should refuse a rate that is not a number, such as a fifth, its rejection naming the rate as not valid', () => {
         const { events, discountAt } = setupSut();
-        const discount = discountAt('a fifth');
 
-        discount.publish();
+        expect(() => discountAt('a fifth').publish()).to.throw(RateNotValidException);
 
         expect(lastRejectionOf(events)).to.include({ rate: 'a fifth', reason: 'not valid' });
       });
       it('should refuse a rate of 12,25, two decimal places after a decimal comma, its rejection naming the rate as not valid', () => {
         const { events, discountAt } = setupSut();
-        const discount = discountAt('12,25');
 
-        discount.publish();
+        expect(() => discountAt('12,25').publish()).to.throw(RateNotValidException);
 
         expect(lastRejectionOf(events)).to.include({ rate: '12,25', reason: 'not valid' });
       });
       it('should refuse a rate of 0,0, zero written with a decimal comma, its rejection naming the rate as not valid', () => {
         const { events, discountAt } = setupSut();
-        const discount = discountAt('0,0');
 
-        discount.publish();
+        expect(() => discountAt('0,0').publish()).to.throw(RateNotValidException);
 
         expect(lastRejectionOf(events)).to.include({ rate: '0,0', reason: 'not valid' });
       });

@@ -1,5 +1,6 @@
 import { DiscountPublicationRejected } from './discount-publication-rejected.js';
 import type { DomainEventPublisher } from './domain-event-publisher.js';
+import { RateNotValidException } from './rate-not-valid-exception.js';
 
 const moreThanOneDecimalPlace = /\.\d{2,}/;
 const aComputersNotation = /[a-z]/i;
@@ -14,7 +15,7 @@ export class DiscountRate {
   whenValid(events: DomainEventPublisher, publish: () => void): void {
     if (this.isNotWrittenAsADecimal() || this.isOutOfBounds()) {
       events.publish(new DiscountPublicationRejected(this.written, 'not valid'));
-      return;
+      throw new RateNotValidException();
     }
     publish();
   }

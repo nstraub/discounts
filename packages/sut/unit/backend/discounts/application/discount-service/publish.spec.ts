@@ -8,6 +8,7 @@ import { DiscountDetails } from '@backend/discounts/application/domain/discount-
 import { DiscountPublished } from '@backend/discounts/application/domain/discount-published';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
+import { RateNotValidException } from '@backend/discounts/application/domain/rate-not-valid-exception';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 const spicesDetails = new DiscountDetails(spicesDiscount);
@@ -50,7 +51,11 @@ describe('class DiscountService', () => {
     });
   });
   describe('publishing a discount at a rate its rules refuse', () => {
-    it.todo('should report the rate as not valid');
+    it('should report the rate as not valid', async () => {
+      const { service } = setupSut();
+
+      await expect(service.publish(spicesDetails.withRate('150'))).rejects.to.be.instanceOf(RateNotValidException);
+    });
     it.todo('should keep nothing when the rate is refused');
     it.todo('should announce DiscountPublicationRejected for the rate refused');
   });
