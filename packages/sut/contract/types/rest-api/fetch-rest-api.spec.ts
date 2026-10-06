@@ -62,6 +62,13 @@ describe('class FetchRestApi', () => {
 
       expect(refusal).to.be.instanceOf(UnprocessableContentException);
     });
+    it('should not reject an answer other than 422 as unprocessable', async () => {
+      const { restApi } = await setupSut();
+
+      const refusal = await refusalOf(restApi.post('/nowhere', spicesDiscount));
+
+      expect(refusal).to.not.be.instanceOf(UnprocessableContentException);
+    });
   });
 
   describe('getting', () => {
