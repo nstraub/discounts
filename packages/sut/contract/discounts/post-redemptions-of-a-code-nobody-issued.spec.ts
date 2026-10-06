@@ -1,10 +1,8 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
-import { spicesDiscount } from '@sut/support/example-discounts';
-
 import { setupSut } from '../support/app';
-import { keptUnused, theCouponsKept, theDiscountsKept, theRowKeptFor } from '../support/discounts-table';
+import { keptAsIssued, theDiscountsAndCouponsKept } from '../support/discounts-table';
 import { bodiesNotMatchingTheErrorSchema, theFieldsNamedBy } from '../support/error-schema';
 import { redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithAnotherCouponOfTheSameDiscount } from '../support/redemptions';
 
@@ -21,12 +19,11 @@ describe('POST /redemptions', () => {
       expect(bodiesNotMatchingTheErrorSchema([response])).to.deep.equal([]);
     });
     it('should keep every discount and coupon as it was when the code was never issued', async () => {
-      const { client, http, published, code, other } = await setupSutWithAnotherCouponOfTheSameDiscount();
+      const sut = await setupSutWithAnotherCouponOfTheSameDiscount();
 
-      await redeemAtTheStoreOf(http, aCodeNobodyIssued);
+      await redeemAtTheStoreOf(sut.http, aCodeNobodyIssued);
 
-      expect(await theCouponsKept(client), 'each coupon kept').to.have.deep.members([keptUnused(code), keptUnused(other)]);
-      expect(await theDiscountsKept(client), 'the discount kept').to.deep.equal([theRowKeptFor(published, spicesDiscount)]);
+      expect(await theDiscountsAndCouponsKept(sut.client)).to.deep.equal(keptAsIssued(sut));
     });
     it('should publish nothing on the application event emitter for a code nobody issued', async () => {
       const { app, http } = await setupSutWithACouponFor();

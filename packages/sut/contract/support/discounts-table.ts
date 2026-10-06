@@ -29,9 +29,12 @@ export const insertACoupon = (client: pg.Client, coupon: { token?: string; disco
 
 export const theDiscountsKept = async (client: pg.Client) => (await client.query('SELECT id, item, rate, store_name, store_address FROM app.discounts')).rows;
 
-export const theCouponsKept = async (client: pg.Client) => (await client.query('SELECT token, redeemed, counted FROM app.coupons')).rows;
+export const theCouponsKept = async (client: pg.Client) =>
+  (await client.query('SELECT token, redeemed, counted FROM app.coupons ORDER BY token COLLATE "C"')).rows;
 
 export const keptUnused = (token: string) => ({ token, redeemed: false, counted: false });
+
+export const theDiscountsAndCouponsKept = async (client: pg.Client) => ({ discounts: await theDiscountsKept(client), coupons: await theCouponsKept(client) });
 
 export const theRowKeptFor = (published: { id: string }, discount: typeof spicesDiscount) => ({
   id: published.id,
@@ -39,6 +42,11 @@ export const theRowKeptFor = (published: { id: string }, discount: typeof spices
   rate: discount.rate,
   store_name: discount.storeName,
   store_address: discount.storeAddress,
+});
+
+export const keptAsIssued = ({ published, code, other }: { published: { id: string }; code: string; other: string }) => ({
+  discounts: [theRowKeptFor(published, spicesDiscount)],
+  coupons: [code, other].sort().map(keptUnused),
 });
 
 export const constraintsAndColumnsOfTheDiscountsTable = async (client: pg.Client) => {
