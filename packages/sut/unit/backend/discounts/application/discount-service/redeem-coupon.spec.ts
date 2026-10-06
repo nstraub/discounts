@@ -6,12 +6,13 @@ import { CouponRedeemed } from '@backend/discounts/application/domain/coupon-red
 import { CouponRedemptionRejected } from '@backend/discounts/application/domain/coupon-redemption-rejected';
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import type { DiscountRepository } from '@backend/discounts/application/domain/discount-repository';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { Store } from '@backend/discounts/application/domain/store';
+import { publishedProduceDiscount, publishedSpicesDiscount, spicesDiscount, theStoreOf } from '@sut/support/example-discounts';
 import { atTheSpicesStore } from '@sut/support/example-stores';
 
 import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
 
-const setupSut = ({ coupons = [{ token: '7K3QX9M2PD', redeemed: false, counted: false }] } = {}) => aServiceOverAKeptDiscount({ coupons });
+const setupSut = ({ kept = publishedSpicesDiscount, coupons = [{ token: '7K3QX9M2PD', redeemed: false, counted: false }] } = {}) => aServiceOverAKeptDiscount({ kept, coupons });
 
 describe('class DiscountService', () => {
   describe('redeeming a coupon', () => {
@@ -80,7 +81,13 @@ describe('class DiscountService', () => {
     });
   });
   describe('redeeming a coupon at a store', () => {
-    it.todo('should redeem a coupon at the store given when it is the store its discount names');
+    it('should redeem a coupon at the store given when it is the store its discount names', async () => {
+      const { repository, service } = setupSut({ kept: publishedProduceDiscount });
+
+      await service.redeemCoupon('7K3QX9M2PD', new Store(theStoreOf(publishedProduceDiscount)));
+
+      expect(repository.save.mock.lastCall?.at(0)?.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true, counted: false }]);
+    });
     it.todo('should report that the coupon is not for the store given');
     it.todo('should keep nothing when the coupon is not for the store given');
     it.todo('should announce CouponRedemptionRejected for the coupon refused at another store');
