@@ -8,6 +8,8 @@ class RestApiException extends Error {}
 
 export class UnprocessableContentException extends RestApiException {}
 
+export class NotFoundException extends RestApiException {}
+
 export class BadRequestException extends RestApiException {
   constructor(
     message: string,
@@ -28,6 +30,6 @@ export const refuseANotOkAnswer = async (request: string, response: Response): P
     throw new UnprocessableContentException(answered);
   }
   if (!response.ok) {
-    throw new RestApiException(answered);
+    throw new NotFoundException(answered);
   }
 };

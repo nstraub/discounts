@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { FetchRestApi } from '@app/types/rest-api';
-import { BadRequestException, UnprocessableContentException } from '@app/types/rest-api-refusals';
+import { BadRequestException, NotFoundException, UnprocessableContentException } from '@app/types/rest-api-refusals';
 import { spicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { setupSut as setupTheApp } from '../../support/app';
@@ -109,7 +109,13 @@ describe('class FetchRestApi', () => {
     });
   });
   describe('posting to something not found', () => {
-    it.todo('should reject an answer of 404 with an exception of its own');
+    it('should reject an answer of 404 with an exception of its own', async () => {
+      const { restApi } = await setupSut();
+
+      const refusal = await refusalOf(restApi.post('/nowhere', spicesDiscount));
+
+      expect(refusal).to.be.instanceOf(NotFoundException);
+    });
     it.todo('should not reject an answer other than 404 as not found');
   });
 
