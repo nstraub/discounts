@@ -79,7 +79,18 @@ describe('Component PublishDiscountForm', () => {
     });
 
     describe('combination', () => {
-      it.todo('should tell Mike every piece missing at once, each beside its own field');
+      it('should tell Mike every piece missing at once, each beside its own field', async () => {
+        const { form } = setupSutRefusingAsMissing(['item', 'rate', 'storeName', 'storeAddress']);
+
+        await askToPublish(form);
+
+        expect(theRequiredFields.map((field) => whatTheFieldTells(form, field)), 'what the fields tell').to.deep.equal([
+          discountTexts.itemMissing,
+          discountTexts.rateMissing,
+          discountTexts.storeNameMissing,
+          discountTexts.storeAddressMissing,
+        ]);
+      });
       it.todo('should tell Mike the rate is missing, never that it is not valid, when the refusal lists it as missing');
     });
   });
