@@ -25,7 +25,14 @@ describe('the discounts of a store found in PostgreSQL', () => {
 
     expect(found).to.deep.equal([spices]);
   });
-  it.todo('should load each discount found with every one of its coupons');
+  it('should load each discount found with every one of its coupons', async () => {
+    const { keepWithCouponsIssued, repository } = await setupSut();
+    await keepWithCouponsIssued(spicesDiscount, ['7K3QX9M2PD', 'R4WZ0BH8NE']);
+
+    const [found] = await repository.ofStore(theSpicesStore);
+
+    expect(found?.toJSON().coupons.map(({ token }) => token)).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
+  });
   it.todo('should find nothing for a name and address no kept discount has');
 
   describe('A2 injection', () => {

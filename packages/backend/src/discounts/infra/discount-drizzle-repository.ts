@@ -41,7 +41,8 @@ export class DiscountDrizzleRepository implements DiscountRepository {
 
   async ofStore({ storeName, storeAddress }: Parameters<DiscountRepository['ofStore']>[0]): Promise<Discount[]> {
     const rows = await this.keptDiscounts().where(and(eq(discounts.storeName, storeName), eq(discounts.storeAddress, storeAddress)));
-    return rows.map((row) => this.rebuilt(row, []));
+    const issued = await couponsIssuedByEachDiscount(this.database);
+    return rows.map((row) => this.rebuilt(row, issued.get(row.id) ?? []));
   }
 
   private keptDiscounts() {
