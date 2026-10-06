@@ -19,7 +19,17 @@ describe('a discount found by one of its coupons\' tokens in PostgreSQL', () => 
 
     expect(found?.toJSON()).to.deep.equal(produce.toJSON());
   });
-  it.todo('should load the discount found with every one of its coupons, not only the one with that token');
+  it('should load the discount found with every one of its coupons, not only the one with that token', async () => {
+    const { keep, repository } = await setupSut();
+    const spices = await keep(spicesDiscount);
+    spices.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+    spices.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
+    await repository.save(spices);
+
+    const found = await repository.withCouponToken(CouponToken.keptAs('R4WZ0BH8NE'));
+
+    expect(found?.toJSON().coupons.map(({ token }) => token)).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
+  });
   it('should find nothing for a token no kept coupon has', async () => {
     const { keep, repository } = await setupSut();
     const spices = await keep(spicesDiscount);
