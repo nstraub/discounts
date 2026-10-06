@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { tokenDrawnAs } from '@backend/app/mocks/coupon-tokens';
 import { CouponIssued } from '@backend/discounts/application/domain/coupon-issued';
+import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import { produceDiscount } from '@sut/support/example-discounts';
 
 import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
@@ -14,14 +14,14 @@ describe('class Discount', () => {
       it('should hold the coupon it issues, with the token it is given', () => {
         const { discount } = setupSut();
 
-        discount.issueCoupon(tokenDrawnAs('7K3QX9M2PD'));
+        discount.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
 
         expect(discount.toJSON().coupons).to.deep.equal(['7K3QX9M2PD']);
       });
       it('should raise CouponIssued carrying its id and the coupon\'s token', () => {
         const { events, discount } = setupSut();
 
-        discount.issueCoupon(tokenDrawnAs('7K3QX9M2PD'));
+        discount.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
 
         const [raised] = events.publish.mock.lastCall ?? [];
         expect(raised).to.be.instanceOf(CouponIssued);
@@ -31,7 +31,7 @@ describe('class Discount', () => {
         const { events, factory } = setupSut();
         const discount = factory.reconstitute({ id: 'produce-id', ...produceDiscount, coupons: [] });
 
-        discount.issueCoupon(tokenDrawnAs('R4WZ0BH8NE'));
+        discount.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
 
         expect(events.publish.mock.lastCall?.at(0)).to.deep.include({ id: 'produce-id', token: 'R4WZ0BH8NE' });
       });
