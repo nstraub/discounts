@@ -1,6 +1,18 @@
+import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
+
+const charactersInAGroup = 5;
+const asThePageShows = (token: string) => `${token.slice(0, charactersInAGroup)} ${token.slice(charactersInAGroup)}`;
+const anyDrawnToken = fc
+  .uint8Array({ minLength: 10, maxLength: 10 })
+  .map((bytes) =>
+    CouponToken.drawnFrom((values) => {
+      values.set(bytes);
+      return values;
+    }).toJSON(),
+  );
 
 describe('class CouponToken', () => {
   describe('reading a code typed at the till', () => {
@@ -32,7 +44,15 @@ describe('class CouponToken', () => {
     });
 
     describe('property', () => {
-      it.todo('should read any drawn token back from the way the page shows it, in upper or lower case');
+      it('should read any drawn token back from the way the page shows it, in upper or lower case', () => {
+        fc.assert(
+          fc.property(anyDrawnToken, fc.boolean(), (drawn, typedInLowerCase) => {
+            const shown = asThePageShows(drawn);
+            const typed = typedInLowerCase ? shown.toLowerCase() : shown;
+            expect(CouponToken.read(typed).toJSON()).to.equal(drawn);
+          }),
+        );
+      });
     });
   });
 });
