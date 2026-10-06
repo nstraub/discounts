@@ -1,5 +1,7 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
+import type { DiscountPublicationRejected } from '@backend/discounts/application/domain/discount-publication-rejected';
 import { requestRejection } from '@app/types/discounts';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
@@ -40,7 +42,15 @@ describe('POST /discounts with a rate that is not valid', () => {
       const listed = await http.get('/discounts');
       expect(listed.body).to.deep.equal([]);
     });
-    it.todo('should publish DiscountPublicationRejected on the application event emitter for the rate refused');
+    it('should publish DiscountPublicationRejected on the application event emitter for the rate refused', async () => {
+      const { app, http } = await setupSut();
+      const rejected: unknown[] = [];
+      app.get(EventEmitter2).on('discount.publication-rejected', ({ rate, reason }: DiscountPublicationRejected) => rejected.push({ rate, reason }));
+
+      await publishAtTheRate(http, '150');
+
+      expect(rejected).to.deep.equal([{ rate: '150', reason: 'not valid' }]);
+    });
     it.todo('should publish no DiscountPublicationRejected when the request schema refuses the body before any rule decides');
   });
 
