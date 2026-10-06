@@ -33,6 +33,7 @@ const discount = defineModel<ReturnType<typeof nothingTyped>>({ required: true }
   <CaptionedInput
     v-model="discount.storeAddress"
     :caption="discountTexts.storeAddress"
+    :told="toldWhenMissing('storeAddress', discountTexts.storeAddressMissing)"
     test-id="discount-store-address"
   />
   <CaptionedInput

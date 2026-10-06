@@ -179,7 +179,6 @@ Feature: Mike publishes a discount on what he is famous for
     Then he is told the item it applies to is missing and the rate is not valid
     And the discount is not published
 
-  @wip
   Scenario Outline: Mike leaves out required information
     Given Mike tries to publish a discount
     When he leaves out <information>
