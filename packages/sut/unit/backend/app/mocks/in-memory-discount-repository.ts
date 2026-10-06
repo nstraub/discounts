@@ -11,4 +11,8 @@ export class InMemoryDiscountRepository implements DiscountRepository {
   async all(): Promise<Discount[]> {
     return [...this.kept];
   }
+
+  async withId(id: string): Promise<Discount | undefined> {
+    return this.kept.find((discount) => discount.toJSON().id === id);
+  }
 }

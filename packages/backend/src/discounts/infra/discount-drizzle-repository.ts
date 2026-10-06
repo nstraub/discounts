@@ -19,4 +19,8 @@ export class DiscountDrizzleRepository implements DiscountRepository {
     const rows = await this.database.select().from(discounts);
     return rows.map((row) => this.factory.reconstitute({ ...row, rate: String(row.rate) }));
   }
+
+  async withId(): Promise<Discount | undefined> {
+    throw new Error('not implemented: DiscountDrizzleRepository.withId');
+  }
 }

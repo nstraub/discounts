@@ -16,6 +16,15 @@ export class DiscountService {
     return discount;
   }
 
+  async changeRate(id: string, rate: string): Promise<void> {
+    const discount = await this.repository.withId(id);
+    if (!discount) {
+      return;
+    }
+    discount.changeRate(rate);
+    await this.repository.save(discount);
+  }
+
   async published(): Promise<Discount[]> {
     return this.repository.all();
   }
