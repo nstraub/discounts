@@ -192,6 +192,11 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   per save. `DiscountRepository.ofStore` finds a store's discounts by name and address.
   `infra/store-counts.controller.ts` serves `POST /stores/counts` (201). Migration `0007` adds
   `coupons.counted` (lossy down).
+- **Single use and concurrency:** `Coupon.redeem` refuses a coupon already redeemed
+  (`CouponRedemptionRejected`; `POST /redemptions` answers 409). `DiscountChanges` runs issuing,
+  redeeming and counting through `DiscountRepository.changing(work)`: one transaction, the discount's
+  row locked (`SELECT … FOR UPDATE`), so concurrent changes to one discount are serialised. `changeRate`
+  stays outside `changing`, last write winning.
 - **The rate** is text end to end (column, schema, domain, page), kept exactly as written
   (migration `0003_rate_as_written`).
 - **`src/discounts/infra/database.module.ts`:** the one connection pool, exported as the Drizzle
@@ -249,7 +254,10 @@ first slice.
   runs a schema backward and forward again. The discounts the specs publish are shared in
   `@sut/support/example-discounts` (with `publishedSpicesDiscount`); `contract/support/error-schema.ts`
   holds `bodiesNotMatchingTheErrorSchema`. Frontend store specs arrange the store with
-  `aTestingDiscountsStore` (`unit/frontend/stores/discounts-store/`). A discount with a hook is
+  `aTestingDiscountsStore` (`unit/frontend/stores/discounts-store/`). A concurrency line fires
+  several requests around the change it races, since one pair rarely interleaves: its supports are
+  `issueACouponFor` and `askForACouponFor` (`contract/support/redemptions.ts`) and `changeTheRateOf`
+  (`contract/support/rates.ts`); keep race rates at or below 100. A discount with a hook is
   `spicesDiscountWithItsHook`; `discounts-table.ts` also holds `aDiscountKeptBefore` and
   `aDiscountKeptBeforeAsReadAfterMigratingForward`, for a discount kept before a migration. A new
   migration joins `theMigrationsAfterIt` in each earlier migration spec; otherwise the migrator
