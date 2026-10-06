@@ -20,6 +20,11 @@ export class DiscountsPage {
     await this.untilTheDiscountIsKeptAndTheFormCleared();
   }
 
+  async publishWithItsHook(discount: ExampleDiscount, hook: string): Promise<void> {
+    await this.page.getByTestId('discount-hook').fill(hook);
+    await this.publish(discount);
+  }
+
   private async untilTheDiscountIsKeptAndTheFormCleared(): Promise<void> {
     const item = await this.page.getByTestId('discount-item').elementHandle();
     await this.page.waitForFunction((input) => (input as HTMLInputElement | null)?.value === '', item);
@@ -53,6 +58,12 @@ export class DiscountsPage {
     const shown = await this.publishedEntryOn(discount);
     assert.equal(await shown.getByTestId('published-item').textContent(), discount.item);
     assert.equal(await shown.getByTestId('published-rate').textContent(), `${discount.rate}%`);
+  }
+
+  async verifyShowsWhatIsNew(discount: ExampleDiscount, whatIsNew: string): Promise<void> {
+    const shown = await this.publishedEntryOn(discount);
+    const hooks = await shown.getByTestId('published-hook').allTextContents();
+    assert.deepEqual(hooks, [whatIsNew], `the discount on ${discount.item} does not say what is new about it`);
   }
 
   async verifyShowsOnceAtTheRate(discount: ExampleDiscount, rate: string): Promise<void> {

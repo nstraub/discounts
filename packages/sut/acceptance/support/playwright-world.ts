@@ -15,6 +15,7 @@ export class PlaywrightWorld extends World {
   page!: Page;
   someoneElsesContext?: BrowserContext;
   publishedDiscount!: typeof produceDiscount;
+  whatIsNew!: string;
 
   /**
    * Opens a fresh browser context and page for one scenario, aimed at the app under test.

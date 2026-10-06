@@ -38,6 +38,7 @@ const publish = async (): Promise<void> => {
       :caption="discountTexts.storeAddress"
       test-id="discount-store-address"
     />
+    <input data-testid="discount-hook">
     <button
       type="submit"
       class="rounded border px-3 py-1"
