@@ -73,3 +73,30 @@ Feature: Stephanie takes the coupon at the till
   Scenario: Someone tries code after code at the till
     When someone tries codes at the till far faster than anyone takes coupons
     Then they are slowed down
+
+  @wip
+  Scenario: A coupon counts only once
+    Given Sue has used her coupon at Stephanie's store
+    When Sue tries to use it again
+    Then Stephanie is told it has already been used
+
+  @todo
+  Scenario: A coupon used before Rodrigo's count is still used after it
+    Given Sue has used her coupon at Stephanie's store
+    And Rodrigo has counted Stephanie's discounted sales since
+    When Sue tries to use it again
+    Then Stephanie is told it has already been used
+
+  @todo
+  Scenario: A coupon is got while another is used
+    Given Sue has a coupon for Stephanie's discount
+    When Sue uses it at Stephanie's store while her neighbour gets a coupon for the same discount
+    Then Stephanie is told the discount applies
+    And her neighbour's coupon applies at Stephanie's store too
+
+  @todo
+  Scenario: Stephanie changes the rate while a coupon is used
+    Given Sue has a coupon for Stephanie's discount
+    When Sue uses it at Stephanie's store while Stephanie changes the discount's rate
+    Then Sue's coupon counts as used
+    And people can see the new rate

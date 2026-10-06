@@ -124,3 +124,11 @@ Feature: Rodrigo counts the discounted sales
     Given Rodrigo has counted Stephanie's discounted sales before
     When Sue uses a coupon for Stephanie's discount while Rodrigo counts the discounted sales
     Then that discounted sale is counted once, in this count or the next
+
+  @todo
+  Scenario: A coupon used again counts once
+    Given Rodrigo has counted Stephanie's discounted sales before
+    And Sue has used her coupon at Stephanie's store since then
+    And Sue has tried to use it again
+    When Rodrigo counts the discounted sales
+    Then he sees 1 discounted sale for that discount
