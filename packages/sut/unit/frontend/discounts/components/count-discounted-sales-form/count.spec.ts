@@ -94,7 +94,11 @@ describe('Component CountDiscountedSalesForm', () => {
     });
 
     describe('state', () => {
-      it.todo('should show no count before the sales are counted');
+      it('should show no count before the sales are counted', () => {
+        const { form } = setupSut();
+
+        expect(whatTheCountShowsFor(form, 'counted-discount'), 'the discounts counted').to.deep.equal([]);
+      });
       it.todo('should count once when Rodrigo counts twice before the first count answers');
     });
 
