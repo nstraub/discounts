@@ -36,7 +36,13 @@ describe('POST /redemptions at a store the coupon is not for', () => {
 
       expect(rejected, 'the redemptions rejected').to.deep.equal([{ discountId: published.id, token: code, reason: 'not for this store' }]);
     });
-    it.todo('should refuse a coupon at a store with the same name as its own at another address');
+    it('should refuse a coupon at a store with the same name as its own at another address', async () => {
+      const { http, code } = await setupSutWithACouponFor();
+
+      const response = await redeemAtTheStoreOf(http, code, { ...spicesDiscount, storeAddress: '9 Quay Street' });
+
+      expect(response.status).to.equal(422);
+    });
   });
 
   describe('no store given', () => {
