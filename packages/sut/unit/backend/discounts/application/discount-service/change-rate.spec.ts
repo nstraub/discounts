@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { DiscountRateChanged } from '@backend/discounts/application/domain/discount-rate-changed';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
-import { aServiceOverTheKeptSpicesDiscount } from './a-service-over-the-kept-spices-discount';
+import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
 
-const setupSut = aServiceOverTheKeptSpicesDiscount;
+const setupSut = aServiceOverAKeptDiscount;
 
 describe('class DiscountService', () => {
   describe('changing the rate of a discount', () => {

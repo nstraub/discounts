@@ -7,7 +7,7 @@ import type { DiscountRepository } from '@backend/discounts/application/domain/d
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
 import { publishedSpicesDiscount } from '@sut/support/example-discounts';
 
-export const aServiceOverTheKeptSpicesDiscount = ({ kept = publishedSpicesDiscount, drawing = '7K3QX9M2PD' } = {}) => {
+export const aServiceOverAKeptDiscount = ({ kept = publishedSpicesDiscount, drawing = '7K3QX9M2PD' } = {}) => {
   const events = mock<DomainEventPublisher>();
   const factory = new DiscountFactory(events);
   const repository = mock<DiscountRepository>();
