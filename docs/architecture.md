@@ -46,17 +46,19 @@ C4Component
     Component(view, "DiscountsView", "Vue view", "Loads the published discounts when the page opens")
     Component(list, "PublishedDiscounts", "Vue component", "One entry per discount: item, rate as written followed by %, store name and address")
     Component(form, "PublishDiscountForm", "Vue component", "Captioned inputs for the four pieces; clears itself once published")
-    Component(store, "discounts store", "Pinia", "publish() and load(); goes through RestApi")
+    Component(changeForm, "ChangeRateForm", "Vue component", "One per listed discount: a new rate and a button to change it")
+    Component(store, "discounts store", "Pinia", "publish(), load() and changeRate(); goes through RestApi, and reloads the list after a change")
   }
 
   Container_Boundary(backend, "Backend (NestJS)") {
-    Component(controller, "DiscountsController", "NestJS controller", "POST /discounts answers 201 with Location; GET /discounts lists")
+    Component(controller, "DiscountsController", "NestJS controller", "POST /discounts answers 201 with Location; PATCH /discounts/:id answers 204; GET /discounts lists")
     Component(parsedBy, "ParsedBy", "Nest pipe, zod", "Parses the request against the shared schema; a failure is a 400 requestRejection")
-    Component(service, "DiscountService", "Application service", "publish() and published()")
+    Component(service, "DiscountService", "Application service", "publish(), changeRate() and published()")
     Component(factory, "DiscountFactory", "Domain factory", "create() gives a new identity; reconstitute() rebuilds a kept discount")
-    Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails; publish() raises DiscountPublished")
+    Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails; publish() raises DiscountPublished, changeRate() raises DiscountRateChanged")
     Component(event, "DiscountPublished", "Domain event", "Carries the discount as published")
-    Component(repositoryPort, "DiscountRepository", "Port", "save() and all()")
+    Component(rateChanged, "DiscountRateChanged", "Domain event", "Carries the discount id and its new rate")
+    Component(repositoryPort, "DiscountRepository", "Port", "save() (inserts or updates), all() and withId()")
     Component(publisherPort, "DomainEventPublisher", "Port", "publish(event)")
     Component(repository, "DiscountDrizzleRepository", "Adapter", "Keeps discounts in app.discounts")
     Component(publisher, "EventEmitterDomainEventPublisher", "Adapter", "Emits the event on the application's EventEmitter2")
@@ -66,15 +68,18 @@ C4Component
 
   Rel(view, list, "Shows")
   Rel(view, form, "Shows")
+  Rel(list, changeForm, "Shows one per discount")
   Rel(form, store, "publish()")
+  Rel(changeForm, store, "changeRate()")
   Rel(view, store, "load()")
-  Rel(store, controller, "POST and GET /discounts", "JSON over HTTP")
+  Rel(store, controller, "POST, PATCH and GET /discounts", "JSON over HTTP")
   Rel(controller, parsedBy, "Parses the body with")
   Rel(controller, service, "Calls")
   Rel(service, factory, "Creates discounts with")
   Rel(factory, discount, "Builds")
   Rel(service, repositoryPort, "Saves and lists through")
   Rel(discount, event, "Raises")
+  Rel(discount, rateChanged, "Raises")
   Rel(discount, publisherPort, "Publishes through")
   Rel(repository, repositoryPort, "Implements")
   Rel(publisher, publisherPort, "Implements")
@@ -109,6 +114,36 @@ sequenceDiagram
   Service-->>Controller: discount
   Controller-->>Store: 201, Location /discounts/{id}, the discount as JSON
   Form->>Form: clears its fields
+```
+
+### Changing a discount's rate
+
+Anyone can change any discount's rate (ADR 0002). The request names the discount by its id and carries
+the new rate as text. A change to a discount nobody published answers 204 and changes nothing.
+
+```mermaid
+sequenceDiagram
+  actor Mike
+  participant Form as ChangeRateForm
+  participant Store as discounts store
+  participant Controller as DiscountsController
+  participant Service as DiscountService
+  participant Repository as DiscountRepository
+  participant Discount
+  participant Events as DomainEventPublisher
+
+  Mike->>Form: types a new rate beside a discount; submits
+  Form->>Store: changeRate(id, change)
+  Store->>Controller: PATCH /discounts/{id}
+  Controller->>Controller: ParsedBy checks the body (400 requestRejection when the rate is missing or mistyped)
+  Controller->>Service: changeRate(id, rate)
+  Service->>Repository: withId(id)
+  Service->>Discount: changeRate(rate)
+  Discount->>Events: publish(DiscountRateChanged)
+  Service->>Repository: save(discount)
+  Controller-->>Store: 204
+  Store->>Controller: GET /discounts
+  Controller-->>Store: the discounts, with the new rate
 ```
 
 Every error answers with the one `requestRejection` schema in `@app/types/discounts`
