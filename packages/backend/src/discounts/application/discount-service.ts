@@ -1,3 +1,4 @@
+import { DiscountChanges } from './discount-changes.js';
 import { CouponToken } from './domain/coupon-token.js';
 import type { Discount } from './domain/discount.js';
 import type { DiscountDetails } from './domain/discount-details.js';
@@ -8,11 +9,15 @@ import type { RandomSource } from './domain/random-source.js';
 import type { RedeemedCoupon } from './domain/redeemed-coupon.js';
 
 export class DiscountService {
+  private readonly changes: DiscountChanges;
+
   constructor(
     private readonly factory: DiscountFactory,
     private readonly repository: DiscountRepository,
     private readonly random: RandomSource,
-  ) {}
+  ) {
+    this.changes = new DiscountChanges(repository);
+  }
 
   async publish(details: DiscountDetails): Promise<Discount> {
     const discount = this.factory.create(details);
@@ -26,27 +31,19 @@ export class DiscountService {
     if (!discount) {
       return;
     }
-    await this.keptAfter(discount, (found) => found.changeRate(rate));
+    await this.changes.keptAfter(discount, (found) => found.changeRate(rate));
   }
 
   async issueCoupon(id: string): Promise<IssuedCoupon> {
-    const discount = (await this.repository.withId(id))!;
-    return this.keptAfter(discount, (found) => found.issueCoupon(CouponToken.drawnFrom(this.random)));
+    return this.changes.toTheOneWithId(id, (found) => found.issueCoupon(CouponToken.drawnFrom(this.random)));
   }
 
   async redeemCoupon(code: string): Promise<RedeemedCoupon> {
     const token = CouponToken.read(code);
-    const discount = (await this.repository.withCouponToken(token))!;
-    return this.keptAfter(discount, (found) => found.redeemCoupon(token));
+    return this.changes.toTheOneThatIssued(token, (found) => found.redeemCoupon(token));
   }
 
   async published(): Promise<Discount[]> {
     return this.repository.all();
-  }
-
-  private async keptAfter<Answer>(discount: Discount, change: (discount: Discount) => Answer): Promise<Answer> {
-    const answer = change(discount);
-    await this.repository.save(discount);
-    return answer;
   }
 }
