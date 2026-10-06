@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { publishedSpicesDiscount } from '@sut/support/example-discounts';
+
 import { setupSut } from './discounts-store-of-an-app';
 
 describe('Store discounts', () => {
@@ -18,7 +20,14 @@ describe('Store discounts', () => {
 
       expect(restApi.patch).to.have.been.calledWith('/discounts/produce-id', { rate: '15' });
     });
-    it.todo('should hold the discount at its new rate once the change succeeds');
+    it('should hold the discount at its new rate once the change succeeds', async () => {
+      const { restApi, discounts } = setupSut();
+      restApi.get.mockResolvedValue([{ ...publishedSpicesDiscount, rate: '30' }]);
+
+      await discounts.changeRate('spices-id', { rate: '30' });
+
+      expect(discounts.published).to.deep.equal([{ ...publishedSpicesDiscount, rate: '30' }]);
+    });
     it.todo('should hold the new rate on that discount only, the others keeping theirs');
 
     describe('dependency failure', () => {
