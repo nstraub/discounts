@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
+import type { Discount } from '@backend/discounts/application/domain/discount';
 import { produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/discount-repository';
@@ -9,6 +10,14 @@ const keepWithACouponIssued = async ({ keep }: Awaited<ReturnType<typeof setupSu
   const discount = await keep(spicesDiscount);
   discount.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
   return discount;
+};
+
+const savedAgainAfter = async (sut: Awaited<ReturnType<typeof setupSut>>, change: (found: Discount) => void) => {
+  const [found] = await sut.loadOnItsOwnConnection();
+  change(found!);
+  await sut.repository.save(found!);
+  const [loaded] = await sut.loadOnItsOwnConnection();
+  return loaded;
 };
 
 describe('a discount kept in PostgreSQL', () => {
@@ -104,12 +113,9 @@ describe('a discount kept in PostgreSQL', () => {
       const sut = await setupSut();
       const discount = await keepWithACouponIssued(sut);
       await sut.repository.save(discount);
-      const found = await sut.repository.withId(discount.toJSON().id);
-      found?.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
 
-      await sut.repository.save(found!);
+      const loaded = await savedAgainAfter(sut, (found) => found.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE')));
 
-      const [loaded] = await sut.loadOnItsOwnConnection();
       expect(loaded?.toJSON().coupons.map(({ token }) => token)).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
     });
   });
@@ -128,12 +134,9 @@ describe('a discount kept in PostgreSQL', () => {
     it('should keep a coupon redeemed once its discount, kept with it unused, is saved again', async () => {
       const sut = await setupSut();
       await sut.repository.save(await keepWithACouponIssued(sut));
-      const [found] = await sut.loadOnItsOwnConnection();
-      found?.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
 
-      await sut.repository.save(found!);
+      const loaded = await savedAgainAfter(sut, (found) => found.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD')));
 
-      const [loaded] = await sut.loadOnItsOwnConnection();
       expect(loaded?.toJSON().coupons.at(0)?.redeemed, 'the coupon loaded back, redeemed').to.equal(true);
     });
     it('should keep a discount\'s other coupons unused when one is redeemed and it is saved again', async () => {
@@ -141,12 +144,9 @@ describe('a discount kept in PostgreSQL', () => {
       const discount = await keepWithACouponIssued(sut);
       discount.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
       await sut.repository.save(discount);
-      const [found] = await sut.loadOnItsOwnConnection();
-      found?.redeemCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
 
-      await sut.repository.save(found!);
+      const loaded = await savedAgainAfter(sut, (found) => found.redeemCoupon(CouponToken.keptAs('R4WZ0BH8NE')));
 
-      const [loaded] = await sut.loadOnItsOwnConnection();
       expect(loaded?.toJSON().coupons.at(0), 'the other coupon loaded back').to.deep.equal({ token: '7K3QX9M2PD', redeemed: false });
     });
     it('should keep a redeemed coupon redeemed when another coupon is issued and the discount is saved again', async () => {
@@ -154,12 +154,9 @@ describe('a discount kept in PostgreSQL', () => {
       const discount = await keepWithACouponIssued(sut);
       discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
       await sut.repository.save(discount);
-      const [found] = await sut.loadOnItsOwnConnection();
-      found?.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
 
-      await sut.repository.save(found!);
+      const loaded = await savedAgainAfter(sut, (found) => found.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE')));
 
-      const [loaded] = await sut.loadOnItsOwnConnection();
       expect(loaded?.toJSON().coupons.at(0), 'the coupon redeemed before').to.deep.equal({ token: '7K3QX9M2PD', redeemed: true });
     });
   });
