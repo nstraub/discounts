@@ -3,15 +3,14 @@ import { describe, expect, it } from 'vitest';
 
 import { InMemoryDiscountRepository } from '@backend/app/mocks/in-memory-discount-repository';
 import { DiscountService } from '@backend/discounts/application/discount-service';
-import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
-import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
+import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
 
 const setupSut = () => {
   const factory = new DiscountFactory(mock<DomainEventPublisher>());
   const repository = new InMemoryDiscountRepository();
-  const keep = (details: typeof spicesDiscount) => repository.save(factory.create(new DiscountDetails(details)));
+  const keep = (discount: typeof publishedSpicesDiscount) => repository.save(factory.reconstitute(discount));
   return { keep, service: new DiscountService(factory, repository) };
 };
 
@@ -27,23 +26,20 @@ describe('class DiscountService', () => {
       });
       it('should answer with the one discount published', async () => {
         const { keep, service } = setupSut();
-        await keep(spicesDiscount);
+        await keep(publishedSpicesDiscount);
 
         const published = await service.published();
 
-        expect(published.map((discount) => discount.toJSON())).to.deep.equal([{ id: 'test-uuid', ...spicesDiscount }]);
+        expect(published.map((discount) => discount.toJSON())).to.deep.equal([publishedSpicesDiscount]);
       });
       it('should answer with every discount published when there are several', async () => {
         const { keep, service } = setupSut();
-        await keep(spicesDiscount);
-        await keep(produceDiscount);
+        await keep(publishedSpicesDiscount);
+        await keep(publishedProduceDiscount);
 
         const published = await service.published();
 
-        expect(published.map((discount) => discount.toJSON())).to.deep.equal([
-          { id: 'test-uuid', ...spicesDiscount },
-          { id: 'test-uuid', ...produceDiscount },
-        ]);
+        expect(published.map((discount) => discount.toJSON())).to.deep.equal([publishedSpicesDiscount, publishedProduceDiscount]);
       });
     });
 

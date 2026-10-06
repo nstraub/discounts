@@ -28,4 +28,19 @@ describe('the published discounts read from PostgreSQL', () => {
     const keptInMemory = await inMemory.all();
     expect(kept.map((discount) => discount.toJSON())).to.have.deep.members(keptInMemory.map((discount) => discount.toJSON()));
   });
+  it('should list a discount saved again once, at its latest rate, as the in-memory repository does', async () => {
+    const { factory, repository } = await setupSut();
+    const inMemory = new InMemoryDiscountRepository();
+    const discount = factory.create(new DiscountDetails(spicesDiscount));
+    await repository.save(discount);
+    await inMemory.save(discount);
+    discount.changeRate('25');
+    await repository.save(discount);
+    await inMemory.save(discount);
+
+    const kept = await repository.all();
+
+    const keptInMemory = await inMemory.all();
+    expect(kept.map((saved) => saved.toJSON())).to.deep.equal(keptInMemory.map((saved) => saved.toJSON()));
+  });
 });
