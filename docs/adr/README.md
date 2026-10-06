@@ -13,3 +13,4 @@ gets none.
 | [0005](0005-coupons-are-entities-inside-the-discount-aggregate.md) | Coupons are entities inside the Discount aggregate, not an aggregate of their own | accepted | 2026-10-05 |
 | [0006](0006-one-transaction-per-discount-when-counting.md) | A count restarts each discount in its own transaction; a store's discounts become consistent eventually | accepted | 2026-10-05 |
 | [0007](0007-one-change-at-a-time-to-a-discount-with-a-row-lock.md) | A change to a discount runs in one transaction with the discount's row locked | accepted | 2026-10-06 |
+| [0008](0008-coupons-collection-and-discount-events-inside-the-aggregate.md) | Discount delegates coupon bookkeeping to a Coupons collection and event building to DiscountEvents, and keeps deciding | accepted | 2026-10-06 |
