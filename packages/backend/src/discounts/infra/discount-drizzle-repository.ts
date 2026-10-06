@@ -4,8 +4,9 @@ import type { Discount } from '../application/domain/discount.js';
 import type { DiscountFactory } from '../application/domain/discount-factory.js';
 import type { DiscountRepository } from '../application/domain/discount-repository.js';
 
+import { keepTheNewlyIssued, tokensIssuedBy, tokensIssuedByEachDiscount } from './coupon-rows.js';
 import type { Database } from './database.module.js';
-import { coupons, discounts } from './schema.js';
+import { discounts } from './schema.js';
 
 const theColumnsOfADiscount = {
   id: discounts.id,
@@ -27,23 +28,19 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   async save(discount: Discount): Promise<void> {
     const { coupons: tokens, ...state } = discount.toJSON();
     await this.database.insert(discounts).values(state).onConflictDoUpdate({ target: discounts.id, set: state });
-    const kept = await this.database.select({ token: coupons.token }).from(coupons).where(eq(coupons.discountId, state.id));
-    const newlyIssued = tokens.filter((token) => !kept.some((coupon) => coupon.token === token));
-    if (newlyIssued.length > 0) {
-      await this.database.insert(coupons).values(newlyIssued.map((token) => ({ token, discountId: state.id })));
-    }
+    await keepTheNewlyIssued(this.database, state.id, tokens);
   }
 
   async all(): Promise<Discount[]> {
     const rows = await this.database.select(theColumnsOfADiscount).from(discounts);
-    const issued = await this.database.select({ token: coupons.token, discountId: coupons.discountId }).from(coupons).orderBy(coupons.id);
-    return rows.map((row) => this.rebuilt(row, issued.filter((coupon) => coupon.discountId === row.id).map((coupon) => coupon.token)));
+    const issued = await tokensIssuedByEachDiscount(this.database);
+    return rows.map((row) => this.rebuilt(row, issued.get(row.id) ?? []));
   }
 
   async withId(id: string): Promise<Discount | undefined> {
     const rows = await this.database.select(theColumnsOfADiscount).from(discounts).where(eq(discounts.id, id));
-    const issued = await this.database.select({ token: coupons.token }).from(coupons).where(eq(coupons.discountId, id)).orderBy(coupons.id);
-    return rows.map((row) => this.rebuilt(row, issued.map((coupon) => coupon.token))).at(0);
+    const issued = await tokensIssuedBy(this.database, id);
+    return rows.map((row) => this.rebuilt(row, issued)).at(0);
   }
 
   private rebuilt(row: typeof discounts.$inferSelect, issued: string[]): Discount {
