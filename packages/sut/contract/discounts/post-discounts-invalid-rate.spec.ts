@@ -53,7 +53,15 @@ describe('POST /discounts with a rate that is not valid', () => {
 
       expect(rejected).to.deep.equal([{ rate: aRateAbove100, reason: 'not valid' }]);
     });
-    it.todo('should publish no DiscountPublicationRejected when the request schema refuses the body before any rule decides');
+    it('should publish no DiscountPublicationRejected when the request schema refuses the body before any rule decides', async () => {
+      const { app, http } = await setupSut();
+      const rejected: unknown[] = [];
+      app.get(EventEmitter2).on('discount.publication-rejected', (event: DiscountPublicationRejected) => rejected.push(event));
+
+      await http.post('/discounts').send({ ...spicesDiscount, rate: Number(aRateAbove100) });
+
+      expect(rejected).to.deep.equal([]);
+    });
   });
 
   describe('combination', () => {
