@@ -1,6 +1,5 @@
 Feature: Rodrigo counts the discounted sales
 
-  @wip
   Scenario: Rodrigo counts the discounted sales since his last count
     Given Rodrigo has counted Stephanie's discounted sales before
     And Sue has used 3 coupons for Stephanie's discount since then

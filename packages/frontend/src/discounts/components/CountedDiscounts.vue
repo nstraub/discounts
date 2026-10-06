@@ -16,7 +16,7 @@ defineProps<{ counted: CountResponse }>();
       <span data-testid="counted-item">{{ discount.item }}</span>
       <span data-testid="counted-rate">{{ discount.rate }}%</span>
       <span>{{ discountTexts.discountedSales }}</span>
-      <span data-testid="counted-sales">2</span>
+      <span data-testid="counted-sales">{{ discount.discountedSales }}</span>
     </li>
   </ul>
 </template>

@@ -85,6 +85,13 @@ describe('Component CountDiscountedSalesForm', () => {
 
       expect(theNumbersCountedUnderTheirCaptions(form), 'the numbers counted').to.deep.equal([`${discountTexts.discountedSales} 2`]);
     });
+    it('should show the number counted for every discount when several are', async () => {
+      const { form } = setupSutCountingTo([mikesSpicesCounted, stephaniesProduceCounted]);
+
+      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+
+      expect(theNumbersCountedUnderTheirCaptions(form), 'the numbers counted').to.deep.equal([`${discountTexts.discountedSales} 1`, `${discountTexts.discountedSales} 2`]);
+    });
 
     describe('state', () => {
       it.todo('should show no count before the sales are counted');
