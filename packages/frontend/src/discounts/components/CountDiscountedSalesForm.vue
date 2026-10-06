@@ -12,7 +12,7 @@ defineProps<{ stores: Store[] }>();
   <form>
     <label>
       {{ discountTexts.store }}
-      <select />
+      <select required />
     </label>
   </form>
 </template>
