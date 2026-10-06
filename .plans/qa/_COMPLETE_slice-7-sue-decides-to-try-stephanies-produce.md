@@ -16,7 +16,7 @@ implementation body was read.
 
 ## Outlined
 
-48 `it.todo` lines: 36 are built in this slice (the table below); 12 are recorded for later and stay
+48 `it.todo` lines: 37 are built in this slice (the table below); 11 are recorded for later and stay
 `it.todo` (*Recorded for later*). Nine spec files are new; lines for six existing spec files are added
 inside each file's top-level `describe`, in groups of their own; no existing line is changed or removed.
 
@@ -42,8 +42,9 @@ inside each file's top-level `describe`, in groups of their own; no existing lin
 
 Built outside the outlined lines: 1 line, `should hold the coupons it issued before beside the one it issues`
 (`unit/backend/discounts/application/domain/discount/issue-coupon.spec.ts`). A red with no failing unit line
-below it forced it: a Discount dropped its earlier coupons (bd5902a, 171bd61). The line that two
-coupons are issued for one discount stays recorded for later.
+below it forced it: a Discount dropped its earlier coupons (bd5902a, 171bd61). It is also the outlined
+line that a second coupon is issued with a token of its own when tried twice, both held: that line is built
+by it, and its `it.todo` is removed.
 
 `POST /discounts/:id/coupons`, with no body, answers 201 with the coupon's token and its store's name. No
 coupon is read back by its token in this slice: "Stephanie redeems a coupon" loads the Discount that owns the
@@ -60,11 +61,10 @@ The token generator is given its random source: the unit lines use a fake source
 
 ## Recorded for later
 
-12 lines stay `it.todo`, each with its `@todo` scenario.
+11 lines stay `it.todo`, each with its `@todo` scenario.
 
 | Lines | Spec file (under `packages/sut/`) | Owned by |
 |---|---|---|
-| 1 — a second coupon with a token of its own when tried twice, both held | `unit/backend/discounts/application/domain/discount/issue-coupon.spec.ts` | `@todo` "Sue decides to try the same discount twice"; settled: two decisions give two coupons, a fresh token on every issue already giving it |
 | 1 — two coupons, each with a token of its own, for two requests | `contract/discounts/post-discounts-id-coupons.spec.ts` | the same `@todo` scenario |
 | 1 — one coupon when the same request arrives twice | the same file | `@todo` "Sue's decision to try a discount arrives twice"; settled: one decision arriving twice gives one coupon, recorded only |
 | 1 — asks once when Sue decides twice before the first answer | `unit/frontend/discounts/components/get-coupon-button/get.spec.ts` | the same `@todo` scenario |
