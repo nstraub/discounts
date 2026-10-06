@@ -8,13 +8,13 @@ import { discountTexts } from '../texts';
 
 import CaptionedInput from './CaptionedInput.vue';
 
-defineProps<{ discount: DiscountResponse }>();
+const props = defineProps<{ discount: DiscountResponse }>();
 
 const discounts = useDiscountsStore();
 const newRate = ref('');
 
 const changeRate = async (): Promise<void> => {
-  await discounts.changeRate('spices-id', { rate: newRate.value });
+  await discounts.changeRate(props.discount.id, { rate: newRate.value });
 };
 </script>
 

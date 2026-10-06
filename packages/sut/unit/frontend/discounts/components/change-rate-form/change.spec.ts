@@ -3,13 +3,14 @@ import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import ChangeRateForm from '@frontend/discounts/components/ChangeRateForm.vue';
 import { useDiscountsStore } from '@frontend/stores/discounts-store';
+import { produceDiscount } from '@sut/support/example-discounts';
 import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
 const spicesDiscount = { id: 'spices-id', item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
-const setupSut = () => {
+const setupSut = ({ discount = spicesDiscount } = {}) => {
   const { pinia, global } = aTestingDiscountsStore();
-  const form = mount(ChangeRateForm, { attachTo: document.body, props: { discount: spicesDiscount }, global });
+  const form = mount(ChangeRateForm, { attachTo: document.body, props: { discount }, global });
   onTestFinished(() => form.unmount());
   return { form, discounts: useDiscountsStore(pinia) };
 };
@@ -27,6 +28,13 @@ describe('Component ChangeRateForm', () => {
       await changeThroughTheForm(form, '30');
 
       expect(discounts.changeRate).to.have.been.calledWith('spices-id', { rate: '30' });
+    });
+    it('should change the rate of another discount through that discount\'s own control', async () => {
+      const { form, discounts } = setupSut({ discount: { id: 'produce-id', ...produceDiscount } });
+
+      await changeThroughTheForm(form, '15');
+
+      expect(discounts.changeRate).to.have.been.calledWith('produce-id', { rate: '15' });
     });
     it('should change it to the rate exactly as Mike wrote it', async () => {
       const { form, discounts } = setupSut();
