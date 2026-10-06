@@ -2,6 +2,7 @@ export interface RestApi {
   get<Response>(path: string): Promise<Response>;
   put(path: string, body: unknown): Promise<void>;
   post<Response>(path: string, body: unknown): Promise<Response>;
+  patch(path: string, body: unknown): Promise<void>;
 }
 
 class RestApiException extends Error {}
@@ -29,6 +30,14 @@ export class FetchRestApi implements RestApi {
       body: JSON.stringify(body),
     });
     return this.bodyOfAnOkAnswer<Response>(`POST ${path}`, response);
+  }
+
+  async patch(path: string, body: unknown): Promise<void> {
+    await fetch(`${this.baseUrl}${path}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
   }
 
   private async bodyOfAnOkAnswer<Body>(request: string, response: Response): Promise<Body> {

@@ -60,7 +60,15 @@ describe('class FetchRestApi', () => {
     });
   });
   describe('patching', () => {
-    it.todo('should send the body as JSON to the path with PATCH');
+    it('should send the body as JSON to the path with PATCH', async () => {
+      const { client, restApi } = await setupSut();
+      const published = await restApi.post<{ id: string }>('/discounts', spicesDiscount);
+
+      await restApi.patch(`/discounts/${published.id}`, { rate: '25' });
+
+      const { rows } = await client.query('SELECT rate FROM app.discounts');
+      expect(rows).to.deep.equal([{ rate: '25' }]);
+    });
     it.todo('should resolve when the answer is ok with no content');
     it.todo('should reject when the answer is not ok');
   });
