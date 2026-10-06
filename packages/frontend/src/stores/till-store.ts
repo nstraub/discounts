@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 import type { RedemptionRequest, RedemptionResponse } from '@app/types/discounts';
+import { UnprocessableContentException } from '@app/types/rest-api';
 
 import { useRestApi } from '../rest-api-key';
 
@@ -14,9 +15,9 @@ export const useTillStore = defineStore('till', () => {
     try {
       redemption.value = await restApi.post<RedemptionResponse>('/redemptions', request);
       couponAlreadyUsed.value = false;
-    } catch {
+    } catch (refusal) {
       couponAlreadyUsed.value = true;
-      couponNotForThisStore.value = true;
+      couponNotForThisStore.value = refusal instanceof UnprocessableContentException;
     }
   };
   return { redemption, couponAlreadyUsed, couponNotForThisStore, redeemCoupon };

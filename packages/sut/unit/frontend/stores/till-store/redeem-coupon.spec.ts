@@ -70,6 +70,13 @@ describe('Store till', () => {
 
       expect(till.couponAlreadyUsed, 'whether a coupon is held as already used').to.equal(false);
     });
+    it('should not hold a coupon already used as not for the store picked', async () => {
+      const { till } = setupSutRefusing(new Error('POST /redemptions answered 409'));
+
+      await till.redeemCoupon(aCodeAtTheSpicesStore);
+
+      expect(till.couponNotForThisStore, 'whether the coupon is held as not for the store picked').to.equal(false);
+    });
   });
   describe('redeeming a coupon at another store', () => {
     it('should hold that the coupon is not for the store picked', async () => {
