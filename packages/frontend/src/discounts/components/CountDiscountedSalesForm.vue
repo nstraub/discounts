@@ -6,6 +6,7 @@ import type { DiscountResponse } from '@app/types/discounts';
 import { useDiscountsStore } from '../../stores/discounts-store';
 import { discountTexts } from '../texts';
 
+import CountedDiscounts from './CountedDiscounts.vue';
 import StorePicker from './StorePicker.vue';
 
 type Store = Pick<DiscountResponse, 'storeName' | 'storeAddress'>;
@@ -35,14 +36,9 @@ const count = async (): Promise<void> => {
     >
       {{ discountTexts.countDiscountedSales }}
     </button>
-    <ul v-if="discounts.counted">
-      <li
-        v-for="discount in discounts.counted"
-        :key="discount.id"
-        data-testid="counted-discount"
-      >
-        <span data-testid="counted-item">{{ discount.item }}</span>
-      </li>
-    </ul>
+    <CountedDiscounts
+      v-if="discounts.counted"
+      :counted="discounts.counted"
+    />
   </form>
 </template>
