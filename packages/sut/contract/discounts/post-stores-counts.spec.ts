@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { countResponse } from '@app/types/discounts';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
@@ -31,7 +32,13 @@ describe('POST /stores/counts', () => {
       expect(response.status).to.equal(201);
       expect(response.body).to.deep.equal([{ id: published.id, item: spicesDiscount.item, rate: spicesDiscount.rate, discountedSales: 1 }]);
     });
-    it.todo('should answer with a body matching the count response schema');
+    it('should answer with a body matching the count response schema', async () => {
+      const { http } = await setupSutWithACouponUsedFor();
+
+      const response = await countTheStoreOf(http);
+
+      expect(countResponse.safeParse(response.body).error).to.equal(undefined);
+    });
     it.todo('should publish DiscountedSalesCounted on the application event emitter for the discount counted');
     it.todo('should answer a count made after another with only the coupons redeemed since that one');
   });
