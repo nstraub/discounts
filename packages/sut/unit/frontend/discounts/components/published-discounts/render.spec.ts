@@ -172,4 +172,7 @@ describe('Component PublishedDiscounts', () => {
       expect(queryAllByRole(document.body, 'button', { name: gettingACouponFor(publishedProduceDiscount) })).to.have.length(1);
     });
   });
+  describe('showing a rate written another way', () => {
+    it.todo('should show a rate without a needless .0');
+  });
 });

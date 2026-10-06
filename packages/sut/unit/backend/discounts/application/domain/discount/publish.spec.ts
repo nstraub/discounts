@@ -72,4 +72,13 @@ describe('class Discount', () => {
       it.todo('should refuse a hook longer than allowed');
     });
   });
+  describe('publishing a discount at a rate written another way', () => {
+    describe('type', () => {
+      it.todo('should accept a rate written with a decimal comma as the rate it names');
+      it.todo('should accept a rate written with or without a percent sign as the rate it names');
+      it.todo('should accept a rate written with spaces around it as the rate it names');
+      it.todo('should accept a rate written with a trailing zero as the rate it names');
+      it.todo('should refuse a rate written as 1e2, 0x14 or Infinity, its rejection naming the rate as not valid');
+    });
+  });
 });

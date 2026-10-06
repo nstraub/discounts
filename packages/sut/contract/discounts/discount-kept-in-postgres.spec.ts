@@ -160,4 +160,13 @@ describe('a discount kept in PostgreSQL', () => {
       expect(loaded?.toJSON().coupons.at(0), 'the coupon redeemed before').to.deep.equal({ token: '7K3QX9M2PD', redeemed: true });
     });
   });
+  describe('its rate', () => {
+    describe('type', () => {
+      it.todo('should keep a rate of 33.3 exactly and load it back as 33.3');
+    });
+
+    describe('state', () => {
+      it.todo('should read back as written the rates published before the rate rules');
+    });
+  });
 });
