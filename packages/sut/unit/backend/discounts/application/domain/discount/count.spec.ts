@@ -68,7 +68,13 @@ describe('class Discount', () => {
     });
 
     describe('boundary', () => {
-      it.todo('should count every coupon redeemed since it was published when it has never been counted');
+      it('should count every coupon redeemed since it was published when it has never been counted', () => {
+        const { discount } = setupSut({ coupons: threeRedeemedCoupons.slice(0, 2) });
+
+        const counted = discount.count();
+
+        expect(counted.toJSON().discountedSales, 'the sales since it was published').to.equal(2);
+      });
     });
   });
 });
