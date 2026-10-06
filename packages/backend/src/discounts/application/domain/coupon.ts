@@ -10,10 +10,11 @@ export class Coupon {
   ) {}
 
   redeem(discountId: string): void {
+    this.redeemed = true;
     this.events.publish(new CouponRedeemed(discountId, this.token.toJSON()));
   }
 
   toJSON(): { token: string; redeemed: boolean } {
-    return { token: this.token.toJSON(), redeemed: true };
+    return { token: this.token.toJSON(), redeemed: this.redeemed };
   }
 }

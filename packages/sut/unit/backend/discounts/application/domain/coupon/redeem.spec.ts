@@ -42,7 +42,11 @@ describe('class Coupon', () => {
     });
 
     describe('state', () => {
-      it.todo('should count as unused from its issue until it is redeemed');
+      it('should count as unused from its issue until it is redeemed', () => {
+        const { coupon } = setupSut();
+
+        expect(coupon.toJSON().redeemed).to.equal(false);
+      });
     });
   });
 });
