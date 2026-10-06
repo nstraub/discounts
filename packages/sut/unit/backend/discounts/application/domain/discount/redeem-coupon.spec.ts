@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { CouponAlreadyUsedException } from '@backend/discounts/application/domain/coupon-already-used-exception';
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
 
@@ -44,6 +45,12 @@ describe('class Discount', () => {
     });
   });
   describe('redeeming a coupon already used', () => {
-    it.todo('should refuse the used coupon, leaving its other coupons as they were');
+    it('should refuse the used coupon, leaving its other coupons as they were', () => {
+      const asTheyWere = [{ token: '7K3QX9M2PD', redeemed: true, counted: false }, { token: 'R4WZ0BH8NE', redeemed: false, counted: false }];
+      const discount = setupSut({ coupons: asTheyWere });
+
+      expect(() => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'))).to.throw(CouponAlreadyUsedException);
+      expect(discount.toJSON().coupons).to.deep.equal(asTheyWere);
+    });
   });
 });
