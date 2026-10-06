@@ -25,7 +25,7 @@ describe('class DiscountService', () => {
 
       expect(repository.save.mock.lastCall?.at(0)?.toJSON()).to.deep.equal({ id: 'spices-id', ...spicesDiscount, rate: '25' });
     });
-    it('should announce DiscountRateChanged once the change is kept', async () => {
+    it('should announce DiscountRateChanged when the rate is changed', async () => {
       const { events, repository, service } = setupSut();
 
       await service.changeRate('spices-id', '25');
