@@ -1,14 +1,9 @@
 import { Then, When } from '@cucumber/cucumber';
 
+import { spicesDiscount } from '@sut/support/example-discounts';
+
 import { DiscountsPage, openSomeoneElsesDiscountsPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
-
-const spicesDiscount = {
-  item: 'Peruvian spices',
-  rate: '20',
-  storeName: "Mike's Groceries",
-  storeAddress: '12 Market Street',
-};
 
 When('Mike publishes a discount on an item', async function (this: PlaywrightWorld) {
   const mikesPage = new DiscountsPage(this.page);
