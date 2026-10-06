@@ -14,12 +14,27 @@ Given('Mike has published a discount on produce', async function (this: Playwrig
   this.publishedDiscount = produceDiscount;
 });
 
+const publishWithNoLocationAsSueJudgesTheDistanceFromTheAddress = async (world: PlaywrightWorld): Promise<void> => {
+  const mikesPage = new DiscountsPage(await world.openSomeoneElsesPage());
+  await mikesPage.open();
+  await mikesPage.publish(produceDiscount);
+  world.publishedDiscount = produceDiscount;
+};
+
+Given("Mike's store is within walking distance of Sue's home", async function (this: PlaywrightWorld) {
+  await publishWithNoLocationAsSueJudgesTheDistanceFromTheAddress(this);
+});
+
 When('Sue looks for a new store with fresh produce', async function (this: PlaywrightWorld) {
   await suesPage(this).open();
 });
 
 Then("she finds Mike's store", async function (this: PlaywrightWorld) {
   await suesPage(this).verifyShowsTheStoreOf(this.publishedDiscount);
+});
+
+Then('she sees where it is', async function (this: PlaywrightWorld) {
+  await suesPage(this).verifyShowsWhereTheStoreIs(this.publishedDiscount);
 });
 
 Then('she sees the discount it offers', async function (this: PlaywrightWorld) {

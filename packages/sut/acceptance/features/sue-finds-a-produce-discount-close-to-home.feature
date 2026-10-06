@@ -47,7 +47,6 @@ Feature: Sue finds a produce discount close to home
     When someone using a screen reader looks for a new store with fresh produce
     Then they hear each discount with its store
 
-  @wip
   Scenario: Sue finds a store close to home
     Given Mike's store is within walking distance of Sue's home
     When Sue looks for a new store with fresh produce
