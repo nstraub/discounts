@@ -9,11 +9,8 @@ export class ParsedBy<Request> implements PipeTransform<unknown, Request> {
   transform(value: unknown): Request {
     const parsed = this.schema.safeParse(value);
     if (!parsed.success) {
-      const rejection: RequestRejection = {
-        statusCode: HttpStatus.BAD_REQUEST,
-        message: 'Missing or mistyped fields',
-        fields: parsed.error.issues.filter((issue) => issue.path.length > 0).map((issue) => issue.path.join('.')),
-      };
+      const fields = parsed.error.issues.filter((issue) => issue.path.length > 0).map((issue) => issue.path.join('.'));
+      const rejection: RequestRejection = { statusCode: HttpStatus.BAD_REQUEST, message: 'Missing or mistyped fields', fields, missing: fields };
       throw new BadRequestException(rejection);
     }
     return parsed.data;
