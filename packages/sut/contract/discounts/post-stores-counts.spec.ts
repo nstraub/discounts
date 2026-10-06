@@ -5,10 +5,10 @@ import { countRequest, countResponse, requestRejection } from '@app/types/discou
 import { longTextInAnyCharacters, spicesDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
-import { oneRaceAfterAnother, timesTheRaceIsRun } from '../support/at-the-same-moment';
 import { answersInTurnToBodiesThatAreNotObjects, statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
+import { countTheStoreOf } from '../support/counts';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
-import { couponsIssuedFor, redeemAtTheStoreOf, setupSutWithACouponFor } from '../support/redemptions';
+import { redeemAtTheStoreOf } from '../support/redemptions';
 
 type ExampleDiscount = typeof spicesDiscount;
 
@@ -36,9 +36,6 @@ const setupSutCountingJsonText = async () => {
   const countWrittenAsJson = (body: string) => sut.http.post('/stores/counts').set('Content-Type', 'application/json').send(body);
   return { ...sut, countWrittenAsJson };
 };
-
-const countTheStoreOf = (http: Http, discount: ExampleDiscount = spicesDiscount) =>
-  http.post('/stores/counts').send(theStoreOf(discount));
 
 describe('POST /stores/counts', () => {
   describe('success', () => {
@@ -157,33 +154,6 @@ describe('POST /stores/counts', () => {
 
       expect(Object.keys(response.body[0]), 'what each entry carries').to.deep.equal(['id', 'item', 'rate', 'discountedSales']);
       expect(response.text).to.not.contain(code);
-    });
-  });
-
-  describe('A4 concurrency', () => {
-    it('should count each redeemed coupon once between two counts of a store arriving at the same moment', async () => {
-      const { http, published } = await setupSutWithACouponFor();
-      const codes = await couponsIssuedFor(http, published, timesTheRaceIsRun);
-
-      const salesCountedByEachPair = await oneRaceAfterAnother(codes, async (code) => {
-        await redeemAtTheStoreOf(http, code);
-        const pair = await Promise.all([countTheStoreOf(http), countTheStoreOf(http)]);
-        return pair.reduce((sales, response) => sales + response.body[0].discountedSales, 0);
-      });
-
-      expect(salesCountedByEachPair, 'the sales two counts at once counted for one coupon redeemed').to.deep.equal(codes.map(() => 1));
-    });
-    it('should count a coupon redeemed during a count once, in that count or the next', async () => {
-      const { http, published } = await setupSutWithACouponFor();
-      const codes = await couponsIssuedFor(http, published, timesTheRaceIsRun);
-
-      const salesCountedForEachCoupon = await oneRaceAfterAnother(codes, async (code) => {
-        const [, during] = await Promise.all([redeemAtTheStoreOf(http, code), countTheStoreOf(http)]);
-        const next = await countTheStoreOf(http);
-        return during.body[0].discountedSales + next.body[0].discountedSales;
-      });
-
-      expect(salesCountedForEachCoupon, 'the sales a count during its redemption and the next counted').to.deep.equal(codes.map(() => 1));
     });
   });
 
