@@ -36,7 +36,7 @@ export class Discount {
   }
 
   redeemCoupon(token: CouponToken, store: Store): RedeemedCoupon {
-    if (store.toJSON().storeName !== this.details.toJSON().storeName || store.toJSON().storeAddress !== this.details.toJSON().storeAddress) {
+    if (!store.equals(this.details.store())) {
       this.events.redemptionRejected(this.id, token.toJSON(), 'not for this store');
       throw new CouponNotForThisStoreException();
     }
