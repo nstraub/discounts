@@ -27,7 +27,13 @@ describe('class CouponToken', () => {
 
       expect(token.toJSON()).to.match(/^[0-9A-Z]{10}$/);
     });
-    it.todo('should draw only from Crockford base32, never I, L, O or U');
+    it('should draw only from Crockford base32, never I, L, O or U', () => {
+      const random = anEvenSourceCyclingThroughEveryByte();
+
+      const tokens = Array.from({ length: 26 }, () => CouponToken.drawnFrom(random).toJSON());
+
+      expect(tokens.filter((token) => !/^[0-9A-HJKMNP-TV-Z]{10}$/.test(token)), 'tokens with a character outside Crockford base32').to.deep.equal([]);
+    });
     it('should favour no character over many draws from an even source', () => {
       const random = anEvenSourceCyclingThroughEveryByte();
 
