@@ -51,7 +51,7 @@ describe('Component PublishedDiscounts', () => {
     });
   });
 
-  describe('empty', () => {
+  describe('none, one and many', () => {
     it('should say in one short line that nothing is published when there is no discount', () => {
       const list = setupSut({ discounts: [] });
 

@@ -17,7 +17,7 @@ const setupSut = () => {
 
 describe('class DiscountService', () => {
   describe('the published discounts', () => {
-    describe('empty', () => {
+    describe('none, one and many', () => {
       it('should answer with no discount when none is published', async () => {
         const { service } = setupSut();
 

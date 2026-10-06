@@ -4,7 +4,7 @@ import { setupSut } from './discounts-store-of-an-app';
 
 describe('Store discounts', () => {
   describe('loading the published discounts', () => {
-    describe('empty', () => {
+    describe('none, one and many', () => {
       it('should hold no discount when none is published', async () => {
         const { restApi, discounts } = setupSut();
         restApi.get.mockResolvedValue([]);
