@@ -3,6 +3,7 @@ import { mock } from 'vitest-mock-extended';
 
 import { CouponIssued } from '@backend/discounts/application/domain/coupon-issued';
 import type { DiscountRepository } from '@backend/discounts/application/domain/discount-repository';
+import { NoSuchDiscountException } from '@backend/discounts/application/domain/no-such-discount-exception';
 import { publishedProduceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
@@ -56,7 +57,13 @@ describe('class DiscountService', () => {
     });
 
     describe('state', () => {
-      it.todo('should report that there is no such discount when no discount has that id, issuing nothing');
+      it('should report that there is no such discount when no discount has that id, issuing nothing', async () => {
+        const { events, repository, service } = setupSut();
+
+        await expect(service.issueCoupon('an-id-no-discount-has')).rejects.to.be.instanceOf(NoSuchDiscountException);
+        expect(repository.save.mock.calls, 'the discounts saved').to.deep.equal([]);
+        expect(events.publish.mock.calls, 'the events published').to.deep.equal([]);
+      });
     });
 
     describe('dependency failure', () => {

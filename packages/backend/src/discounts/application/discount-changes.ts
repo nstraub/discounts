@@ -1,6 +1,7 @@
 import type { CouponToken } from './domain/coupon-token.js';
 import type { Discount } from './domain/discount.js';
 import type { DiscountRepository } from './domain/discount-repository.js';
+import { NoSuchDiscountException } from './domain/no-such-discount-exception.js';
 import type { Store } from './domain/store.js';
 
 type Change<Answer> = (discount: Discount) => Answer;
@@ -11,7 +12,13 @@ export class DiscountChanges {
   constructor(private readonly repository: DiscountRepository) {}
 
   async toTheOneWithId<Answer>(id: string, change: Change<Answer>): Promise<Answer> {
-    return this.toTheOneFound((repository) => repository.withId(id), change);
+    return this.toTheOneFound(async (repository) => {
+      const discount = await repository.withId(id);
+      if (!discount) {
+        throw new NoSuchDiscountException();
+      }
+      return discount;
+    }, change);
   }
 
   async toTheOneThatIssued<Answer>(token: CouponToken, change: Change<Answer>): Promise<Answer> {
