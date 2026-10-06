@@ -8,6 +8,15 @@ import type { PlaywrightWorld } from './playwright-world';
 
 type ExampleDiscount = { item: string; rate: string; storeName: string; storeAddress: string };
 
+export type RequiredPiece = { spoken: string; field: string; missing: string };
+
+export const requiredPieces: RequiredPiece[] = [
+  { spoken: 'the item it applies to', field: 'discount-item', missing: discountTexts.itemMissing },
+  { spoken: 'the rate', field: 'discount-rate', missing: discountTexts.rateMissing },
+  { spoken: 'the name of his store', field: 'discount-store-name', missing: discountTexts.storeNameMissing },
+  { spoken: 'the address of his store', field: 'discount-store-address', missing: discountTexts.storeAddressMissing },
+];
+
 const twoGroupsOfFiveCrockfordCharacters = /^[0-9A-HJKMNP-TV-Z]{5} [0-9A-HJKMNP-TV-Z]{5}$/;
 
 export class DiscountsPage {
@@ -45,6 +54,17 @@ export class DiscountsPage {
   async verifyTellsTheRateIsNotValid(): Promise<void> {
     const told = this.page.getByRole('status').filter({ hasText: discountTexts.rateNotValid });
     await told.waitFor().catch(() => assert.fail("Mike's page does not tell him the rate is not valid"));
+  }
+
+  async publishLeavingOut(discount: ExampleDiscount, piece: RequiredPiece): Promise<void> {
+    await this.page.getByTestId('discount-rate').fill(discount.rate);
+    await this.page.getByTestId(piece.field).fill('');
+    await this.page.getByTestId('publish-discount').click();
+  }
+
+  async verifyTellsIsMissing(piece: RequiredPiece): Promise<void> {
+    const told = this.page.getByTestId(`${piece.field}-field`).getByRole('status').filter({ hasText: piece.missing });
+    await told.waitFor().catch(() => assert.fail(`Mike's page does not tell him ${piece.spoken} is missing`));
   }
 
   async verifyDoesNotShow(discount: ExampleDiscount): Promise<void> {
