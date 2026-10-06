@@ -5,7 +5,7 @@ import RedeemCouponForm from '@frontend/discounts/components/RedeemCouponForm.vu
 import { discountTexts } from '@frontend/discounts/texts';
 import { produceDiscount, spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
-import { aFormOfferingTheStores, theStorePickersUnder, theStoresOfferedUnder } from '../a-form-offering-the-stores';
+import { aFormOfferingTheStores, theStorePickersUnder, theStoresOfferedUnder, whetherEachStorePickerUnderRequiresAStore } from '../a-form-offering-the-stores';
 
 const theStoreOf = ({ storeName, storeAddress }: typeof produceDiscount) => ({ storeName, storeAddress });
 
@@ -25,7 +25,7 @@ describe('Component RedeemCouponForm', () => {
     it('should require a store to be picked before the coupon is redeemed', () => {
       setupSut();
 
-      expect(theStorePickers().map((picker) => picker.required), 'the store picker required').to.deep.equal([true]);
+      expect(whetherEachStorePickerUnderRequiresAStore(discountTexts.yourStore), 'the store picker required').to.deep.equal([true]);
     });
     it('should offer each store it is given as its name and address', () => {
       setupSut({ stores: [theCornerGrocery] });

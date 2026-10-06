@@ -15,5 +15,7 @@ export const aFormOfferingTheStores = (form: Component, stores: ReadonlyArray<{ 
 
 export const theStorePickersUnder = (caption: string) => queryAllByRole<HTMLSelectElement>(document.body, 'combobox', { name: caption });
 
+export const whetherEachStorePickerUnderRequiresAStore = (caption: string) => theStorePickersUnder(caption).map((picker) => picker.required);
+
 export const theStoresOfferedUnder = (caption: string, name: string) =>
   theStorePickersUnder(caption).flatMap((picker) => queryAllByRole(picker, 'option', { name }));
