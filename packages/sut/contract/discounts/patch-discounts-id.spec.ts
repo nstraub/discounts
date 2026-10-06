@@ -5,6 +5,7 @@ import { requestRejection } from '@app/types/discounts';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
+import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
 
 type Http = Awaited<ReturnType<typeof setupSut>>['http'];
 
@@ -92,9 +93,7 @@ describe('PATCH /discounts/:id', () => {
         await patchWrittenAsJson(http, published.id, '{"rate": "25",'),
       ];
 
-      const unmatched = errors.map((response) => response.body).filter((body) => !requestRejection.safeParse(body).success);
-
-      expect(unmatched).to.deep.equal([]);
+      expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
     });
   });
 
