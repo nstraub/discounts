@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { CouponAlreadyUsedException } from '@backend/discounts/application/domain/coupon-already-used-exception';
 import { CouponNotForThisStoreException } from '@backend/discounts/application/domain/coupon-not-for-this-store-exception';
+import { CouponRedeemed } from '@backend/discounts/application/domain/coupon-redeemed';
 import { CouponRedemptionRejected } from '@backend/discounts/application/domain/coupon-redemption-rejected';
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import type { Discount } from '@backend/discounts/application/domain/discount';
@@ -85,7 +86,13 @@ describe('class Discount', () => {
 
       expect(events.publish).to.have.been.calledWith(new CouponRedemptionRejected(publishedSpicesDiscount.id, '7K3QX9M2PD', 'not for this store'));
     });
-    it.todo('should not raise CouponRedeemed when its coupon is refused at another store');
+    it('should not raise CouponRedeemed when its coupon is refused at another store', () => {
+      const { events, discount } = setupSutWithItsEvents();
+
+      expect(tryingItsCouponAtStephaniesStore(discount)).to.throw(CouponNotForThisStoreException);
+
+      expect(events.publish).to.not.have.been.calledWith(expect.any(CouponRedeemed));
+    });
 
     describe('boundary', () => {
       it.todo('should refuse its coupon at a store with the same name at another address');
