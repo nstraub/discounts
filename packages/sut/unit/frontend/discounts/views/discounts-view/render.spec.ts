@@ -1,6 +1,5 @@
-import { createTestingPinia } from '@pinia/testing';
-import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
+import { flushPromises, type VueWrapper } from '@vue/test-utils';
+import { describe, expect, it } from 'vitest';
 import { mock } from 'vitest-mock-extended';
 
 import type { CouponResponse, DiscountResponse } from '@app/types/discounts';
@@ -8,17 +7,11 @@ import type { RestApi } from '@app/types/rest-api';
 import IssuedCoupon from '@frontend/discounts/components/IssuedCoupon.vue';
 import PublishDiscountForm from '@frontend/discounts/components/PublishDiscountForm.vue';
 import DiscountsView from '@frontend/discounts/views/DiscountsView.vue';
-import { restApiKey } from '@frontend/rest-api-key';
 import { couponForTheProduceDiscount, couponForTheSpicesDiscount, publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
 
-const openThePageWhenPublished = async (published: DiscountResponse[], restApi = mock<RestApi>()) => {
-  restApi.get.mockResolvedValue(published);
-  const view = mount(DiscountsView, {
-    global: { plugins: [createTestingPinia({ createSpy: vi.fn, stubActions: false })], provide: { [restApiKey]: restApi } },
-  });
-  await flushPromises();
-  return view;
-};
+import { aViewOpenedWhenPublished } from '../a-view-opened-when-published';
+
+const openThePageWhenPublished = (published: DiscountResponse[], restApi = mock<RestApi>()) => aViewOpenedWhenPublished(DiscountsView, published, restApi);
 
 const openThePageIssuing = (coupon: CouponResponse, published: DiscountResponse[]) => {
   const restApi = mock<RestApi>();

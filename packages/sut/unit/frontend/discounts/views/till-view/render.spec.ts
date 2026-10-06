@@ -1,24 +1,13 @@
-import { createTestingPinia } from '@pinia/testing';
-import { flushPromises, mount } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
-import { mock } from 'vitest-mock-extended';
+import { describe, expect, it } from 'vitest';
 
 import type { DiscountResponse } from '@app/types/discounts';
-import type { RestApi } from '@app/types/rest-api';
 import RedeemCouponForm from '@frontend/discounts/components/RedeemCouponForm.vue';
 import TillView from '@frontend/discounts/views/TillView.vue';
-import { restApiKey } from '@frontend/rest-api-key';
 import { publishedProduceDiscount, publishedSpicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
-const openTheTillWhenPublished = async (published: DiscountResponse[]) => {
-  const restApi = mock<RestApi>();
-  restApi.get.mockResolvedValue(published);
-  const view = mount(TillView, {
-    global: { plugins: [createTestingPinia({ createSpy: vi.fn, stubActions: false })], provide: { [restApiKey]: restApi } },
-  });
-  await flushPromises();
-  return view;
-};
+import { aViewOpenedWhenPublished } from '../a-view-opened-when-published';
+
+const openTheTillWhenPublished = (published: DiscountResponse[]) => aViewOpenedWhenPublished(TillView, published);
 
 describe('View TillView', () => {
   describe('opening the till', () => {
