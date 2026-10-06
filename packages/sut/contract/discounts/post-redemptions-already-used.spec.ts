@@ -1,5 +1,7 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
+import type { CouponRedemptionRejected } from '@backend/discounts/application/domain/coupon-redemption-rejected';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
@@ -29,7 +31,16 @@ describe('POST /redemptions', () => {
         { id: published.id, item: spicesDiscount.item, rate: spicesDiscount.rate, store_name: spicesDiscount.storeName, store_address: spicesDiscount.storeAddress },
       ]);
     });
-    it.todo('should publish CouponRedemptionRejected on the application event emitter for the coupon already used');
+    it('should publish CouponRedemptionRejected on the application event emitter for the coupon already used', async () => {
+      const { app, http, published, code } = await setupSutWithACouponFor();
+      await redeemAtTheStoreOf(http, code);
+      const rejected: unknown[] = [];
+      app.get(EventEmitter2).on('coupon.redemption-rejected', ({ discountId, token, reason }: CouponRedemptionRejected) => rejected.push({ discountId, token, reason }));
+
+      await redeemAtTheStoreOf(http, code);
+
+      expect(rejected).to.deep.equal([{ discountId: published.id, token: code, reason: 'already used' }]);
+    });
     it.todo('should refuse a used coupon whose code is sent in lower case, in two groups, the second time');
   });
 });
