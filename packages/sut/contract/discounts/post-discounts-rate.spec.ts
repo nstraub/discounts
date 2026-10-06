@@ -6,7 +6,7 @@ import { setupSut } from '../support/app';
 
 describe('POST /discounts with a rate written another way', () => {
   describe('type', () => {
-    it('should answer 400 naming the rate, or publish it, when the rate is sent as a JSON number, never a 500', async () => {
+    it('should answer 400 naming the rate when the rate is sent as a JSON number, never a 500', async () => {
       const { http } = await setupSut();
 
       const response = await http.post('/discounts').send({ ...spicesDiscount, rate: Number(spicesDiscount.rate) });
