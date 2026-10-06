@@ -55,7 +55,15 @@ describe('POST /discounts/:id/coupons', () => {
   });
 
   describe('A3 handle guessing (no accounts)', () => {
-    it.todo('should give the coupon a token of its own, ignoring a token sent in the request');
+    it('should give the coupon a token of its own, ignoring a token sent in the request', async () => {
+      const { http } = await setupSut();
+      const published = await publishTheSpicesDiscount(http);
+
+      const response = await http.post(`/discounts/${published.id}/coupons`).send({ token: 'CH0SENBYME' });
+
+      expect(response.body.token).to.not.equal('CH0SENBYME');
+      expect(response.body.token).to.match(tenCrockfordCharacters);
+    });
     it.todo('should answer with the coupon issued only, never another coupon\'s token');
     it.todo('should answer 404 for an id no discount has, issuing no coupon');
   });
