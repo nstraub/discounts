@@ -1,22 +1,34 @@
 import { createTestingPinia } from '@pinia/testing';
-import { flushPromises, mount } from '@vue/test-utils';
+import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { mock } from 'vitest-mock-extended';
 
-import type { DiscountResponse } from '@app/types/discounts';
+import type { CouponResponse, DiscountResponse } from '@app/types/discounts';
 import type { RestApi } from '@app/types/rest-api';
+import IssuedCoupon from '@frontend/discounts/components/IssuedCoupon.vue';
 import PublishDiscountForm from '@frontend/discounts/components/PublishDiscountForm.vue';
 import DiscountsView from '@frontend/discounts/views/DiscountsView.vue';
 import { restApiKey } from '@frontend/rest-api-key';
+import { couponForTheSpicesDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
 
-const openThePageWhenPublished = async (published: DiscountResponse[]) => {
-  const restApi = mock<RestApi>();
+const openThePageWhenPublished = async (published: DiscountResponse[], restApi = mock<RestApi>()) => {
   restApi.get.mockResolvedValue(published);
   const view = mount(DiscountsView, {
     global: { plugins: [createTestingPinia({ createSpy: vi.fn, stubActions: false })], provide: { [restApiKey]: restApi } },
   });
   await flushPromises();
   return view;
+};
+
+const openThePageIssuing = (coupon: CouponResponse, published: DiscountResponse[]) => {
+  const restApi = mock<RestApi>();
+  restApi.post.mockResolvedValue(coupon);
+  return openThePageWhenPublished(published, restApi);
+};
+
+const decideToTry = async (view: VueWrapper): Promise<void> => {
+  await view.get('[data-testid="get-coupon"]').trigger('click');
+  await flushPromises();
 };
 
 describe('View DiscountsView', () => {
@@ -43,6 +55,12 @@ describe('View DiscountsView', () => {
     });
   });
   describe('the coupon Sue gets', () => {
-    it.todo('should show the coupon Sue has got once she decides to try a discount');
+    it('should show the coupon Sue has got once she decides to try a discount', async () => {
+      const view = await openThePageIssuing(couponForTheSpicesDiscount, [publishedSpicesDiscount]);
+
+      await decideToTry(view);
+
+      expect(view.findAllComponents(IssuedCoupon).map((shown) => shown.props('coupon'))).to.deep.equal([couponForTheSpicesDiscount]);
+    });
   });
 });
