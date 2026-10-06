@@ -81,7 +81,10 @@ describe('class DiscountService', () => {
     it('should report the pieces left out as missing', async () => {
       const { service } = setupSut();
 
-      await expect(service.publish(spicesDetailsWithItsItemAndStoreNameLeftOut)).rejects.to.have.deep.property('pieces', ['item', 'storeName']);
+      const refusal = await service.publish(spicesDetailsWithItsItemAndStoreNameLeftOut).catch((refused: unknown) => refused);
+
+      expect(refusal).to.be.instanceOf(PiecesMissingException);
+      expect((refusal as PiecesMissingException).pieces).to.deep.equal(['item', 'storeName']);
     });
     it('should keep nothing when a piece is left out', async () => {
       const { repository, service } = setupSut();
