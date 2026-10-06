@@ -1,3 +1,4 @@
+import { DiscountRate } from './discount-rate.js';
 import { PiecesMissingException } from './pieces-missing-exception.js';
 import { Store } from './store.js';
 
@@ -8,7 +9,12 @@ export class DiscountDetails {
     return new DiscountDetails({ ...this.details, rate });
   }
 
-  whenComplete<Published>(complete: () => Published, refused: (rate: string, missing: readonly string[]) => void): Published {
+  whenPublishable<Published>(publishable: () => Published, refused: (rate: string, reason: string, pieces: readonly string[]) => void): Published {
+    const publishAtAValidRate = () => new DiscountRate(this.details.rate).whenValid(publishable, (rate) => refused(rate, 'not valid', ['rate']));
+    return this.whenComplete(publishAtAValidRate, (rate, missing) => refused(rate, 'missing', missing));
+  }
+
+  private whenComplete<Published>(complete: () => Published, refused: (rate: string, missing: readonly string[]) => void): Published {
     const missing = this.piecesLeftOut();
     if (missing.length > 0) {
       refused(this.details.rate, missing);
