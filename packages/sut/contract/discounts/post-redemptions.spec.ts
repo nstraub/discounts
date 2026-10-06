@@ -5,9 +5,10 @@ import { redemptionRequest, redemptionResponse, requestRejection } from '@app/ty
 import { longTextInAnyCharacters, produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
+import { oneRaceAfterAnother, timesTheRaceIsRun } from '../support/at-the-same-moment';
 import { answersInTurnToBodiesThatAreNotObjects, statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
-import { redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithAnotherCouponOfTheSameDiscount } from '../support/redemptions';
+import { couponsIssuedFor, redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithAnotherCouponOfTheSameDiscount } from '../support/redemptions';
 
 const redeemWrittenAsJson = (http: Http, body: string) => http.post('/redemptions').set('Content-Type', 'application/json').send(body);
 
@@ -141,7 +142,19 @@ describe('POST /redemptions', () => {
   });
 
   describe('A4 concurrency', () => {
-    it.todo('should redeem a coupon once when it is used twice at the same moment');
+    it('should redeem a coupon once when it is used twice at the same moment', async () => {
+      const { http, published } = await setupSutWithACouponFor();
+      const codes = await couponsIssuedFor(http, published, timesTheRaceIsRun);
+
+      const statusesOfEachPair = await oneRaceAfterAnother(codes, async (code) => {
+        const pair = await Promise.all([redeemAtTheStoreOf(http, code), redeemAtTheStoreOf(http, code)]);
+        return pair.map((response) => response.status).sort();
+      });
+
+      expect(statusesOfEachPair, 'the statuses answering each coupon used twice at once').to.deep.equal(
+        codes.map(() => [201, 409]),
+      );
+    });
   });
 
   describe('A5 resource exhaustion', () => {

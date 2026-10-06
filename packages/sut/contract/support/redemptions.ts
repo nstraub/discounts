@@ -19,3 +19,8 @@ export const setupSutWithAnotherCouponOfTheSameDiscount = async () => {
 
 export const redeemAtTheStoreOf = (http: Http, code: string, discount: ExampleDiscount = spicesDiscount) =>
   http.post('/redemptions').send({ code, storeName: discount.storeName, storeAddress: discount.storeAddress });
+
+export const couponsIssuedFor = async (http: Http, published: { id: string }, howMany: number): Promise<string[]> => {
+  const issued = await Promise.all(Array.from({ length: howMany }, () => http.post(`/discounts/${published.id}/coupons`).send({})));
+  return issued.map((response) => response.body.token);
+};

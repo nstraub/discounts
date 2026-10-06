@@ -28,7 +28,7 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   }
 
   async withId(id: string): Promise<Discount | undefined> {
-    const rows = await this.keptDiscounts().where(eq(discounts.id, id));
+    const rows = await this.keptDiscounts().where(eq(discounts.id, id)).for('update');
     const issued = await couponsIssuedBy(this.database, id);
     return rows.map((row) => rebuiltFrom(this.factory, row, issued)).at(0);
   }
@@ -45,7 +45,7 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   }
 
   async changing<Answer>(work: (repository: DiscountRepository) => Promise<Answer>): Promise<Answer> {
-    return work(this);
+    return this.database.transaction((transaction) => work(new DiscountDrizzleRepository(transaction, this.factory)));
   }
 
   private keptDiscounts() {

@@ -1,10 +1,11 @@
 import { Inject, Module, type OnApplicationShutdown } from '@nestjs/common';
-import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { drizzle, type NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
+import type { PgDatabase } from 'drizzle-orm/pg-core';
 import pg from 'pg';
 
 export const database = Symbol('database');
 
-export type Database = NodePgDatabase;
+export type Database = PgDatabase<NodePgQueryResultHKT>;
 
 const pool = Symbol('pool');
 
