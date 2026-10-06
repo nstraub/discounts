@@ -42,8 +42,8 @@ inside each file's top-level `describe`, in groups of their own; no existing lin
 
 Built outside the outlined lines: 1 line, `should hold the coupons it issued before beside the one it issues`
 (`unit/backend/discounts/application/domain/discount/issue-coupon.spec.ts`). A red with no failing unit line
-below it forced it: a Discount dropped its earlier coupons (bd5902a, 171bd61). Ledger
-`2026-10-06-discounts-attempt-4-slice-7-holding-earlier-coupons-built-two-coupons-line-stays-recorded`.
+below it forced it: a Discount dropped its earlier coupons (bd5902a, 171bd61). The line that two
+coupons are issued for one discount stays recorded for later.
 
 `POST /discounts/:id/coupons`, with no body, answers 201 with the coupon's token and its store's name. No
 coupon is read back by its token in this slice: "Stephanie redeems a coupon" loads the Discount that owns the

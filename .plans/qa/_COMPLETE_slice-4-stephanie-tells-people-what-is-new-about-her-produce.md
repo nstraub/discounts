@@ -9,7 +9,7 @@ the feature of story 1 (new): the scenario carries `@wip` while it is red; each 
 story's second scenario, "Sue decides to try Stephanie's produce", is not in the file yet.
 
 Files read: `AGENTS.md`, `.plans/stephanie-comeback-epic.md`, `.plans/_IN_PROGRESS_discounts-plan.md`,
-`.plans/regime.md`, `.plans/qa/slice-3-mike-raises-a-discount.md`, the three feature files, the step patterns
+`.plans/qa/slice-3-mike-raises-a-discount.md`, the three feature files, the step patterns
 under `packages/sut/acceptance/features/steps/` and `acceptance/support/discounts-page.ts`,
 `packages/sut/cucumber.js`, `packages/sut/support/example-discounts.ts`, the arrange of
 `contract/discounts/{discounts-table,rate-as-written}-migration.spec.ts`, the `describe` and `it` names of every

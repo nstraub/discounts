@@ -80,6 +80,6 @@ items are produce; no address is checked, which belongs to "she sees where it is
 7. No new names in production code.
 8. No identity and no location: nothing records where Sue is.
 
-## Dependencies (the developer installs them)
+## Dependencies
 
 None new.

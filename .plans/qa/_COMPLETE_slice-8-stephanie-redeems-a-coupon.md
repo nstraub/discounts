@@ -11,7 +11,7 @@ counts only once", "A coupon for another store's discount", "A coupon nobody iss
 that has ended") are not in the file yet.
 
 Files read: `AGENTS.md`, `.plans/stephanie-comeback-epic.md`, `.plans/_IN_PROGRESS_discounts-plan.md`,
-`.plans/regime.md`, `.plans/qa/_COMPLETE_slice-3-mike-raises-a-discount.md`,
+`.plans/qa/_COMPLETE_slice-3-mike-raises-a-discount.md`,
 `.plans/qa/_COMPLETE_slice-4-stephanie-tells-people-what-is-new-about-her-produce.md`,
 `.plans/qa/_COMPLETE_slice-5-mike-lowers-a-discount.md`, `.plans/qa/slice-7-sue-decides-to-try-stephanies-produce.md`
 with its outline and its scenarios, the feature of story 1, `packages/sut/cucumber.js`, the step patterns under

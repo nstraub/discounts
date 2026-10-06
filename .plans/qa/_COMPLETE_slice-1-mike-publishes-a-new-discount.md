@@ -15,7 +15,7 @@ implementation body was read.
 ## Outlined
 
 75 `it.todo` lines in 15 files: 62 are built in this slice (the table below); 13 are recorded for later
-and stay `it.todo` (*Recorded for later*). This hand-off is complete once the 62 built lines are filled and
+and stay `it.todo` (*Recorded for later*). This outline is complete once the 62 built lines are filled and
 green.
 
 | Lines | Criterion or case | Found by | Spec file (under `packages/sut/`) |

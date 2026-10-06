@@ -24,7 +24,7 @@ No line is built in this slice. The rate is text end to end and no rule on it ex
 the outline (20 %, 12.5 %, 100 %) is published and shown as written by the lines already built for "Mike
 publishes a new discount". The scenario is expected to pass as soon as its step definitions exist; a
 working-tree break that shows the rate other than as published makes the `Then` fail, and is restored. The
-hand-off is complete once the scenario passes.
+outline is complete once the scenario passes.
 
 | Clause | Covered by (under `packages/sut/`) |
 |---|---|
@@ -80,6 +80,6 @@ risk with no behaviour proposed (settled).
 7. No new names.
 8. No identity: nothing records who published a discount.
 
-## Dependencies (the developer installs them)
+## Dependencies
 
 None new.
