@@ -19,7 +19,10 @@ export class CountPage {
 
   async countTheStoreOf(discount: ExampleDiscount): Promise<void> {
     await pickTheStoreOf(this.page, discountTexts.store, discount, 'the count');
+    const answered = this.page.waitForResponse((response) => response.url().endsWith('/stores/counts'));
     await this.page.getByRole('button', { name: discountTexts.countDiscountedSales }).click();
+    await answered;
+    await this.page.getByTestId('counted-discount').first().waitFor();
   }
 
   async verifyShowsTheSalesCountedFor(discount: ExampleDiscount, sales: number): Promise<void> {
