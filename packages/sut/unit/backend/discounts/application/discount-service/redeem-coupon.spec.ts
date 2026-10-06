@@ -32,7 +32,14 @@ describe('class DiscountService', () => {
     });
 
     describe('combination', () => {
-      it.todo('should redeem the coupon whose code is typed in lower case, in two groups');
+      it('should redeem the coupon whose code is typed in lower case, in two groups', async () => {
+        const { repository, service } = setupSut();
+
+        await service.redeemCoupon('7k3qx 9m2pd');
+
+        const [kept] = repository.save.mock.lastCall?.at(0)?.toJSON().coupons ?? [];
+        expect(kept, 'the coupon of the code typed').to.deep.equal({ token: '7K3QX9M2PD', redeemed: true });
+      });
     });
 
     describe('dependency failure', () => {

@@ -38,7 +38,7 @@ export class DiscountService {
   }
 
   async redeemCoupon(code: string): Promise<RedeemedCoupon> {
-    const token = CouponToken.keptAs(code);
+    const token = CouponToken.read(code);
     const discount = (await this.repository.withCouponToken(token))!;
     const redeemed = discount.redeemCoupon(token);
     await this.repository.save(discount);
