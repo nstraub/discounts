@@ -1,3 +1,4 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { redemptionResponse } from '@app/types/discounts';
@@ -32,7 +33,15 @@ describe('POST /redemptions', () => {
 
       expect(redemptionResponse.safeParse(response.body).error).to.equal(undefined);
     });
-    it.todo('should publish CouponRedeemed on the application event emitter for the coupon redeemed');
+    it('should publish CouponRedeemed on the application event emitter for the coupon redeemed', async () => {
+      const { app, http, published, code } = await setupSutWithACouponForTheSpicesDiscount();
+      const redeemed: unknown[] = [];
+      app.get(EventEmitter2).on('coupon.redeemed', (event: { id: string; token: string }) => redeemed.push({ id: event.id, token: event.token }));
+
+      await redeemAtTheSpicesStore(http, code);
+
+      expect(redeemed).to.deep.equal([{ id: published.id, token: code }]);
+    });
     it.todo('should keep the coupon redeemed and its discount\'s other coupons unused');
     it.todo('should redeem a coupon whose code is sent in lower case, in two groups');
   });
