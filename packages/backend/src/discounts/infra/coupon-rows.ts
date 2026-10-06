@@ -12,8 +12,9 @@ const theColumnsOfACoupon = { token: coupons.token, redeemed: coupons.redeemed, 
 export const couponsIssuedBy = (database: Database, discountId: string): Promise<KeptCoupon[]> =>
   database.select(theColumnsOfACoupon).from(coupons).where(eq(coupons.discountId, discountId)).orderBy(coupons.id);
 
-export const couponsIssuedByEachDiscount = async (database: Database): Promise<Map<string, KeptCoupon[]>> => {
-  const rows = await database.select({ ...theColumnsOfACoupon, discountId: coupons.discountId }).from(coupons).orderBy(coupons.id);
+export const couponsIssuedByEachDiscount = async (database: Database, discountIds: string[]): Promise<Map<string, KeptCoupon[]>> => {
+  const issuedByThem = inArray(coupons.discountId, discountIds);
+  const rows = await database.select({ ...theColumnsOfACoupon, discountId: coupons.discountId }).from(coupons).where(issuedByThem).orderBy(coupons.id);
   const byDiscount = Map.groupBy(rows, (row) => row.discountId);
   return new Map(byDiscount.entries().map(([discountId, issued]) => [discountId, issued.map(({ token, redeemed, counted }) => ({ token, redeemed, counted }))]));
 };
