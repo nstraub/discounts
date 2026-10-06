@@ -85,7 +85,15 @@ describe('POST /redemptions', () => {
       expect(response.status).to.equal(201);
       expect(redemptionRequest.safeParse({ code: longTextInAnyCharacters.item, ...atAStoreInAnyText }).error).to.equal(undefined);
     });
-    it.todo('should keep the redemption response schema no stricter than the item a discount has');
+    it('should keep the redemption response schema no stricter than the item a discount has', async () => {
+      const aDiscountInAnyText = { ...spicesDiscount, ...longTextInAnyCharacters };
+      const { http, code } = await setupSutWithACouponFor(aDiscountInAnyText);
+
+      const response = await redeemAtTheStoreOf(http, code, aDiscountInAnyText);
+
+      expect(response.body.item).to.equal(longTextInAnyCharacters.item);
+      expect(redemptionResponse.safeParse(response.body).error).to.equal(undefined);
+    });
   });
 
   describe('malformed request', () => {
