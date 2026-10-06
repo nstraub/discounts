@@ -44,33 +44,47 @@ C4Component
 
   Container_Boundary(web, "Web app (Vue 3)") {
     Component(view, "DiscountsView", "Vue view", "Loads the published discounts when the page opens")
-    Component(list, "PublishedDiscounts", "Vue component", "One entry per discount: item, rate as written followed by %, store name and address, and its hook when it has one")
+    Component(list, "PublishedDiscounts", "Vue component", "The list of published discounts, or one short line saying nothing is published")
+    Component(entry, "PublishedDiscount", "Vue component", "One entry: item, rate as written followed by %, store name and address, its hook when it has one, and its controls")
     Component(form, "PublishDiscountForm", "Vue component", "Publishes the typed discount and clears itself once published")
     Component(fields, "TypedDiscountFields", "Vue component", "Five captioned inputs: item, rate, store name, store address and the optional hook")
     Component(changeForm, "ChangeRateForm", "Vue component", "One per listed discount: a new rate and a button to change it")
-    Component(store, "discounts store", "Pinia", "publish(), load() and changeRate(); goes through RestApi, and reloads the list after a change")
+    Component(couponButton, "GetCouponButton", "Vue component", "One per listed discount: asks for a coupon")
+    Component(issuedCoupon, "IssuedCoupon", "Vue component", "Shows the coupon just issued: the store to use it at and its code as two groups of five")
+    Component(store, "discounts store", "Pinia", "publish(), load(), changeRate() and getCoupon(); goes through RestApi, reloads the list after a rate change and holds the coupon just issued")
   }
 
   Container_Boundary(backend, "Backend (NestJS)") {
-    Component(controller, "DiscountsController", "NestJS controller", "POST /discounts answers 201 with Location; PATCH /discounts/:id answers 204; GET /discounts lists")
+    Component(controller, "DiscountsController", "NestJS controller", "POST /discounts answers 201 with Location; PATCH /discounts/:id answers 204; POST /discounts/:id/coupons answers the coupon; GET /discounts lists")
     Component(parsedBy, "ParsedBy", "Nest pipe, zod", "Parses the request against the shared schema; a failure is a 400 requestRejection")
-    Component(service, "DiscountService", "Application service", "publish(), changeRate() and published()")
+    Component(service, "DiscountService", "Application service", "publish(), changeRate(), issueCoupon() and published()")
     Component(factory, "DiscountFactory", "Domain factory", "create() gives a new identity; reconstitute() rebuilds a kept discount")
-    Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails (item, rate, store name, store address, optional hook); publish() raises DiscountPublished, changeRate() raises DiscountRateChanged")
+    Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails (item, rate, store name, store address, optional hook); publish() raises DiscountPublished, changeRate() raises DiscountRateChanged, issueCoupon() adds a coupon token and raises CouponIssued")
     Component(event, "DiscountPublished", "Domain event", "Carries the discount as published")
+    Component(token, "CouponToken", "Value object", "Ten characters of Crockford base32, drawn from a random source")
+    Component(issued, "IssuedCoupon", "Domain value", "A coupon token and the name of the store it is for")
+    Component(couponIssued, "CouponIssued", "Domain event", "Raised when a coupon is issued")
     Component(rateChanged, "DiscountRateChanged", "Domain event", "Carries the discount id and its new rate")
     Component(repositoryPort, "DiscountRepository", "Port", "save() (inserts or updates), all() and withId()")
     Component(publisherPort, "DomainEventPublisher", "Port", "publish(event)")
-    Component(repository, "DiscountDrizzleRepository", "Adapter", "Keeps discounts in app.discounts; a null hook column is an absent hook")
+    Component(repository, "DiscountDrizzleRepository", "Adapter", "Keeps a discount in app.discounts and its coupons in app.coupons, written and read with it; a null hook column is an absent hook")
     Component(publisher, "EventEmitterDomainEventPublisher", "Adapter", "Emits the event on the application's EventEmitter2")
   }
 
-  ContainerDb(database, "Database", "PostgreSQL 16", "app.discounts")
+  ContainerDb(database, "Database", "PostgreSQL 16", "app.discounts, app.coupons")
 
   Rel(view, list, "Shows")
   Rel(view, form, "Shows")
   Rel(form, fields, "Asks through")
-  Rel(list, changeForm, "Shows one per discount")
+  Rel(list, entry, "Shows one per discount")
+  Rel(entry, changeForm, "Shows")
+  Rel(entry, couponButton, "Shows")
+  Rel(view, issuedCoupon, "Shows the coupon just issued")
+  Rel(couponButton, store, "getCoupon()")
+  Rel(service, token, "Draws from the random source")
+  Rel(discount, token, "Holds its coupons as")
+  Rel(discount, issued, "Answers with")
+  Rel(discount, couponIssued, "Raises")
   Rel(form, store, "publish()")
   Rel(changeForm, store, "changeRate()")
   Rel(view, store, "load()")
@@ -155,6 +169,40 @@ A discount may carry a hook: an optional free text saying why it is worth a look
 none; on the wire, `hook` is optional in the publish request and the response; in the database it is the
 nullable `hook` column added by migration `0004` (its down drops the column and loses every hook). The
 form leaves an empty hook out of the request, and the list shows a hook only when there is one, trimmed.
+
+### Coupons
+
+Coupons belong to the Discount aggregate: only the discount issues them, and it keeps no coupon
+repository and no coupon port. `Discount.issueCoupon(token)` adds the token to the discount's coupons,
+raises `CouponIssued` and answers with an `IssuedCoupon` (the token and the store's name), which the
+controller maps through the shared `couponResponse` schema. `DiscountService.issueCoupon(id)` draws the
+token with `CouponToken.drawnFrom(random)`; the random source is injected, and in production it is
+`crypto.getRandomValues` (ADR 0004). The repository saves a discount's coupons with it, in the `coupons`
+table (migration `0005`: a token that is unique, and a foreign key to the discount; its down drops the
+table and loses every coupon issued).
+
+```mermaid
+sequenceDiagram
+  actor Sue
+  participant Button as GetCouponButton
+  participant Store as discounts store
+  participant Controller as DiscountsController
+  participant Service as DiscountService
+  participant Repository as DiscountRepository
+  participant Discount
+  participant Events as DomainEventPublisher
+
+  Sue->>Button: asks for a coupon beside a discount
+  Button->>Store: getCoupon(id)
+  Store->>Controller: POST /discounts/{id}/coupons
+  Controller->>Service: issueCoupon(id)
+  Service->>Repository: withId(id)
+  Service->>Discount: issueCoupon(CouponToken.drawnFrom(random))
+  Discount->>Events: publish(CouponIssued)
+  Service->>Repository: save(discount)
+  Controller-->>Store: the token and the store's name
+  Store-->>Sue: IssuedCoupon shows the store and the code, as two groups of five
+```
 
 Every error answers with the one `requestRejection` schema in `@app/types/discounts`
 (`statusCode`, `message`, optional `fields`); there is no exception filter.
