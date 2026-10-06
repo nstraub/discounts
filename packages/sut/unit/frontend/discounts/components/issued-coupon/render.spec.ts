@@ -13,7 +13,11 @@ describe('Component IssuedCoupon', () => {
 
       expect(shown.get('[data-testid="coupon-code"]').text().replaceAll(' ', '')).to.equal(couponForTheSpicesDiscount.token);
     });
-    it.todo('should show its code as two groups of five characters');
+    it('should show its code as two groups of five characters', () => {
+      const shown = setupSut();
+
+      expect(shown.get('[data-testid="coupon-code"]').text()).to.equal('7K3QX 9M2PD');
+    });
     it.todo('should show the store it is for under its caption');
     it.todo('should show the address of its store and the item it is for');
   });

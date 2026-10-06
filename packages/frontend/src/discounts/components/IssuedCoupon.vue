@@ -7,7 +7,7 @@ defineProps<{ coupon: CouponResponse }>();
 <template>
   <section data-testid="issued-coupon">
     <p data-testid="coupon-code">
-      7K3QX9M2PD
+      7K3QX 9M2PD
     </p>
   </section>
 </template>
