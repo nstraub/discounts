@@ -1,16 +1,14 @@
-import { mount, type VueWrapper } from '@vue/test-utils';
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import type { VueWrapper } from '@vue/test-utils';
+import { describe, expect, it, vi } from 'vitest';
 
 import ChangeRateForm from '@frontend/discounts/components/ChangeRateForm.vue';
-import { useDiscountsStore } from '@frontend/stores/discounts-store';
 import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
-import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
+
+import { anEntryControlFor } from '../an-entry-control';
 
 const setupSut = ({ discount = publishedSpicesDiscount } = {}) => {
-  const { pinia, global } = aTestingDiscountsStore();
-  const form = mount(ChangeRateForm, { attachTo: document.body, props: { discount, namedBy: 'entry-text' }, global });
-  onTestFinished(() => form.unmount());
-  return { form, discounts: useDiscountsStore(pinia) };
+  const { control, discounts } = anEntryControlFor(ChangeRateForm, discount);
+  return { form: control, discounts };
 };
 
 const changeThroughTheForm = async (form: VueWrapper, newRate: string): Promise<void> => {

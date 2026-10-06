@@ -1,17 +1,11 @@
-import { mount } from '@vue/test-utils';
-import { describe, expect, it, onTestFinished } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import GetCouponButton from '@frontend/discounts/components/GetCouponButton.vue';
-import { useDiscountsStore } from '@frontend/stores/discounts-store';
 import { publishedSpicesDiscount } from '@sut/support/example-discounts';
-import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
-const setupSut = ({ discount = publishedSpicesDiscount } = {}) => {
-  const { pinia, global } = aTestingDiscountsStore();
-  const control = mount(GetCouponButton, { attachTo: document.body, props: { discount, namedBy: 'entry-text' }, global });
-  onTestFinished(() => control.unmount());
-  return { control, discounts: useDiscountsStore(pinia) };
-};
+import { anEntryControlFor } from '../an-entry-control';
+
+const setupSut = ({ discount = publishedSpicesDiscount } = {}) => anEntryControlFor(GetCouponButton, discount);
 
 describe('Component GetCouponButton', () => {
   describe('getting a coupon for its discount', () => {
