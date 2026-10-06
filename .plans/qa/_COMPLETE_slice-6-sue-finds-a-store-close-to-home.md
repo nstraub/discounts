@@ -34,7 +34,7 @@ The step definitions:
 
 - "Given Mike's store is within walking distance of Sue's home" publishes Mike's produce discount, with his
   store's address, through the page, and sets no location: the product holds none, and Sue judges the
-  distance from the address herself. A one-line comment in the step says so.
+  distance from the address herself. The step's helper is named for it, `publishWithNoLocationAsSueJudgesTheDistanceFromTheAddress`.
 - "And she sees where it is" checks the store's address on the entry of the store found, and nothing else.
   The page driver gains that check beside the existing name-only and item-and-rate checks, so each `Then`
   owns one fact and fails for its own reason.
