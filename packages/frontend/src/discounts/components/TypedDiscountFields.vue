@@ -19,6 +19,7 @@ const discount = defineModel<ReturnType<typeof nothingTyped>>({ required: true }
   <CaptionedInput
     v-model="discount.rate"
     :caption="discountTexts.rate"
+    :told="missing.includes('rate') ? discountTexts.rateMissing : ''"
     test-id="discount-rate"
   />
   <CaptionedInput

@@ -30,7 +30,14 @@ describe('Component PublishDiscountForm', () => {
 
       expect(whatTheFieldTells(form, 'discount-item'), "what the item's field tells").to.equal(discountTexts.itemMissing);
     });
-    it.todo('should tell Mike the rate is missing beside its field when refused for it');
+    it('should tell Mike the rate is missing beside its field when refused for it', async () => {
+      const { form } = setupSutRefusingAsMissing(['rate']);
+
+      await form.get('[data-testid="publish-discount"]').trigger('click');
+      await flushPromises();
+
+      expect(whatTheFieldTells(form, 'discount-rate'), "what the rate's field tells").to.equal(discountTexts.rateMissing);
+    });
     it.todo('should tell Mike the store name is missing beside its field when refused for it');
     it.todo('should tell Mike the store address is missing beside its field when refused for it');
 
