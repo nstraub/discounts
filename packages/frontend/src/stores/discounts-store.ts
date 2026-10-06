@@ -14,7 +14,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const load = async (): Promise<void> => {
     published.value = await restApi.get<DiscountResponse[]>('/discounts');
   };
-  const changeRate: (id: string, change: Partial<ChangeRateRequest>) => Promise<void> = async (id, change) => {
+  const changeRate = async (id: string, change: Partial<ChangeRateRequest>): Promise<void> => {
     await restApi.patch(`/discounts/${id}`, change);
   };
   return { published, publish, load, changeRate };
