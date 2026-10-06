@@ -15,7 +15,7 @@ onMounted(discounts.load);
   <PublishedDiscounts :discounts="discounts.published" />
   <IssuedCoupon
     v-if="discounts.coupon"
-    :coupon="{ token: '7K3QX9M2PD', storeName: 'Mike\'s Groceries' }"
+    :coupon="discounts.coupon"
   />
   <PublishDiscountForm />
 </template>

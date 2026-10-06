@@ -9,7 +9,7 @@ import IssuedCoupon from '@frontend/discounts/components/IssuedCoupon.vue';
 import PublishDiscountForm from '@frontend/discounts/components/PublishDiscountForm.vue';
 import DiscountsView from '@frontend/discounts/views/DiscountsView.vue';
 import { restApiKey } from '@frontend/rest-api-key';
-import { couponForTheSpicesDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
+import { couponForTheProduceDiscount, couponForTheSpicesDiscount, publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
 
 const openThePageWhenPublished = async (published: DiscountResponse[], restApi = mock<RestApi>()) => {
   restApi.get.mockResolvedValue(published);
@@ -61,6 +61,13 @@ describe('View DiscountsView', () => {
       await decideToTry(view);
 
       expect(view.findAllComponents(IssuedCoupon).map((shown) => shown.props('coupon'))).to.deep.equal([couponForTheSpicesDiscount]);
+    });
+    it('should show the other coupon Sue has got for another discount', async () => {
+      const view = await openThePageIssuing(couponForTheProduceDiscount, [publishedProduceDiscount]);
+
+      await decideToTry(view);
+
+      expect(view.findAllComponents(IssuedCoupon).map((shown) => shown.props('coupon'))).to.deep.equal([couponForTheProduceDiscount]);
     });
     it('should show no coupon until Sue decides to try a discount', async () => {
       const view = await openThePageIssuing(couponForTheSpicesDiscount, [publishedSpicesDiscount]);
