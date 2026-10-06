@@ -9,6 +9,7 @@ import CaptionedInput from './CaptionedInput.vue';
 
 const discounts = useDiscountsStore();
 const discount = ref(nothingTyped());
+const hook = ref('');
 
 const publish = async (): Promise<void> => {
   await discounts.publish(discountToPublish(discount.value));
@@ -38,7 +39,11 @@ const publish = async (): Promise<void> => {
       :caption="discountTexts.storeAddress"
       test-id="discount-store-address"
     />
-    <input data-testid="discount-hook">
+    <CaptionedInput
+      v-model="hook"
+      :caption="discountTexts.hook"
+      test-id="discount-hook"
+    />
     <button
       type="submit"
       class="rounded border px-3 py-1"

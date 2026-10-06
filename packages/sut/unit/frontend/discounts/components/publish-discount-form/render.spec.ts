@@ -1,5 +1,6 @@
+import { queryAllByRole } from '@testing-library/dom';
 import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, onTestFinished } from 'vitest';
 
 import PublishDiscountForm from '@frontend/discounts/components/PublishDiscountForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
@@ -41,6 +42,11 @@ describe('Component PublishDiscountForm', () => {
     });
   });
   describe('what the form asks for about the hook', () => {
-    it.todo('should ask for the hook under its caption');
+    it('should ask for the hook under its caption', () => {
+      const form = mount(PublishDiscountForm, { attachTo: document.body, global: aTestingDiscountsStore().global });
+      onTestFinished(() => form.unmount());
+
+      expect(queryAllByRole(document.body, 'textbox', { name: discountTexts.hook })).to.have.length(1);
+    });
   });
 });

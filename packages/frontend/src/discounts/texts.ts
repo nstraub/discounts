@@ -3,6 +3,7 @@ export const discountTexts = {
   rate: 'Rate (%)',
   storeName: 'Store name',
   storeAddress: 'Store address',
+  hook: 'Why it is worth a look (optional)',
   publish: 'Publish',
   newRate: 'New rate (%)',
   changeRate: 'Change rate',
