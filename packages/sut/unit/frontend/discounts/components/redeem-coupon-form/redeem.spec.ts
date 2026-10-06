@@ -1,23 +1,16 @@
 import { queryAllByRole } from '@testing-library/dom';
 import type { VueWrapper } from '@vue/test-utils';
-import { mount } from '@vue/test-utils';
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import RedeemCouponForm from '@frontend/discounts/components/RedeemCouponForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
-import { useDiscountsStore } from '@frontend/stores/discounts-store';
 import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
-import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
+
+import { aFormOfferingTheStores } from '../a-form-offering-the-stores';
 
 const theStoreOf = ({ storeName, storeAddress }: typeof spicesDiscount) => ({ storeName, storeAddress });
 
-const setupSut = () => {
-  const { pinia, global } = aTestingDiscountsStore();
-  const stores = [theStoreOf(spicesDiscount), theStoreOf(stephaniesProduceDiscount)];
-  const form = mount(RedeemCouponForm, { attachTo: document.body, props: { stores }, global });
-  onTestFinished(() => form.unmount());
-  return { form, discounts: useDiscountsStore(pinia) };
-};
+const setupSut = () => aFormOfferingTheStores(RedeemCouponForm, [theStoreOf(spicesDiscount), theStoreOf(stephaniesProduceDiscount)]);
 
 const setupSutRedeemingTo = (item: string) => {
   const sut = setupSut();

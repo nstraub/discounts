@@ -1,16 +1,12 @@
 import { queryAllByRole } from '@testing-library/dom';
-import { mount } from '@vue/test-utils';
-import { describe, expect, it, onTestFinished } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import CountDiscountedSalesForm from '@frontend/discounts/components/CountDiscountedSalesForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
-import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
-const setupSut = () => {
-  const form = mount(CountDiscountedSalesForm, { attachTo: document.body, props: { stores: [] }, global: aTestingDiscountsStore().global });
-  onTestFinished(() => form.unmount());
-  return form;
-};
+import { aFormOfferingTheStores } from '../a-form-offering-the-stores';
+
+const setupSut = () => aFormOfferingTheStores(CountDiscountedSalesForm, []);
 
 describe('Component CountDiscountedSalesForm', () => {
   describe('what the count asks for', () => {

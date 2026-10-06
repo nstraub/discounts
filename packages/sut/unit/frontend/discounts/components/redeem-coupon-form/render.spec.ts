@@ -1,21 +1,17 @@
 import { queryAllByRole } from '@testing-library/dom';
-import { mount } from '@vue/test-utils';
-import { describe, expect, it, onTestFinished } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import RedeemCouponForm from '@frontend/discounts/components/RedeemCouponForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
 import { produceDiscount, spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
-import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
+
+import { aFormOfferingTheStores } from '../a-form-offering-the-stores';
 
 const theStoreOf = ({ storeName, storeAddress }: typeof produceDiscount) => ({ storeName, storeAddress });
 
 const theCornerGrocery = theStoreOf(produceDiscount);
 
-const setupSut = ({ stores = [theCornerGrocery] } = {}) => {
-  const form = mount(RedeemCouponForm, { attachTo: document.body, props: { stores }, global: aTestingDiscountsStore().global });
-  onTestFinished(() => form.unmount());
-  return form;
-};
+const setupSut = ({ stores = [theCornerGrocery] } = {}) => aFormOfferingTheStores(RedeemCouponForm, stores);
 
 const theStorePickers = () => queryAllByRole<HTMLSelectElement>(document.body, 'combobox', { name: discountTexts.yourStore });
 
