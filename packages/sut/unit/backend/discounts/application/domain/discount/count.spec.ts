@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import { DiscountedSalesCounted } from '@backend/discounts/application/domain/discounted-sales-counted';
 import { publishedSpicesDiscount } from '@sut/support/example-discounts';
 
@@ -38,7 +39,16 @@ describe('class Discount', () => {
     });
 
     describe('state', () => {
-      it.todo('should leave out of a count the coupons redeemed before its last count');
+      it('should leave out of a count the coupons redeemed before its last count', () => {
+        const coupons = [...threeRedeemedCoupons.slice(0, 2), { token: 'C9D2F6H8JK', redeemed: false }];
+        const { discount } = setupSut({ coupons });
+        discount.count();
+        discount.redeemCoupon(CouponToken.keptAs('C9D2F6H8JK'));
+
+        const counted = discount.count();
+
+        expect(counted.toJSON().discountedSales, 'the sales since the last count').to.equal(1);
+      });
       it.todo('should count a coupon issued before its last count and redeemed after it');
       it.todo('should not count a coupon issued and not yet redeemed');
     });
