@@ -9,7 +9,7 @@ import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-stor
 
 const theStoreOf = ({ storeName, storeAddress }: typeof produceDiscount) => ({ storeName, storeAddress });
 
-const theCornerGrocery = { storeName: produceDiscount.storeName, storeAddress: produceDiscount.storeAddress };
+const theCornerGrocery = theStoreOf(produceDiscount);
 
 const setupSut = ({ stores = [theCornerGrocery] } = {}) => {
   const form = mount(RedeemCouponForm, { attachTo: document.body, props: { stores }, global: aTestingDiscountsStore().global });
