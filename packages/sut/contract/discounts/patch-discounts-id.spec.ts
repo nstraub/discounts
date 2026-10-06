@@ -14,6 +14,8 @@ const bodiesThatAreNotObjects = ['[]', '"25"', '25', 'null'];
 
 const patchTheDiscount = (http: Http, id: string) => http.patch(`/discounts/${id}`);
 
+const patchWrittenAsJson = (http: Http, id: string, body: string) => patchTheDiscount(http, id).set('Content-Type', 'application/json').send(body);
+
 describe('PATCH /discounts/:id', () => {
   describe('success', () => {
     it('should answer 204 with no body when the rate is changed', async () => {
@@ -63,7 +65,7 @@ describe('PATCH /discounts/:id', () => {
 
       const statuses = [];
       for (const body of bodiesThatAreNotObjects) {
-        const response = await patchTheDiscount(http, published.id).set('Content-Type', 'application/json').send(body);
+        const response = await patchWrittenAsJson(http, published.id, body);
         statuses.push(response.status);
       }
 
@@ -73,7 +75,7 @@ describe('PATCH /discounts/:id', () => {
       const { http } = await setupSut();
       const published = await publishTheSpicesDiscount(http);
 
-      const response = await patchTheDiscount(http, published.id).set('Content-Type', 'application/json').send('{"rate": "25",');
+      const response = await patchWrittenAsJson(http, published.id, '{"rate": "25",');
 
       expect(response.status).to.equal(400);
     });
