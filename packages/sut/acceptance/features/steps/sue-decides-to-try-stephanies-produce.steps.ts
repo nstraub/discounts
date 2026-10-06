@@ -2,13 +2,11 @@ import { Given, Then, When } from '@cucumber/cucumber';
 
 import { stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
-import { openSomeoneElsesDiscountsPage, suesPage } from '../../support/discounts-page';
+import { publishFromSomeoneElsesPage, suesPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
 
 Given("Sue has found Stephanie's discount on produce", async function (this: PlaywrightWorld) {
-  const stephaniesPage = await openSomeoneElsesDiscountsPage(this);
-  await stephaniesPage.publish(stephaniesProduceDiscount);
-  this.publishedDiscount = stephaniesProduceDiscount;
+  await publishFromSomeoneElsesPage(this, stephaniesProduceDiscount);
   await suesPage(this).open();
 });
 

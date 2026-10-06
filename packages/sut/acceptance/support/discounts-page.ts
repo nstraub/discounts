@@ -106,4 +106,10 @@ export const openSomeoneElsesDiscountsPage = async (world: PlaywrightWorld): Pro
   return discountsPage;
 };
 
+export const publishFromSomeoneElsesPage = async (world: PlaywrightWorld, discount: ExampleDiscount): Promise<void> => {
+  const theirPage = await openSomeoneElsesDiscountsPage(world);
+  await theirPage.publish(discount);
+  world.publishedDiscount = discount;
+};
+
 export const suesPage = (world: PlaywrightWorld): DiscountsPage => new DiscountsPage(world.page);

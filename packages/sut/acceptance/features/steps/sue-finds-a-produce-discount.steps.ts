@@ -2,19 +2,15 @@ import { Given, Then, When } from '@cucumber/cucumber';
 
 import { produceDiscount } from '@sut/support/example-discounts';
 
-import { openSomeoneElsesDiscountsPage, suesPage } from '../../support/discounts-page';
+import { publishFromSomeoneElsesPage, suesPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
 
 Given('Mike has published a discount on produce', async function (this: PlaywrightWorld) {
-  const mikesPage = await openSomeoneElsesDiscountsPage(this);
-  await mikesPage.publish(produceDiscount);
-  this.publishedDiscount = produceDiscount;
+  await publishFromSomeoneElsesPage(this, produceDiscount);
 });
 
 const publishWithNoLocationAsSueJudgesTheDistanceFromTheAddress = async (world: PlaywrightWorld): Promise<void> => {
-  const mikesPage = await openSomeoneElsesDiscountsPage(world);
-  await mikesPage.publish(produceDiscount);
-  world.publishedDiscount = produceDiscount;
+  await publishFromSomeoneElsesPage(world, produceDiscount);
 };
 
 Given("Mike's store is within walking distance of Sue's home", async function (this: PlaywrightWorld) {
