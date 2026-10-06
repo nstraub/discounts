@@ -15,6 +15,8 @@ const setupSutRefusing = (refusal: BadRequestException) => {
   return sut;
 };
 
+const spicesDiscountWithoutItsRate = { item: spicesDiscount.item, storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress };
+
 describe('Store discounts', () => {
   describe('publishing a discount', () => {
     it('should hand the item, rate, store name and store address over to be published', async () => {
@@ -72,7 +74,7 @@ describe('Store discounts', () => {
     it('should hold other pieces as missing when the refusal lists others', async () => {
       const { discounts } = setupSutRefusing(aRefusalListingAsMissing(['rate']));
 
-      await discounts.publish({ item: spicesDiscount.item, storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
+      await discounts.publish(spicesDiscountWithoutItsRate);
 
       expect(discounts.missing, 'the pieces held as missing').to.deep.equal(['rate']);
     });
