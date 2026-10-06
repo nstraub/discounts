@@ -1,3 +1,4 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { countResponse } from '@app/types/discounts';
@@ -39,7 +40,17 @@ describe('POST /stores/counts', () => {
 
       expect(countResponse.safeParse(response.body).error).to.equal(undefined);
     });
-    it.todo('should publish DiscountedSalesCounted on the application event emitter for the discount counted');
+    it('should publish DiscountedSalesCounted on the application event emitter for the discount counted', async () => {
+      const { app, http, published } = await setupSutWithACouponUsedFor();
+      const counted: unknown[] = [];
+      app.get(EventEmitter2).on('discount.sales-counted', (event: { discountId: string; discountedSales: number }) =>
+        counted.push({ discountId: event.discountId, discountedSales: event.discountedSales }),
+      );
+
+      await countTheStoreOf(http);
+
+      expect(counted).to.deep.equal([{ discountId: published.id, discountedSales: 1 }]);
+    });
     it.todo('should answer a count made after another with only the coupons redeemed since that one');
   });
 
