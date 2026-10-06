@@ -1,4 +1,4 @@
-import { mock } from 'vitest-mock-extended';
+import { mock, type MockProxy } from 'vitest-mock-extended';
 import { describe, expect, it } from 'vitest';
 
 import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
@@ -13,6 +13,11 @@ const setupSut = () => {
   return { events, discountWith: (details: ConstructorParameters<typeof DiscountDetails>[0]) => factory.create(new DiscountDetails(details)) };
 };
 
+const lastEventOf = (events: MockProxy<DomainEventPublisher>) => {
+  const [published] = events.publish.mock.lastCall ?? [];
+  return published as DiscountPublished;
+};
+
 describe('class Discount', () => {
   describe('publishing a discount', () => {
     describe('the discount published', () => {
@@ -22,9 +27,8 @@ describe('class Discount', () => {
 
         discount.publish();
 
-        const [published] = events.publish.mock.lastCall ?? [];
-        expect(published).to.be.instanceOf(DiscountPublished);
-        expect((published as DiscountPublished).discount).to.deep.include(spicesDiscount);
+        expect(lastEventOf(events)).to.be.instanceOf(DiscountPublished);
+        expect(lastEventOf(events).discount).to.deep.include(spicesDiscount);
       });
     });
 
@@ -48,8 +52,7 @@ describe('class Discount', () => {
 
         discount.publish();
 
-        const [published] = events.publish.mock.lastCall ?? [];
-        expect((published as DiscountPublished).discount.hook).to.equal('Our spices now come from a new supplier');
+        expect(lastEventOf(events).discount.hook).to.equal('Our spices now come from a new supplier');
       });
       it('should raise DiscountPublished carrying no hook when it has none', () => {
         const { events, discountWith } = setupSut();
@@ -57,8 +60,7 @@ describe('class Discount', () => {
 
         discount.publish();
 
-        const [published] = events.publish.mock.lastCall ?? [];
-        expect((published as DiscountPublished).discount).to.not.have.property('hook');
+        expect(lastEventOf(events).discount).to.not.have.property('hook');
       });
     });
 
