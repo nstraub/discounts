@@ -6,4 +6,5 @@ export interface DiscountRepository {
   all(): Promise<Discount[]>;
   withId(id: string): Promise<Discount | undefined>;
   withCouponToken(token: CouponToken): Promise<Discount | undefined>;
+  ofStore(store: { storeName: string; storeAddress: string }): Promise<Discount[]>;
 }

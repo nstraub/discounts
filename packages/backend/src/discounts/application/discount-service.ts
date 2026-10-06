@@ -1,4 +1,5 @@
 import { DiscountChanges } from './discount-changes.js';
+import type { CountedSales } from './domain/counted-sales.js';
 import { CouponToken } from './domain/coupon-token.js';
 import type { Discount } from './domain/discount.js';
 import type { DiscountDetails } from './domain/discount-details.js';
@@ -41,6 +42,10 @@ export class DiscountService {
   async redeemCoupon(code: string): Promise<RedeemedCoupon> {
     const token = CouponToken.read(code);
     return this.changes.toTheOneThatIssued(token, (found) => found.redeemCoupon(token));
+  }
+
+  async count(store: Parameters<DiscountRepository['ofStore']>[0]): Promise<CountedSales[]> {
+    return this.changes.toEachOfTheStore(store, (found) => found.count());
   }
 
   async published(): Promise<Discount[]> {

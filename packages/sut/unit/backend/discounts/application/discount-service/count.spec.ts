@@ -1,8 +1,22 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { publishedSpicesDiscount } from '@sut/support/example-discounts';
+
+import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
+
+const theSpicesStore = { storeName: publishedSpicesDiscount.storeName, storeAddress: publishedSpicesDiscount.storeAddress };
+
+const setupSut = ({ coupons = [{ token: '7K3QX9M2PD', redeemed: true, counted: false }] } = {}) => aServiceOverAKeptDiscount({ coupons });
 
 describe('class DiscountService', () => {
   describe('counting a store\'s discounted sales', () => {
-    it.todo('should keep the store\'s discount with its sales counted');
+    it('should keep the store\'s discount with its sales counted', async () => {
+      const { repository, service } = setupSut();
+
+      await service.count(theSpicesStore);
+
+      expect(repository.save.mock.lastCall?.at(0)?.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true, counted: true }]);
+    });
     it.todo('should announce DiscountedSalesCounted once the count is kept');
     it.todo('should answer with the discount\'s id, item and rate and the number of sales counted');
 

@@ -20,4 +20,8 @@ export class InMemoryDiscountRepository implements DiscountRepository {
   async withCouponToken(token: CouponToken): Promise<Discount | undefined> {
     return [...this.kept.values()].find((discount) => discount.toJSON().coupons.some((coupon) => coupon.token === token.toJSON()));
   }
+
+  async ofStore({ storeName, storeAddress }: Parameters<DiscountRepository['ofStore']>[0]): Promise<Discount[]> {
+    return [...this.kept.values()].filter((discount) => discount.toJSON().storeName === storeName && discount.toJSON().storeAddress === storeAddress);
+  }
 }

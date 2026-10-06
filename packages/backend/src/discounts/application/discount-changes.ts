@@ -15,6 +15,11 @@ export class DiscountChanges {
     return this.keptAfter((await this.repository.withCouponToken(token))!, change);
   }
 
+  async toEachOfTheStore<Answer>(store: Parameters<DiscountRepository['ofStore']>[0], change: Change<Answer>): Promise<Answer[]> {
+    const [discount] = await this.repository.ofStore(store);
+    return [await this.keptAfter(discount!, change)];
+  }
+
   async keptAfter<Answer>(discount: Discount, change: Change<Answer>): Promise<Answer> {
     const answer = change(discount);
     await this.repository.save(discount);
