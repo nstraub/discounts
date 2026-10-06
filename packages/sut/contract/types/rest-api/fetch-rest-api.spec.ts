@@ -69,7 +69,14 @@ describe('class FetchRestApi', () => {
       const { rows } = await client.query('SELECT rate FROM app.discounts');
       expect(rows).to.deep.equal([{ rate: '25' }]);
     });
-    it.todo('should resolve when the answer is ok with no content');
+    it('should resolve when the answer is ok with no content', async () => {
+      const { restApi } = await setupSut();
+      const published = await restApi.post<{ id: string }>('/discounts', spicesDiscount);
+
+      const outcome = await outcomeOf(restApi.patch(`/discounts/${published.id}`, { rate: '25' }));
+
+      expect(outcome).to.equal('resolved');
+    });
     it.todo('should reject when the answer is not ok');
   });
 });
