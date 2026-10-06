@@ -1,17 +1,21 @@
 import { eq } from 'drizzle-orm';
 
+import type { Coupon } from '../application/domain/coupon.js';
+
 import type { Database } from './database.module.js';
 import { coupons } from './schema.js';
 
-export const tokensIssuedBy = async (database: Database, discountId: string): Promise<string[]> => {
-  const rows = await database.select({ token: coupons.token }).from(coupons).where(eq(coupons.discountId, discountId)).orderBy(coupons.id);
-  return rows.map((row) => row.token);
-};
+type KeptCoupon = ReturnType<Coupon['toJSON']>;
 
-export const tokensIssuedByEachDiscount = async (database: Database): Promise<Map<string, string[]>> => {
-  const rows = await database.select({ token: coupons.token, discountId: coupons.discountId }).from(coupons).orderBy(coupons.id);
+const theColumnsOfACoupon = { token: coupons.token, redeemed: coupons.redeemed };
+
+export const couponsIssuedBy = (database: Database, discountId: string): Promise<KeptCoupon[]> =>
+  database.select(theColumnsOfACoupon).from(coupons).where(eq(coupons.discountId, discountId)).orderBy(coupons.id);
+
+export const couponsIssuedByEachDiscount = async (database: Database): Promise<Map<string, KeptCoupon[]>> => {
+  const rows = await database.select({ ...theColumnsOfACoupon, discountId: coupons.discountId }).from(coupons).orderBy(coupons.id);
   const byDiscount = Map.groupBy(rows, (row) => row.discountId);
-  return new Map(byDiscount.entries().map(([discountId, issued]) => [discountId, issued.map((row) => row.token)]));
+  return new Map(byDiscount.entries().map(([discountId, issued]) => [discountId, issued.map(({ token, redeemed }) => ({ token, redeemed }))]));
 };
 
 export const idsOfTheDiscountsThatIssued = async (database: Database, token: string): Promise<string[]> => {
@@ -19,10 +23,10 @@ export const idsOfTheDiscountsThatIssued = async (database: Database, token: str
   return rows.map((row) => row.discountId);
 };
 
-export const keepTheNewlyIssued = async (database: Database, discountId: string, tokens: string[]): Promise<void> => {
-  const kept = await tokensIssuedBy(database, discountId);
-  const newlyIssued = tokens.filter((token) => !kept.includes(token));
+export const keepTheNewlyIssued = async (database: Database, discountId: string, issued: KeptCoupon[]): Promise<void> => {
+  const kept = (await couponsIssuedBy(database, discountId)).map(({ token }) => token);
+  const newlyIssued = issued.filter(({ token }) => !kept.includes(token));
   if (newlyIssued.length > 0) {
-    await database.insert(coupons).values(newlyIssued.map((token) => ({ token, discountId })));
+    await database.insert(coupons).values(newlyIssued.map((coupon) => ({ ...coupon, discountId })));
   }
 };
