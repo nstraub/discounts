@@ -21,7 +21,8 @@ export class BadRequestException extends RestApiException {
 export const refuseANotOkAnswer = async (request: string, response: Response): Promise<void> => {
   const answered = `${request} answered ${response.status}`;
   if (response.status === badRequest) {
-    throw new BadRequestException(answered, requestRejection.parse(await response.json()).missing ?? [], ['rate']);
+    const { missing, fields } = requestRejection.parse(await response.json());
+    throw new BadRequestException(answered, missing ?? [], fields ?? []);
   }
   if (response.status === unprocessableContent) {
     throw new UnprocessableContentException(answered);

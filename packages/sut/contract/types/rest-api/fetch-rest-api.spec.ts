@@ -100,6 +100,13 @@ describe('class FetchRestApi', () => {
 
       expect(refusal).to.deep.include({ fields: ['rate'] });
     });
+    it('should carry other fields when a 400 names others', async () => {
+      const { restApi } = await setupSut();
+
+      const refusal = await refusalOf(restApi.post('/discounts', { ...spicesDiscount, item: '' }));
+
+      expect(refusal).to.deep.include({ fields: ['item'] });
+    });
   });
 
   describe('getting', () => {
