@@ -14,5 +14,12 @@ describe('a discount found by its id in PostgreSQL', () => {
 
     expect(found?.toJSON()).to.deep.equal(produce.toJSON());
   });
-  it.todo('should find nothing for an id no kept discount has');
+  it('should find nothing for an id no kept discount has', async () => {
+    const { keep, repository } = await setupSut();
+    await keep(spicesDiscount);
+
+    const found = await repository.withId('an-id-no-discount-has');
+
+    expect(found).to.equal(undefined);
+  });
 });
