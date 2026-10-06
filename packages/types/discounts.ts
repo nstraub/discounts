@@ -30,7 +30,7 @@ export type Store = z.infer<typeof store>;
 
 const textNotBlank = z.string().refine((text) => text.trim() !== '');
 
-export const redemptionRequest = z.object({ code: z.string(), storeName: textNotBlank, storeAddress: textNotBlank });
+export const redemptionRequest = z.object({ code: textNotBlank, storeName: textNotBlank, storeAddress: textNotBlank });
 
 export type RedemptionRequest = z.infer<typeof redemptionRequest>;
 

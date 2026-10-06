@@ -5,7 +5,7 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
 import { theDiscountsKept, theRowKeptFor } from '../support/discounts-table';
-import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
+import { bodiesNotMatchingTheErrorSchema, theFieldsNamedBy } from '../support/error-schema';
 import { redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithAnotherCouponOfTheSameDiscount } from '../support/redemptions';
 
 const aCodeNobodyIssued = 'ZZZZZZZZZZ';
@@ -41,7 +41,15 @@ describe('POST /redemptions', () => {
   });
 
   describe('empty', () => {
-    it.todo('should answer 400 naming the code when it is empty or only blank space');
+    it('should answer 400 naming the code when it is empty or only blank space', async () => {
+      const { http } = await setupSut();
+
+      const empty = await redeemAtTheStoreOf(http, '');
+      const blank = await redeemAtTheStoreOf(http, ' \t ');
+
+      expect([empty.status, blank.status]).to.deep.equal([400, 400]);
+      expect(theFieldsNamedBy(empty, blank)).to.deep.equal([['code'], ['code']]);
+    });
   });
 
   describe('A2 injection', () => {
