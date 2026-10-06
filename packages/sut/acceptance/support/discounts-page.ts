@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 
 import type { Locator, Page } from 'playwright';
 
+import { discountTexts } from '@frontend/discounts/texts';
+
 import type { PlaywrightWorld } from './playwright-world';
 
 type ExampleDiscount = { item: string; rate: string; storeName: string; storeAddress: string };
@@ -47,7 +49,7 @@ export class DiscountsPage {
 
   async decideToTry(discount: ExampleDiscount): Promise<void> {
     const entry = await this.publishedEntryOn(discount);
-    await entry.getByTestId('get-coupon').click();
+    await entry.getByRole('button', { name: discountTexts.getCoupon }).click();
   }
 
   async verifyShowsACouponToUseAt(discount: ExampleDiscount): Promise<void> {
