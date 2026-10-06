@@ -1,8 +1,21 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { setupSut } from '../support/app';
+import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
+import { redeemAtTheStoreOf } from '../support/redemptions';
+
+const aCodeNobodyIssued = 'ZZZZZZZZZZ';
 
 describe('POST /redemptions', () => {
   describe('a code nobody issued', () => {
-    it.todo('should answer 404 with a body matching the error schema for a well-formed code nobody issued');
+    it('should answer 404 with a body matching the error schema for a well-formed code nobody issued', async () => {
+      const { http } = await setupSut();
+
+      const response = await redeemAtTheStoreOf(http, aCodeNobodyIssued);
+
+      expect(response.status).to.equal(404);
+      expect(bodiesNotMatchingTheErrorSchema([response])).to.deep.equal([]);
+    });
     it.todo('should keep every discount and coupon as it was when the code was never issued');
     it.todo('should publish nothing on the application event emitter for a code nobody issued');
   });
