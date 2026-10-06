@@ -1,6 +1,7 @@
 import { Body, ConflictException, Controller, HttpStatus, Inject, Post, UnprocessableEntityException } from '@nestjs/common';
 
-import { redemptionRequest, redemptionResponse, type RedemptionRequest, type RequestRejection } from '@app/types/discounts';
+import { redemptionRequest, redemptionResponse, type RedemptionRequest } from '@app/types/discounts';
+import type { RequestRejection } from '@app/types/request-rejection';
 
 import { DiscountService } from '../application/discount-service.js';
 import { CouponNotForThisStoreException } from '../application/domain/coupon-not-for-this-store-exception.js';

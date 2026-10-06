@@ -2,7 +2,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import type { DiscountPublicationRejected } from '@backend/discounts/application/domain/discount-publication-rejected';
-import { requestRejection } from '@app/types/discounts';
+import { requestRejection } from '@app/types/request-rejection';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';

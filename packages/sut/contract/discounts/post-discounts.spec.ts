@@ -1,7 +1,8 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
-import { discountResponse, requestRejection } from '@app/types/discounts';
+import { discountResponse } from '@app/types/discounts';
+import { requestRejection } from '@app/types/request-rejection';
 import { longTextInAnyCharacters, produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';

@@ -1,7 +1,7 @@
 import { BadRequestException, HttpStatus, type PipeTransform } from '@nestjs/common';
 import type { ZodType } from 'zod';
 
-import type { RequestRejection } from '@app/types/discounts';
+import type { RequestRejection } from '@app/types/request-rejection';
 
 export class ParsedBy<Request> implements PipeTransform<unknown, Request> {
   constructor(private readonly schema: ZodType<Request>) {}

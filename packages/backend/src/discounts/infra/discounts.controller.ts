@@ -8,8 +8,8 @@ import {
   publishDiscountRequest,
   type PublishDiscountRequest,
   publishedDiscountsResponse,
-  type RequestRejection,
 } from '@app/types/discounts';
+import type { RequestRejection } from '@app/types/request-rejection';
 
 import { DiscountService } from '../application/discount-service.js';
 import { DiscountDetails } from '../application/domain/discount-details.js';
