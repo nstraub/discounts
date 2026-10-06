@@ -17,7 +17,7 @@ export const insertADiscountWithout = (client: pg.Client, missing: keyof typeof 
   );
 };
 
-export const insertACoupon = (client: pg.Client, coupon: { token?: string; discount_id?: string }): Promise<string> => {
+export const insertACoupon = (client: pg.Client, coupon: { token?: string; discount_id?: string; redeemed?: boolean }): Promise<string> => {
   const given = Object.entries(coupon);
   const columns = given.map(([column]) => column).join(', ');
   const placeholders = given.map((_, index) => `$${index + 1}`).join(', ');
