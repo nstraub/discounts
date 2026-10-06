@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { couponForTheSpicesDiscount } from '@sut/support/example-discounts';
+
 import { setupSut } from './discounts-store-of-an-app';
 
 describe('Store discounts', () => {
@@ -18,7 +20,14 @@ describe('Store discounts', () => {
 
       expect(restApi.post).to.have.been.calledWith('/discounts/produce-id/coupons', {});
     });
-    it.todo('should hold the coupon got once it is issued');
+    it('should hold the coupon got once it is issued', async () => {
+      const { restApi, discounts } = setupSut();
+      restApi.post.mockResolvedValue(couponForTheSpicesDiscount);
+
+      await discounts.getCoupon('spices-id');
+
+      expect(discounts.coupon).to.deep.equal(couponForTheSpicesDiscount);
+    });
     it.todo('should keep the coupon got when the page is opened again');
 
     describe('dependency failure', () => {

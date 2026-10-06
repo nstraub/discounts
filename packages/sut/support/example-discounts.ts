@@ -15,3 +15,5 @@ export const publishedSpicesDiscount = { id: 'spices-id', ...spicesDiscount };
 export const publishedProduceDiscount = { id: 'produce-id', ...produceDiscount };
 
 export const spicesDiscountWithItsHook = { ...spicesDiscount, hook: 'Our spices now come from a new supplier' };
+
+export const couponForTheSpicesDiscount = { token: '7K3QX9M2PD', storeName: spicesDiscount.storeName };

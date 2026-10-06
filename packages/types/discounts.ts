@@ -20,6 +20,10 @@ export const changeRateRequest = z.object({ rate: z.string() });
 
 export type ChangeRateRequest = z.infer<typeof changeRateRequest>;
 
+export const couponResponse = z.object({ token: z.string(), storeName: z.string() });
+
+export type CouponResponse = z.infer<typeof couponResponse>;
+
 export const requestRejection = z.object({
   statusCode: z.number(),
   message: z.string(),
