@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { CouponAlreadyUsedException } from '@backend/discounts/application/domain/coupon-already-used-exception';
 import { CouponRedeemed } from '@backend/discounts/application/domain/coupon-redeemed';
+import { CouponRedemptionRejected } from '@backend/discounts/application/domain/coupon-redemption-rejected';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
@@ -53,6 +54,12 @@ describe('class DiscountService', () => {
 
       await expect(service.redeemCoupon('7K3QX9M2PD')).rejects.to.be.instanceOf(CouponAlreadyUsedException);
     });
-    it.todo('should announce CouponRedemptionRejected for the coupon already used');
+    it('should announce CouponRedemptionRejected for the coupon already used', async () => {
+      const { events, service } = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: true, counted: false }] });
+
+      await expect(service.redeemCoupon('7K3QX9M2PD')).rejects.to.be.instanceOf(CouponAlreadyUsedException);
+
+      expect(events.publish).to.have.been.calledWith(new CouponRedemptionRejected('spices-id', '7K3QX9M2PD', 'already used'));
+    });
   });
 });
