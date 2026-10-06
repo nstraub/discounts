@@ -70,7 +70,9 @@ C4Component
     Component(service, "DiscountService", "Application service", "publish(), changeRate(), issueCoupon(), redeemCoupon(code), count(store) and published()")
     Component(changes, "DiscountChanges", "Application collaborator", "The unit of work: runs issuing, redeeming and counting through the repository's changing(work): load, tell, save in one transaction")
     Component(factory, "DiscountFactory", "Domain factory", "create() gives a new identity; reconstitute() rebuilds a kept discount")
-    Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails (item, rate, store name, store address, optional hook); publish() raises DiscountPublished, changeRate() raises DiscountRateChanged, issueCoupon() adds a coupon and raises CouponIssued, redeemCoupon(token) redeems it, count() counts the coupons redeemed since the last count and raises DiscountedSalesCounted")
+    Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails (item, rate, store name, store address, optional hook); publish(keep) refuses a rate that is not valid, otherwise keeps the discount and raises DiscountPublished, changeRate() raises DiscountRateChanged, issueCoupon() adds a coupon and raises CouponIssued, redeemCoupon(token) redeems it, count() counts the coupons redeemed since the last count and raises DiscountedSalesCounted")
+    Component(rate, "DiscountRate", "Value object", "The rule of a rate on publishing: above 0 and at most 100, at most one decimal")
+    Component(publicationRejected, "DiscountPublicationRejected", "Domain event", "Raised when a discount is refused: the rate and the reason")
     Component(event, "DiscountPublished", "Domain event", "Carries the discount as published")
     Component(token, "CouponToken", "Value object", "Ten characters of Crockford base32: drawnFrom(random) for a new one, read(code) for a typed one (case, O, I, L and spacing normalised)")
     Component(issued, "IssuedCoupon", "Domain value", "A coupon token and the name of the store it is for")
@@ -130,6 +132,8 @@ C4Component
   Rel(factory, discount, "Builds")
   Rel(service, repositoryPort, "Saves and lists through")
   Rel(discount, event, "Raises")
+  Rel(discount, rate, "Checks its rate with")
+  Rel(discount, publicationRejected, "Raises")
   Rel(discount, rateChanged, "Raises")
   Rel(discount, publisherPort, "Publishes through")
   Rel(repository, repositoryPort, "Implements")
@@ -159,13 +163,25 @@ sequenceDiagram
   Controller->>Controller: ParsedBy checks the body (400 requestRejection when a field is missing or mistyped)
   Controller->>Service: publish(details)
   Service->>Discount: DiscountFactory.create(details)
-  Service->>Repository: save(discount)
-  Service->>Discount: publish()
+  Service->>Discount: publish(keep)
+  Discount->>Discount: DiscountRate checks the rate (400 fields: rate, nothing kept, DiscountPublicationRejected raised, when it is not valid)
+  Discount->>Repository: keep(discount) saves it
   Discount->>Events: publish(DiscountPublished)
   Service-->>Controller: discount
   Controller-->>Store: 201, Location /discounts/{id}, the discount as JSON
   Form->>Form: clears its fields
 ```
+
+### The rate's rule
+
+A rate is checked when a discount is published, and only then: a rate already kept is never checked
+again, and changing a rate has no rule yet. `DiscountRate` holds the rule: the rate is written as
+digits (no sign, no leading zero) with at most one decimal after a point or a comma, the whole value
+and nothing around it, and it is above 0 and at most 100. `Discount.publish(keep)` asks the rate; when it
+is not valid the discount keeps nothing, raises `DiscountPublicationRejected` (the rate and the reason)
+and refuses, and `POST /discounts` answers `400` with `fields: ['rate']` in the one error schema. The
+rate stays text in the discount and in the database, exactly as written. The form shows "The rate must
+be above 0 % and at most 100 %, with at most one decimal." and lists nothing new.
 
 ### Changing a discount's rate
 
