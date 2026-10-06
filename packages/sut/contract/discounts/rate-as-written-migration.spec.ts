@@ -4,7 +4,9 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { discountRepositoryOn } from '../support/discount-repository';
 import { constraintsAndColumnsOfTheDiscountsTable } from '../support/discounts-table';
-import { setupSut } from '../support/migrations';
+import { migrateBackward, setupSut } from '../support/migrations';
+
+const theMigration = '0003_rate_as_written';
 
 const aRateWrittenWithAComma = { ...spicesDiscount, rate: '12,5' };
 
@@ -20,5 +22,21 @@ describe('the migration that keeps the rate as written', () => {
     await keep(aRateWrittenWithAComma);
     const [loaded] = await loadOnItsOwnConnection();
     expect(loaded?.toJSON()).to.deep.include(aRateWrittenWithAComma);
+  });
+  it('should run backward to the rate kept as a number, a rate that is a number kept, and forward again, back as text', async () => {
+    const { client, databaseUrl, migrateForward } = await setupSut();
+    await migrateForward();
+    const { keep, loadOnItsOwnConnection } = discountRepositoryOn(client, databaseUrl);
+    await keep(spicesDiscount);
+
+    await migrateBackward(client, theMigration);
+
+    const backward = await client.query('SELECT rate FROM app.discounts');
+    expect(backward.rows, 'the rate, backward').to.deep.equal([{ rate: 20 }]);
+
+    await migrateForward();
+
+    const [loaded] = await loadOnItsOwnConnection();
+    expect(loaded?.toJSON(), 'the discount, forward again').to.deep.include(spicesDiscount);
   });
 });
