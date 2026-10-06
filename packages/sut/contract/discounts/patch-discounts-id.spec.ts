@@ -79,6 +79,7 @@ describe('PATCH /discounts/:id', () => {
         await patchWrittenAsJson(http, published.id, '25'),
         await patchWrittenAsJson(http, published.id, 'null'),
         await patchWrittenAsJson(http, published.id, '{"rate": "25",'),
+        await patchTheDiscount(http, 'an-id-no-discount-has').send({ rate: '25' }),
       ];
 
       expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
