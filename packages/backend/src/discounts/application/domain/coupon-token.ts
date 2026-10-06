@@ -1,3 +1,4 @@
+import { NoCouponHasTheCodeException } from './no-coupon-has-the-code-exception.js';
 import type { RandomSource } from './random-source.js';
 
 const crockfordBase32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
@@ -20,6 +21,9 @@ export class CouponToken {
 
   static read(typed: string): CouponToken {
     const withoutSeparators = typed.toUpperCase().replaceAll(separatorsTypedBetweenOrAroundTheGroups, '');
+    if (withoutSeparators.length < charactersInAToken) {
+      throw new NoCouponHasTheCodeException();
+    }
     return new CouponToken(withoutSeparators.replaceAll(theLetterTypedForAZero, '0').replaceAll(theLettersTypedForAOne, '1'));
   }
 

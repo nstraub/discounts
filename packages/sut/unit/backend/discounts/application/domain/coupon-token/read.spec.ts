@@ -2,6 +2,7 @@ import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
+import { NoCouponHasTheCodeException } from '@backend/discounts/application/domain/no-coupon-has-the-code-exception';
 
 const charactersInAGroup = 5;
 const asThePageShows = (token: string) => `${token.slice(0, charactersInAGroup)} ${token.slice(charactersInAGroup)}`;
@@ -57,7 +58,9 @@ describe('class CouponToken', () => {
   });
   describe('reading a code that cannot be a token', () => {
     describe('boundary', () => {
-      it.todo('should read no token from a code of nine characters');
+      it('should read no token from a code of nine characters', () => {
+        expect(() => CouponToken.read('7K3QX9M2P')).to.throw(NoCouponHasTheCodeException);
+      });
       it.todo('should read no token from a code of eleven characters');
     });
 
