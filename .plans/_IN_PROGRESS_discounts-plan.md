@@ -27,7 +27,7 @@ showcase ("adding feedback would be too onerous to be worth it").
 | 1 (done) | *Slice 0, the walking skeleton*, then Mike publishes a new discount | Sue finds a discount on produce | *(through Mike's slice)* |
 | 2 (done) | Mike raises a discount | Stephanie tells people what is new about her produce *(one slice, value to Sue and Stephanie)* | *(same slice)* |
 | 3 (done) | Mike lowers a discount | Sue finds a store close to home | Sue decides to try Stephanie's produce + Stephanie redeems a coupon *(together)* |
-| 4 | Mike publishes a discount at any rate up to 100% | Sue finds more than one store | Rodrigo counts the discounted sales since his last count |
+| 4 (done) | Mike publishes a discount at any rate up to 100% | Sue finds more than one store | Rodrigo counts the discounted sales since his last count |
 | 5 | Mike's earlier discounts stay published | — | A coupon counts only once |
 | 6 | Mike gives an invalid rate | — | A coupon for another store's discount |
 | 7 | Mike leaves out required information | — | A coupon nobody issued |
@@ -69,7 +69,7 @@ architecture is drawn in `docs/architecture.md`.
 | 8 | 3 | Stephanie redeems a coupon, done | Stephanie · 2. Stephanie takes the coupon at the till | Stephanie (with slice 7) |
 | 9 | 4 | Mike publishes a discount at any rate up to 100%, done | Mike · 1. Mike makes his new store known with a discount on what he is famous for | Mike |
 | 10 | 4 | Sue finds more than one store, done | Sue · 1. Sue finds a produce discount at a store close to home | Sue |
-| 11 | 4 | Rodrigo counts the discounted sales since his last count | Rodrigo · 1. Rodrigo counts the store's discounted sales since he last looked | Rodrigo |
+| 11 | 4 | Rodrigo counts the discounted sales since his last count, done | Rodrigo · 1. Rodrigo counts the store's discounted sales since he last looked | Rodrigo |
 | 12 | 5 | Mike's earlier discounts stay published | Mike · 1. Mike makes his new store known with a discount on what he is famous for | Mike |
 | 13 | 5 | A coupon counts only once | Stephanie · 2. Stephanie takes the coupon at the till | Stephanie |
 | 14 | 6 | Mike gives an invalid rate | Mike · 1. Mike makes his new store known with a discount on what he is famous for | Mike |
