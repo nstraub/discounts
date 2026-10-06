@@ -16,6 +16,10 @@ When('Mike publishes a discount on an item', async function (this: PlaywrightWor
   await publishAsMike(this, spicesDiscount);
 });
 
+When('Mike publishes a discount of {word} on an item', async function (this: PlaywrightWorld, rateWithItsSign: string) {
+  await publishAsMike(this, { ...spicesDiscount, rate: rateWithItsSign.replace(/%$/, '') });
+});
+
 Then('people can see it immediately', async function (this: PlaywrightWorld) {
   const peoplesPage = await openSomeoneElsesDiscountsPage(this);
   await peoplesPage.verifyShows(this.publishedDiscount);

@@ -62,7 +62,6 @@ Feature: Mike publishes a discount on what he is famous for
     Then they are slowed down
     And people can still see every discount published before
 
-  @wip
   Scenario Outline: Mike publishes a discount at any rate up to 100%
     When Mike publishes a discount of <rate> on an item
     Then people can see it immediately
