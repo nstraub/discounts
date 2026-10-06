@@ -4,6 +4,7 @@ import { requestRejection } from '@app/types/request-rejection';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
+import { theFieldsNamedBy } from '../support/error-schema';
 
 const { item, rate, storeName, storeAddress } = spicesDiscount;
 
@@ -34,7 +35,15 @@ describe('POST /discounts with a piece left out', () => {
 
       expect(requestRejection.parse(response.body).missing).to.deep.equal(['storeAddress']);
     });
-    it.todo('should list a rate left out as missing and not list a rate of 150 as missing, fields naming the rate in both');
+    it('should list a rate left out as missing and not list a rate of 150 as missing, fields naming the rate in both', async () => {
+      const { http } = await setupSut();
+
+      const rateLeftOut = await http.post('/discounts').send({ item, storeName, storeAddress });
+      const rateOf150 = await http.post('/discounts').send({ ...spicesDiscount, rate: '150' });
+
+      expect(theFieldsNamedBy(rateLeftOut, rateOf150), 'the fields named').to.deep.equal([['rate'], ['rate']]);
+      expect([rateLeftOut, rateOf150].map((answer) => requestRejection.parse(answer.body).missing)).to.deep.equal([['rate'], undefined]);
+    });
     it.todo('should answer 400 listing the item, the store name and the store address as missing when each is empty text');
     it.todo('should answer with a body matching the error schema when pieces are missing');
     it.todo('should publish nothing when a piece is missing, listing no discount afterwards');
