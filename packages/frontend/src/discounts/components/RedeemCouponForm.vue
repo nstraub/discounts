@@ -7,8 +7,8 @@ import { useDiscountsStore } from '../../stores/discounts-store';
 import { discountTexts } from '../texts';
 
 import CaptionedInput from './CaptionedInput.vue';
-import DiscountApplies from './DiscountApplies.vue';
 import StorePicker from './StorePicker.vue';
+import TillAnswer from './TillAnswer.vue';
 
 defineProps<{ stores: Store[] }>();
 
@@ -41,9 +41,6 @@ const redeem = async (): Promise<void> => {
     >
       {{ discountTexts.redeem }}
     </button>
-    <DiscountApplies
-      v-if="discounts.redemption"
-      :redemption="discounts.redemption"
-    />
+    <TillAnswer />
   </form>
 </template>
