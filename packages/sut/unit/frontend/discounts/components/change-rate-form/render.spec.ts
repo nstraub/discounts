@@ -7,9 +7,9 @@ import { discountTexts } from '@frontend/discounts/texts';
 import { publishedSpicesDiscount } from '@sut/support/example-discounts';
 import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
-const setupSut = ({ discount = publishedSpicesDiscount } = {}) =>
+const setupSut = () =>
   mount(ChangeRateForm, {
-    props: { discount, namedBy: 'entry-text' },
+    props: { discount: publishedSpicesDiscount, namedBy: 'entry-text' },
     global: aTestingDiscountsStore().global,
   });
 
