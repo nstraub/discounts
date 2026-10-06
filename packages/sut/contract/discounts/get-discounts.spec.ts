@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { publishedDiscountsResponse } from '@app/types/discounts';
-import { longTextInAnyCharacters, produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
+import { longTextInAnyCharacters, produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
 
@@ -77,7 +77,14 @@ describe('GET /discounts', () => {
     it.todo('should answer every published discount when a very large number are published, without failing');
   });
   describe('the hook', () => {
-    it.todo('should list a discount with its hook');
+    it('should list a discount with its hook', async () => {
+      const { http } = await setupSut();
+      await http.post('/discounts').send(spicesDiscountWithItsHook);
+
+      const response = await http.get('/discounts');
+
+      expect(response.body.map((discount: { hook: unknown }) => discount.hook)).to.deep.equal([spicesDiscountWithItsHook.hook]);
+    });
     it.todo('should list a discount published without a hook with no hook');
   });
 });

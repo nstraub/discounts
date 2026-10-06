@@ -13,7 +13,10 @@ const theColumnsOfADiscount = {
   rate: discounts.rate,
   storeName: discounts.storeName,
   storeAddress: discounts.storeAddress,
+  hook: discounts.hook,
 };
+
+const withNoHookWhenNoneIsKept = <Row extends { hook: string | null }>({ hook, ...row }: Row) => (hook === null ? row : { ...row, hook });
 
 export class DiscountDrizzleRepository implements DiscountRepository {
   constructor(
@@ -28,11 +31,11 @@ export class DiscountDrizzleRepository implements DiscountRepository {
 
   async all(): Promise<Discount[]> {
     const rows = await this.database.select(theColumnsOfADiscount).from(discounts);
-    return rows.map((row) => this.factory.reconstitute({ ...row, rate: String(row.rate) }));
+    return rows.map((row) => this.factory.reconstitute(withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) })));
   }
 
   async withId(id: string): Promise<Discount | undefined> {
     const rows = await this.database.select(theColumnsOfADiscount).from(discounts).where(eq(discounts.id, id));
-    return rows.map((row) => this.factory.reconstitute({ ...row, rate: String(row.rate) })).at(0);
+    return rows.map((row) => this.factory.reconstitute(withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) }))).at(0);
   }
 }
