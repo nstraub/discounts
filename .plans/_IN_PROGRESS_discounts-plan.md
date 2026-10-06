@@ -63,7 +63,7 @@ architecture is drawn in `docs/architecture.md`.
 | 2 | 1 | Sue finds a discount on produce, done | Sue · 1. Sue finds a produce discount at a store close to home | Sue |
 | 3 | 2 | Mike raises a discount, done | Mike · 2. Mike raises a discount that is not working | Mike |
 | 4 | 2 | Stephanie tells people what is new about her produce, done | Stephanie · 1. Stephanie gets her produce discount into people's hands | Sue and Stephanie |
-| 5 | 3 | Mike lowers a discount | Mike · 2. Mike raises a discount that is not working | Mike |
+| 5 | 3 | Mike lowers a discount, done | Mike · 2. Mike raises a discount that is not working | Mike |
 | 6 | 3 | Sue finds a store close to home | Sue · 1. Sue finds a produce discount at a store close to home | Sue |
 | 7 | 3 | Sue decides to try Stephanie's produce | Stephanie · 1. Stephanie gets her produce discount into people's hands | Stephanie (with slice 8) |
 | 8 | 3 | Stephanie redeems a coupon | Stephanie · 2. Stephanie takes the coupon at the till | Stephanie (with slice 7) |
