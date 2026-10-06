@@ -178,3 +178,24 @@ Feature: Mike publishes a discount on what he is famous for
     When he leaves out the item it applies to and gives a rate of 150%
     Then he is told the item it applies to is missing and the rate is not valid
     And the discount is not published
+
+  @wip
+  Scenario Outline: Mike leaves out required information
+    Given Mike tries to publish a discount
+    When he leaves out <information>
+    Then he is told <information> is missing
+    And the discount is not published
+
+    Examples:
+      | information              |
+      | the item it applies to   |
+      | the rate                 |
+      | the name of his store    |
+      | the address of his store |
+
+  @todo
+  Scenario: Mike gives what he left out and publishes
+    Given Mike has been told the item it applies to is missing
+    When he gives the item it applies to and publishes
+    Then people can see it immediately
+    And he is no longer told anything is missing
