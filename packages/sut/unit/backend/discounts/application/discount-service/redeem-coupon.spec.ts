@@ -7,6 +7,7 @@ import { CouponRedeemed } from '@backend/discounts/application/domain/coupon-red
 import { CouponRedemptionRejected } from '@backend/discounts/application/domain/coupon-redemption-rejected';
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import type { DiscountRepository } from '@backend/discounts/application/domain/discount-repository';
+import { NoCouponHasTheCodeException } from '@backend/discounts/application/domain/no-coupon-has-the-code-exception';
 import { Store } from '@backend/discounts/application/domain/store';
 import { publishedProduceDiscount, publishedSpicesDiscount, spicesDiscount, theStoreOf } from '@sut/support/example-discounts';
 import { atStephaniesStore, atTheSpicesStore } from '@sut/support/example-stores';
@@ -110,7 +111,12 @@ describe('class DiscountService', () => {
     });
   });
   describe('redeeming a code nobody issued', () => {
-    it.todo('should report that no coupon has the code when none was issued with it');
+    it('should report that no coupon has the code when none was issued with it', async () => {
+      const { repository, service } = setupSut();
+      repository.withCouponToken.mockResolvedValue(undefined);
+
+      await expect(service.redeemCoupon('ZZZZZZZZZZ', atTheSpicesStore)).rejects.to.be.instanceOf(NoCouponHasTheCodeException);
+    });
     it.todo('should report a code that cannot be a coupon\'s as one nobody issued');
     it.todo('should keep nothing and announce nothing when no coupon has the code');
   });

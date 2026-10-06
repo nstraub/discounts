@@ -1,6 +1,7 @@
 import type { CouponToken } from './domain/coupon-token.js';
 import type { Discount } from './domain/discount.js';
 import type { DiscountRepository } from './domain/discount-repository.js';
+import { NoCouponHasTheCodeException } from './domain/no-coupon-has-the-code-exception.js';
 import { NoSuchDiscountException } from './domain/no-such-discount-exception.js';
 import type { Store } from './domain/store.js';
 
@@ -16,6 +17,14 @@ const theOneWithId = (id: string): Lookup => async (repository) => {
   return discount;
 };
 
+const theOneThatIssued = (token: CouponToken): Lookup => async (repository) => {
+  const discount = await repository.withCouponToken(token);
+  if (!discount) {
+    throw new NoCouponHasTheCodeException();
+  }
+  return discount;
+};
+
 export class DiscountChanges {
   constructor(private readonly repository: DiscountRepository) {}
 
@@ -24,7 +33,7 @@ export class DiscountChanges {
   }
 
   async toTheOneThatIssued<Answer>(token: CouponToken, change: Change<Answer>): Promise<Answer> {
-    return this.toTheOneFound((repository) => repository.withCouponToken(token), change);
+    return this.toTheOneFound(theOneThatIssued(token), change);
   }
 
   async toEachOfTheStore<Answer>(store: Store, change: Change<Answer>): Promise<Answer[]> {
