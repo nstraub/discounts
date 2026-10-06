@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { discountRepositoryOn } from '../support/discount-repository';
-import { constraintsAndColumnsOfTheDiscountsTable } from '../support/discounts-table';
+import { aDiscountKeptBefore, aDiscountKeptBeforeAsReadAfterMigratingForward, constraintsAndColumnsOfTheDiscountsTable } from '../support/discounts-table';
 import { migrateBackward, setupSut } from '../support/migrations';
 
 const theMigration = '0004_add_discount_hook';
@@ -41,6 +41,14 @@ describe('the migration that adds the hook to discounts', () => {
       keptAgain.toJSON(),
     ]);
   });
-  it.todo('should read back with no hook, through the repository, a discount kept before the migration');
+  it('should read back with no hook, through the repository, a discount kept before the migration', async () => {
+    const sut = await setupSut();
+    await sut.migrateForward();
+    await migrateBackward(sut.client, theMigration);
+
+    const readBack = await aDiscountKeptBeforeAsReadAfterMigratingForward(sut);
+
+    expect(readBack).to.deep.equal(aDiscountKeptBefore);
+  });
   it.todo('should keep and load back, as the deployed version does, a discount without a hook on the migrated table');
 });
