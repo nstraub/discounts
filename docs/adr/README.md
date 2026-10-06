@@ -11,3 +11,4 @@ gets none.
 | [0003](0003-one-database-pool-per-process.md) | One database pool per process, closed on shutdown | accepted | 2026-10-05 |
 | [0004](0004-coupon-token-form-and-entropy.md) | A coupon's token is ten Crockford base32 characters from a CSPRNG | accepted | 2026-10-05 |
 | [0005](0005-coupons-are-entities-inside-the-discount-aggregate.md) | Coupons are entities inside the Discount aggregate, not an aggregate of their own | accepted | 2026-10-05 |
+| [0006](0006-one-transaction-per-discount-when-counting.md) | A count restarts each discount in its own transaction; a store's discounts become consistent eventually | accepted | 2026-10-05 |
