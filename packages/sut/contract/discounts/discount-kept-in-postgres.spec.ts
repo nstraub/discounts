@@ -87,7 +87,14 @@ describe('a discount kept in PostgreSQL', () => {
   });
   describe('its rate', () => {
     describe('type', () => {
-      it.todo('should keep a rate of 33.3 exactly and load it back as 33.3');
+      it('should keep a rate of 33.3 exactly and load it back as 33.3', async () => {
+        const { keep, loadOnItsOwnConnection } = await setupSut();
+        await keep({ ...spicesDiscount, rate: '33.3' });
+
+        const [loaded] = await loadOnItsOwnConnection();
+
+        expect(loaded?.toJSON().rate).to.equal('33.3');
+      });
     });
 
     describe('state', () => {
