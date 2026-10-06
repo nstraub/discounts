@@ -106,4 +106,8 @@ describe('Component RedeemCouponForm', () => {
       expect(whatTheTillTells(), 'what the till tells after an earlier coupon applied').not.to.contain(discountTexts.theDiscountAppliesTo);
     });
   });
+  describe('a coupon for another store', () => {
+    it.todo('should tell Stephanie the coupon is not for her store');
+    it.todo('should not say the discount applies when the coupon is not for her store');
+  });
 });

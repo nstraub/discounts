@@ -78,4 +78,10 @@ describe('class DiscountService', () => {
       expect(events.publish).to.have.been.calledWith(new CouponRedemptionRejected('spices-id', '7K3QX9M2PD', 'already used'));
     });
   });
+  describe('redeeming a coupon at a store', () => {
+    it.todo('should redeem a coupon at the store given when it is the store its discount names');
+    it.todo('should report that the coupon is not for the store given');
+    it.todo('should keep nothing when the coupon is not for the store given');
+    it.todo('should announce CouponRedemptionRejected for the coupon refused at another store');
+  });
 });

@@ -40,4 +40,7 @@ describe('Store discounts', () => {
       });
     });
   });
+  describe('the stores as the till names them', () => {
+    it.todo('should list each store with its name and address exactly as published, spaces around them included');
+  });
 });

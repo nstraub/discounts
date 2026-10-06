@@ -96,4 +96,7 @@ describe('changes to one discount at the same moment', () => {
       );
     });
   });
+  describe('A4 concurrency: a coupon tried at two stores', () => {
+    it.todo('should keep a coupon redeemed at its own store when it is tried at another store at the same moment');
+  });
 });

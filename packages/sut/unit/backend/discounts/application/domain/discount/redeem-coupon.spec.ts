@@ -53,4 +53,25 @@ describe('class Discount', () => {
       expect(discount.toJSON().coupons).to.deep.equal(asTheyWere);
     });
   });
+  describe('redeeming one of its coupons at a store', () => {
+    it.todo('should redeem its coupon at its own store, the name and address it was published with');
+    it.todo('should refuse its coupon at another store, the coupon staying unused');
+    it.todo('should raise CouponRedemptionRejected carrying its id, the coupon\'s token and that the coupon is not for that store');
+    it.todo('should not raise CouponRedeemed when its coupon is refused at another store');
+
+    describe('boundary', () => {
+      it.todo('should refuse its coupon at a store with the same name at another address');
+      it.todo('should refuse its coupon at a store with another name at the same address');
+      it.todo('should refuse its coupon at a store whose name differs from its own only in its capitals');
+      it.todo('should refuse its coupon at a store whose name has spaces around it that its own has not');
+    });
+
+    describe('state', () => {
+      it.todo('should redeem at its own store a coupon refused at another store before');
+    });
+
+    describe('combination', () => {
+      it.todo('should refuse a coupon already used, tried at another store, as not for that store');
+    });
+  });
 });

@@ -157,10 +157,6 @@ describe('POST /stores/counts', () => {
     });
   });
 
-  describe('a coupon taken at another store\'s till', () => {
-    it.todo('should count a coupon redeemed at another store\'s till with the store of its discount');
-  });
-
   describe('A5 resource exhaustion', () => {
     it.todo('should answer 503 with a body matching the error schema when the store\'s discounts cannot be counted, restarting nothing');
   });
@@ -175,5 +171,8 @@ describe('POST /stores/counts', () => {
         { id: published.id, item: spicesDiscount.item, rate: spicesDiscount.rate, discountedSales: 1 },
       ]);
     });
+  });
+  describe('a coupon refused at another store\'s till', () => {
+    it.todo('should count a coupon refused at another store\'s till with neither store');
   });
 });

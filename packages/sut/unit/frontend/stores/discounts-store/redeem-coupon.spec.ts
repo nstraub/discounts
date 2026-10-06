@@ -63,4 +63,7 @@ describe('Store discounts', () => {
       expect(discounts.couponAlreadyUsed, 'whether a coupon is held as already used').to.equal(false);
     });
   });
+  describe('redeeming a coupon at another store', () => {
+    it.todo('should hold that the coupon is not for the store picked');
+  });
 });
