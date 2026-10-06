@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
+import { DiscountRateChanged } from '@backend/discounts/application/domain/discount-rate-changed';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
@@ -21,7 +22,15 @@ describe('class Discount', () => {
 
         expect(discount.toJSON().rate).to.equal('25');
       });
-      it.todo('should raise DiscountRateChanged carrying its id and its new rate');
+      it('should raise DiscountRateChanged carrying its id and its new rate', () => {
+        const { events, discount } = setupSut();
+
+        discount.changeRate('25');
+
+        const [raised] = events.publish.mock.lastCall ?? [];
+        expect(raised).to.be.instanceOf(DiscountRateChanged);
+        expect(raised).to.deep.include({ id: 'test-uuid', rate: '25' });
+      });
       it.todo('should keep its item, store name and store address when its rate changes');
     });
 

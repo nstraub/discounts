@@ -1,5 +1,6 @@
 import type { DiscountDetails } from './discount-details.js';
 import { DiscountPublished } from './discount-published.js';
+import { DiscountRateChanged } from './discount-rate-changed.js';
 import type { DomainEventPublisher } from './domain-event-publisher.js';
 
 export class Discount {
@@ -15,6 +16,7 @@ export class Discount {
 
   changeRate(rate: string): void {
     this.details = this.details.withRate(rate);
+    this.events.publish(new DiscountRateChanged('test-uuid', '25'));
   }
 
   toJSON(): { id: string } & ReturnType<DiscountDetails['toJSON']> {
