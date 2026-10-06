@@ -5,7 +5,7 @@ import type { CouponRedemptionRejected } from '@backend/discounts/application/do
 import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
 import { theDiscountsKept, theRowKeptFor } from '../support/discounts-table';
-import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
+import { bodiesNotMatchingTheErrorSchema, theFieldsNamedBy } from '../support/error-schema';
 import { redeemAtTheStoreOf, setupSutWithACouponFor } from '../support/redemptions';
 
 describe('POST /redemptions at a store the coupon is not for', () => {
@@ -46,7 +46,17 @@ describe('POST /redemptions at a store the coupon is not for', () => {
   });
 
   describe('no store given', () => {
-    it.todo('should answer 400 naming the store\'s name and address when they are missing or not text, the coupon staying unused, never a 500');
+    it('should answer 400 naming the store\'s name and address when they are missing or not text, the coupon staying unused, never a 500', async () => {
+      const { client, http, code } = await setupSutWithACouponFor();
+
+      const missing = await http.post('/redemptions').send({ code });
+      const notText = await http.post('/redemptions').send({ code, storeName: 1234567890, storeAddress: 1234567890 });
+
+      expect([missing.status, notText.status]).to.deep.equal([400, 400]);
+      expect(theFieldsNamedBy(missing, notText)).to.deep.equal([['storeName', 'storeAddress'], ['storeName', 'storeAddress']]);
+      const kept = await client.query('SELECT redeemed FROM app.coupons');
+      expect(kept.rows, 'the coupon kept').to.deep.equal([{ redeemed: false }]);
+    });
     it.todo('should answer 400 naming the store\'s name and address when each is empty or only blank space, the coupon staying unused');
   });
 
