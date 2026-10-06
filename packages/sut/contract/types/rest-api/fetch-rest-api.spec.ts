@@ -77,6 +77,13 @@ describe('class FetchRestApi', () => {
 
       expect(outcome).to.equal('resolved');
     });
-    it.todo('should reject when the answer is not ok');
+    it('should reject when the answer is not ok', async () => {
+      const { restApi } = await setupSut();
+      const published = await restApi.post<{ id: string }>('/discounts', spicesDiscount);
+
+      const outcome = await outcomeOf(restApi.patch(`/discounts/${published.id}`, {}));
+
+      expect(outcome).to.equal(`PATCH /discounts/${published.id} answered 400`);
+    });
   });
 });

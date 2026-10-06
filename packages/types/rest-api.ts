@@ -33,11 +33,14 @@ export class FetchRestApi implements RestApi {
   }
 
   async patch(path: string, body: unknown): Promise<void> {
-    await fetch(`${this.baseUrl}${path}`, {
+    const response = await fetch(`${this.baseUrl}${path}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
+    if (!response.ok) {
+      throw new RestApiException(`PATCH ${path} answered ${response.status}`);
+    }
   }
 
   private async bodyOfAnOkAnswer<Body>(request: string, response: Response): Promise<Body> {
