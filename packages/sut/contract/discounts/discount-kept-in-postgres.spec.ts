@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/discount-repository';
 
@@ -41,5 +41,18 @@ describe('a discount kept in PostgreSQL', () => {
     const loaded = await loadOnItsOwnConnection();
     expect(loaded.map((kept) => kept.toJSON())).to.deep.equal([{ id: discount.toJSON().id, ...spicesDiscount, rate: '25' }]);
   });
-  it.todo('should change only the discount named, the other keeping its rate');
+  it('should change only the discount named, the other keeping its rate', async () => {
+    const { keep, repository, loadOnItsOwnConnection } = await setupSut();
+    const spices = await keep(spicesDiscount);
+    const produce = await keep(produceDiscount);
+    spices.changeRate('25');
+
+    await repository.save(spices);
+
+    const loaded = await loadOnItsOwnConnection();
+    expect(loaded.map((kept) => kept.toJSON())).to.have.deep.members([
+      { id: spices.toJSON().id, ...spicesDiscount, rate: '25' },
+      { id: produce.toJSON().id, ...produceDiscount },
+    ]);
+  });
 });
