@@ -10,7 +10,9 @@ import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
 
 type Http = Awaited<ReturnType<typeof setupSut>>['http'];
 
-const ratesTheScenarioRefuses = ['150', '100.5', '12.25', '0', '-10'];
+const aRateAbove100 = '150';
+
+const ratesTheScenarioRefuses = [aRateAbove100, '100.5', '12.25', '0', '-10'];
 
 const publishAtTheRate = (http: Http, rate: string) => http.post('/discounts').send({ ...spicesDiscount, rate });
 
@@ -30,14 +32,14 @@ describe('POST /discounts with a rate that is not valid', () => {
     it('should answer with a body matching the error schema when the rate is not valid', async () => {
       const { http } = await setupSut();
 
-      const response = await publishAtTheRate(http, '150');
+      const response = await publishAtTheRate(http, aRateAbove100);
 
       expect(bodiesNotMatchingTheErrorSchema([response])).to.deep.equal([]);
     });
     it('should publish nothing when the rate is not valid, listing no discount afterwards', async () => {
       const { http } = await setupSut();
 
-      await publishAtTheRate(http, '150');
+      await publishAtTheRate(http, aRateAbove100);
 
       const listed = await http.get('/discounts');
       expect(listed.body).to.deep.equal([]);
@@ -47,9 +49,9 @@ describe('POST /discounts with a rate that is not valid', () => {
       const rejected: unknown[] = [];
       app.get(EventEmitter2).on('discount.publication-rejected', ({ rate, reason }: DiscountPublicationRejected) => rejected.push({ rate, reason }));
 
-      await publishAtTheRate(http, '150');
+      await publishAtTheRate(http, aRateAbove100);
 
-      expect(rejected).to.deep.equal([{ rate: '150', reason: 'not valid' }]);
+      expect(rejected).to.deep.equal([{ rate: aRateAbove100, reason: 'not valid' }]);
     });
     it.todo('should publish no DiscountPublicationRejected when the request schema refuses the body before any rule decides');
   });
