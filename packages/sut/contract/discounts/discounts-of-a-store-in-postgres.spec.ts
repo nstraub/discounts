@@ -33,7 +33,14 @@ describe('the discounts of a store found in PostgreSQL', () => {
 
     expect(found?.toJSON().coupons.map(({ token }) => token)).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
   });
-  it.todo('should find nothing for a name and address no kept discount has');
+  it('should find nothing for a name and address no kept discount has', async () => {
+    const { keep, repository } = await setupSut();
+    await keep(spicesDiscount);
+
+    const found = await repository.ofStore({ storeName: produceDiscount.storeName, storeAddress: produceDiscount.storeAddress });
+
+    expect(found).to.deep.equal([]);
+  });
 
   describe('A2 injection', () => {
     it.todo('should find nothing for a store name and address with quotes, semicolons and SQL keywords, every kept discount and coupon left as it was');
