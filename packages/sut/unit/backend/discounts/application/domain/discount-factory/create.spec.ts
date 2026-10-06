@@ -50,6 +50,12 @@ describe('class DiscountFactory', () => {
 
       expect(discount.toJSON().hook).to.equal('Our spices now come from a new supplier');
     });
-    it.todo('should hold no hook when created without one');
+    it('should hold no hook when created without one', () => {
+      const { discountWith } = setupSut();
+
+      const discount = discountWith(spicesDiscount);
+
+      expect(discount.toJSON()).to.not.have.property('hook');
+    });
   });
 });
