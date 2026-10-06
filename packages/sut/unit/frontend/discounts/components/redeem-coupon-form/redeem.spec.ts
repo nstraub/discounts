@@ -117,6 +117,16 @@ describe('Component RedeemCouponForm', () => {
 
       expect(whatTheTillTells(), 'what the till tells').to.contain(discountTexts.couponNotForYourStore);
     });
-    it.todo('should not say the discount applies when the coupon is not for her store');
+    it('should not say the discount applies when the coupon is not for her store', async () => {
+      const sut = setupSut();
+      sut.till.redemption = { item: spicesDiscount.item };
+      vi.mocked(sut.till.redeemCoupon).mockImplementation(async () => {
+        sut.till.couponNotForThisStore = true;
+      });
+
+      await redeemThroughTheForm(sut.form, "Stephanie's Market, 8 Orchard Lane", '7k3qx 9m2pd');
+
+      expect(whatTheTillTells(), 'what the till tells after an earlier coupon applied').not.to.contain(discountTexts.theDiscountAppliesTo);
+    });
   });
 });
