@@ -107,7 +107,12 @@ describe('class Discount', () => {
 
         expect(tryingItsCouponAt(underAnotherName, discount)).to.throw(CouponNotForThisStoreException);
       });
-      it.todo('should refuse its coupon at a store whose name differs from its own only in its capitals');
+      it('should refuse its coupon at a store whose name differs from its own only in its capitals', () => {
+        const discount = setupSut();
+        const inOtherCapitals = new Store({ storeName: publishedSpicesDiscount.storeName.toUpperCase(), storeAddress: publishedSpicesDiscount.storeAddress });
+
+        expect(tryingItsCouponAt(inOtherCapitals, discount)).to.throw(CouponNotForThisStoreException);
+      });
       it.todo('should refuse its coupon at a store whose name has spaces around it that its own has not');
     });
 
