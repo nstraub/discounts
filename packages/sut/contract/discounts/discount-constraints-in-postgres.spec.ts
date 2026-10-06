@@ -48,6 +48,12 @@ describe('the discounts table refusing what Discount refuses', () => {
     ]);
   });
   describe('the hook', () => {
-    it.todo('should accept a discount without a hook: the hook column nullable mirrors "a discount may carry a hook"');
+    it('should accept a discount without a hook: the hook column nullable mirrors "a discount may carry a hook"', async () => {
+      const { client } = await setupSut();
+
+      const outcome = await insertADiscountWithout(client, 'hook');
+
+      expect(outcome).to.equal('accepted');
+    });
   });
 });
