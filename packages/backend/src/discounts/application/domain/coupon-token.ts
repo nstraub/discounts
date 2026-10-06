@@ -6,7 +6,7 @@ const charactersInAToken = 10;
 const separatorsTypedBetweenOrAroundTheGroups = /[\s-]/g;
 const theLetterTypedForAZero = 'O';
 const theLettersTypedForAOne = /[IL]/g;
-const theLetterNoTokenHas = 'U';
+const writtenAsAToken = new RegExp(`^[${crockfordBase32}]{${charactersInAToken}}$`);
 
 export class CouponToken {
   private constructor(private readonly characters: string) {}
@@ -22,10 +22,11 @@ export class CouponToken {
 
   static read(typed: string): CouponToken {
     const withoutSeparators = typed.toUpperCase().replaceAll(separatorsTypedBetweenOrAroundTheGroups, '');
-    if (withoutSeparators.length !== charactersInAToken || withoutSeparators.includes(theLetterNoTokenHas)) {
+    const characters = withoutSeparators.replaceAll(theLetterTypedForAZero, '0').replaceAll(theLettersTypedForAOne, '1');
+    if (!writtenAsAToken.test(characters)) {
       throw new NoCouponHasTheCodeException();
     }
-    return new CouponToken(withoutSeparators.replaceAll(theLetterTypedForAZero, '0').replaceAll(theLettersTypedForAOne, '1'));
+    return new CouponToken(characters);
   }
 
   toJSON(): string {
