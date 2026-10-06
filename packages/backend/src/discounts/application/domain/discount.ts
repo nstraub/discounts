@@ -30,6 +30,11 @@ export class Discount {
     return new IssuedCoupon(token, this.details.toJSON().storeName);
   }
 
+  // eslint-disable-next-line unused-imports/no-unused-vars -- the token picks which coupon is redeemed
+  redeemCoupon(token: CouponToken): void {
+    this.coupons.forEach((coupon) => coupon.redeem(this.id));
+  }
+
   toJSON(): { id: string; coupons: ReturnType<Coupon['toJSON']>[] } & ReturnType<DiscountDetails['toJSON']> {
     return { id: this.id, ...this.details.toJSON(), coupons: this.coupons.map((coupon) => coupon.toJSON()) };
   }
