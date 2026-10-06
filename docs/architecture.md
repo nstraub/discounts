@@ -44,8 +44,9 @@ C4Component
 
   Container_Boundary(web, "Web app (Vue 3)") {
     Component(view, "DiscountsView", "Vue view", "Loads the published discounts when the page opens")
-    Component(list, "PublishedDiscounts", "Vue component", "One entry per discount: item, rate as written followed by %, store name and address")
-    Component(form, "PublishDiscountForm", "Vue component", "Captioned inputs for the four pieces; clears itself once published")
+    Component(list, "PublishedDiscounts", "Vue component", "One entry per discount: item, rate as written followed by %, store name and address, and its hook when it has one")
+    Component(form, "PublishDiscountForm", "Vue component", "Publishes the typed discount and clears itself once published")
+    Component(fields, "TypedDiscountFields", "Vue component", "Five captioned inputs: item, rate, store name, store address and the optional hook")
     Component(changeForm, "ChangeRateForm", "Vue component", "One per listed discount: a new rate and a button to change it")
     Component(store, "discounts store", "Pinia", "publish(), load() and changeRate(); goes through RestApi, and reloads the list after a change")
   }
@@ -55,12 +56,12 @@ C4Component
     Component(parsedBy, "ParsedBy", "Nest pipe, zod", "Parses the request against the shared schema; a failure is a 400 requestRejection")
     Component(service, "DiscountService", "Application service", "publish(), changeRate() and published()")
     Component(factory, "DiscountFactory", "Domain factory", "create() gives a new identity; reconstitute() rebuilds a kept discount")
-    Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails; publish() raises DiscountPublished, changeRate() raises DiscountRateChanged")
+    Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails (item, rate, store name, store address, optional hook); publish() raises DiscountPublished, changeRate() raises DiscountRateChanged")
     Component(event, "DiscountPublished", "Domain event", "Carries the discount as published")
     Component(rateChanged, "DiscountRateChanged", "Domain event", "Carries the discount id and its new rate")
     Component(repositoryPort, "DiscountRepository", "Port", "save() (inserts or updates), all() and withId()")
     Component(publisherPort, "DomainEventPublisher", "Port", "publish(event)")
-    Component(repository, "DiscountDrizzleRepository", "Adapter", "Keeps discounts in app.discounts")
+    Component(repository, "DiscountDrizzleRepository", "Adapter", "Keeps discounts in app.discounts; a null hook column is an absent hook")
     Component(publisher, "EventEmitterDomainEventPublisher", "Adapter", "Emits the event on the application's EventEmitter2")
   }
 
@@ -68,6 +69,7 @@ C4Component
 
   Rel(view, list, "Shows")
   Rel(view, form, "Shows")
+  Rel(form, fields, "Asks through")
   Rel(list, changeForm, "Shows one per discount")
   Rel(form, store, "publish()")
   Rel(changeForm, store, "changeRate()")
@@ -145,6 +147,14 @@ sequenceDiagram
   Store->>Controller: GET /discounts
   Controller-->>Store: the discounts, with the new rate
 ```
+
+### The hook
+
+A discount may carry a hook: an optional free text saying why it is worth a look (the form asks
+"Why it is worth a look (optional)"). In the domain, `DiscountDetails` has no `hook` key when there is
+none; on the wire, `hook` is optional in the publish request and the response; in the database it is the
+nullable `hook` column added by migration `0004` (its down drops the column and loses every hook). The
+form leaves an empty hook out of the request, and the list shows a hook only when there is one, trimmed.
 
 Every error answers with the one `requestRejection` schema in `@app/types/discounts`
 (`statusCode`, `message`, optional `fields`); there is no exception filter.
