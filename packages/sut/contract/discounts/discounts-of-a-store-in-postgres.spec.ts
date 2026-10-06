@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { Store } from '@backend/discounts/application/domain/store';
-import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, spicesDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/discount-repository';
 
-const theSpicesStore = new Store({ storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
+const theSpicesStore = new Store(theStoreOf(spicesDiscount));
 
 const theSpicesStoresDiscountsFoundBeside = async (another: typeof spicesDiscount) => {
   const { keep, repository } = await setupSut();
@@ -38,7 +38,7 @@ describe('the discounts of a store found in PostgreSQL', () => {
     const { keep, repository } = await setupSut();
     await keep(spicesDiscount);
 
-    const found = await repository.ofStore(new Store({ storeName: produceDiscount.storeName, storeAddress: produceDiscount.storeAddress }));
+    const found = await repository.ofStore(new Store(theStoreOf(produceDiscount)));
 
     expect(found).to.deep.equal([]);
   });

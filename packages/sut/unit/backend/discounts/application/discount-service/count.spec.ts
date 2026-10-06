@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import { DiscountedSalesCounted } from '@backend/discounts/application/domain/discounted-sales-counted';
 import { Store } from '@backend/discounts/application/domain/store';
-import { publishedSpicesDiscount } from '@sut/support/example-discounts';
+import { publishedSpicesDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
 
-const theSpicesStore = new Store({ storeName: publishedSpicesDiscount.storeName, storeAddress: publishedSpicesDiscount.storeAddress });
+const theSpicesStore = new Store(theStoreOf(publishedSpicesDiscount));
 
 const setupSut = ({ coupons = [{ token: '7K3QX9M2PD', redeemed: true, counted: false }] } = {}) => aServiceOverAKeptDiscount({ coupons });
 
