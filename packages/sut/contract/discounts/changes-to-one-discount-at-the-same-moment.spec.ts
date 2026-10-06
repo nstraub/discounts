@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { oneRaceAfterAnother, timesTheRaceIsRun } from '../support/at-the-same-moment';
 import { countTheStoreOf } from '../support/counts';
+import { changeTheRateOf } from '../support/rates';
 import { askForACouponFor, issueACouponFor, redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithACouponForEachRace } from '../support/redemptions';
 
 describe('changes to one discount at the same moment', () => {
@@ -37,7 +38,7 @@ describe('changes to one discount at the same moment', () => {
 
       const keptAfterEachPair = await oneRaceAfterAnother(codes, async (code) => {
         const rate = String(codes.indexOf(code) + 30);
-        await Promise.all([redeemAtTheStoreOf(http, code), http.patch(`/discounts/${published.id}`).send({ rate })]);
+        await Promise.all([redeemAtTheStoreOf(http, code), changeTheRateOf(http, published, rate)]);
         const [listed] = (await http.get('/discounts')).body;
         const usedAgain = await redeemAtTheStoreOf(http, code);
         return { rateChanged: listed.rate === rate, redemptionKept: usedAgain.status === 409 };
@@ -54,7 +55,7 @@ describe('changes to one discount at the same moment', () => {
         const changes = await Promise.all([
           redeemAtTheStoreOf(http, code),
           askForACouponFor(http, published),
-          http.patch(`/discounts/${published.id}`).send({ rate: '25' }),
+          changeTheRateOf(http, published, '25'),
           countTheStoreOf(http),
         ]);
         return changes.map((response) => response.status);
