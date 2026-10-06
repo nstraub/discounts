@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { UnprocessableContentException } from '@app/types/rest-api';
+import { UnprocessableContentException } from '@app/types/rest-api-refusals';
 import { CouponAlreadyUsed, CouponNotForThisStore, DiscountApplies, NoStoreSaid } from '@frontend/discounts/till-answers';
 import { produceDiscount, spicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
 

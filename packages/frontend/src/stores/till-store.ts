@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { shallowRef } from 'vue';
 
 import type { RedemptionRequest, RedemptionResponse } from '@app/types/discounts';
-import { UnprocessableContentException } from '@app/types/rest-api';
+import { UnprocessableContentException } from '@app/types/rest-api-refusals';
 
 import { CouponAlreadyUsed, CouponNotForThisStore, DiscountApplies, NoStoreSaid, NothingTold, type TillAnswer } from '../discounts/till-answers';
 import { useRestApi } from '../rest-api-key';

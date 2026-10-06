@@ -1,15 +1,11 @@
+import { refuseANotOkAnswer } from '@app/types/rest-api-refusals';
+
 export interface RestApi {
   get<Response>(path: string): Promise<Response>;
   put(path: string, body: unknown): Promise<void>;
   post<Response>(path: string, body: unknown): Promise<Response>;
   patch(path: string, body: unknown): Promise<void>;
 }
-
-const unprocessableContent = 422;
-
-class RestApiException extends Error {}
-
-export class UnprocessableContentException extends RestApiException {}
 
 export class FetchRestApi implements RestApi {
   constructor(private readonly baseUrl: string) {}
@@ -30,7 +26,7 @@ export class FetchRestApi implements RestApi {
 
   async patch(path: string, body: unknown): Promise<void> {
     const response = await this.sendAsJson('PATCH', path, body);
-    this.refuseANotOkAnswer(`PATCH ${path}`, response);
+    refuseANotOkAnswer(`PATCH ${path}`, response);
   }
 
   private sendAsJson(method: string, path: string, body: unknown): Promise<Response> {
@@ -42,16 +38,7 @@ export class FetchRestApi implements RestApi {
   }
 
   private async bodyOfAnOkAnswer<Body>(request: string, response: Response): Promise<Body> {
-    this.refuseANotOkAnswer(request, response);
+    refuseANotOkAnswer(request, response);
     return (await response.json()) as Body;
-  }
-
-  private refuseANotOkAnswer(request: string, response: Response): void {
-    if (response.status === unprocessableContent) {
-      throw new UnprocessableContentException(`${request} answered ${response.status}`);
-    }
-    if (!response.ok) {
-      throw new RestApiException(`${request} answered ${response.status}`);
-    }
   }
 }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { FetchRestApi, UnprocessableContentException } from '@app/types/rest-api';
+import { FetchRestApi } from '@app/types/rest-api';
+import { UnprocessableContentException } from '@app/types/rest-api-refusals';
 import { spicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { setupSut as setupTheApp } from '../../support/app';
