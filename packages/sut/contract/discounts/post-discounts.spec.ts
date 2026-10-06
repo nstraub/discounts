@@ -109,7 +109,9 @@ describe('POST /discounts', () => {
     it('should answer 500, not a refusal of the discount, when the discounts table cannot be written', async () => {
       const { client, http } = await setupSut();
       await client.query('ALTER TABLE app.discounts RENAME TO discounts_out_of_reach');
-      onTestFinished(() => client.query('ALTER TABLE app.discounts_out_of_reach RENAME TO discounts'));
+      onTestFinished(async () => {
+        await client.query('ALTER TABLE app.discounts_out_of_reach RENAME TO discounts');
+      });
 
       const response = await http.post('/discounts').send(spicesDiscount);
 
