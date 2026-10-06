@@ -1,4 +1,4 @@
-import { getByRole, queryAllByRole } from '@testing-library/dom';
+import { queryAllByRole } from '@testing-library/dom';
 import { mount } from '@vue/test-utils';
 import { describe, expect, it, onTestFinished } from 'vitest';
 
@@ -15,17 +15,19 @@ const setupSut = ({ stores = [theCornerGrocery] } = {}) => {
   return form;
 };
 
+const theStorePickers = () => queryAllByRole<HTMLSelectElement>(document.body, 'combobox', { name: discountTexts.yourStore });
+
 describe('Component RedeemCouponForm', () => {
   describe('what the till asks for', () => {
     it('should ask for the store under its caption', () => {
       setupSut();
 
-      expect(queryAllByRole(document.body, 'combobox', { name: discountTexts.yourStore }), 'store pickers under the caption').to.have.length(1);
+      expect(theStorePickers(), 'store pickers under the caption').to.have.length(1);
     });
     it('should require a store to be picked before the coupon is redeemed', () => {
       setupSut();
 
-      expect(getByRole<HTMLSelectElement>(document.body, 'combobox', { name: discountTexts.yourStore }).required, 'the store picker required').to.equal(true);
+      expect(theStorePickers().map((picker) => picker.required), 'the store picker required').to.deep.equal([true]);
     });
     it.todo('should offer each store it is given as its name and address');
     it.todo('should ask for the coupon\'s code under its caption');
