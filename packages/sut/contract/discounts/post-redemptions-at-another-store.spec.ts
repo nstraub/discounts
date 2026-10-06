@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { stephaniesProduceDiscount } from '@sut/support/example-discounts';
+import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
+import { theDiscountsKept, theRowKeptFor } from '../support/discounts-table';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
 import { redeemAtTheStoreOf, setupSutWithACouponFor } from '../support/redemptions';
 
@@ -15,7 +16,15 @@ describe('POST /redemptions at a store the coupon is not for', () => {
       expect(response.status).to.equal(422);
       expect(bodiesNotMatchingTheErrorSchema([response])).to.deep.equal([]);
     });
-    it.todo('should keep the coupon unused and its discount as it was when the coupon is not for the store given');
+    it('should keep the coupon unused and its discount as it was when the coupon is not for the store given', async () => {
+      const { client, http, published, code } = await setupSutWithACouponFor();
+
+      await redeemAtTheStoreOf(http, code, stephaniesProduceDiscount);
+
+      const kept = await client.query('SELECT redeemed, counted FROM app.coupons');
+      expect(kept.rows, 'the coupon kept').to.deep.equal([{ redeemed: false, counted: false }]);
+      expect(await theDiscountsKept(client), 'the discount kept').to.deep.equal([theRowKeptFor(published, spicesDiscount)]);
+    });
     it.todo('should publish CouponRedemptionRejected on the application event emitter for the coupon refused at another store');
     it.todo('should refuse a coupon at a store with the same name as its own at another address');
   });
