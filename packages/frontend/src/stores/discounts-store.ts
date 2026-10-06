@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 
 import type { ChangeRateRequest, CountRequest, CountResponse, CouponResponse, DiscountResponse, PublishDiscountRequest } from '@app/types/discounts';
 import { BadRequestException } from '@app/types/rest-api-refusals';
 
+import { NothingToldOfThePublish, type PublishAnswer, theAnswerTo } from '../discounts/publish-answers';
 import { useRestApi } from '../rest-api-key';
 
 const theStoreOf = ({ storeName, storeAddress }: DiscountResponse) => ({ storeName, storeAddress });
@@ -16,21 +17,18 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const restApi = useRestApi();
   const published = ref<DiscountResponse[]>([]);
   const coupon = ref<CouponResponse>();
-  const rateNotValid = ref(false);
-  const missing = ref<readonly string[]>([]);
+  const publishAnswer = shallowRef<PublishAnswer>(new NothingToldOfThePublish());
   const counted = ref<CountResponse>();
   const stores = computed(() => theDistinctStoresPublishing(published.value));
   const publish = async (discount: Partial<PublishDiscountRequest>): Promise<void> => {
     try {
       await restApi.post('/discounts', discount);
-      rateNotValid.value = false;
-      missing.value = [];
+      publishAnswer.value = new NothingToldOfThePublish();
     } catch (refusal) {
       if (!(refusal instanceof BadRequestException)) {
         throw refusal;
       }
-      missing.value = refusal.missing;
-      rateNotValid.value = refusal.missing.length === 0 && refusal.fields.includes('rate');
+      publishAnswer.value = theAnswerTo(refusal);
     }
   };
   const load = async (): Promise<void> => {
@@ -46,5 +44,5 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const countDiscountedSales = async (store: CountRequest): Promise<void> => {
     counted.value = await restApi.post<CountResponse>('/stores/counts', store);
   };
-  return { published, stores, coupon, publish, rateNotValid, missing, load, changeRate, getCoupon, counted, countDiscountedSales };
+  return { published, stores, coupon, publish, publishAnswer, load, changeRate, getCoupon, counted, countDiscountedSales };
 });

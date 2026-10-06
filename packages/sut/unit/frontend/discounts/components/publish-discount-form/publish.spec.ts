@@ -2,6 +2,7 @@ import { getByRole, queryAllByRole } from '@testing-library/dom';
 import { DOMWrapper, type VueWrapper } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 
+import { RateNotValid } from '@frontend/discounts/publish-answers';
 import { discountTexts } from '@frontend/discounts/texts';
 import { spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
@@ -135,7 +136,7 @@ describe('Component PublishDiscountForm', () => {
     it('should tell Mike the rate is not valid when the publish is refused for it', async () => {
       const { form, discounts } = setupSut();
       vi.mocked(discounts.publish).mockImplementation(async () => {
-        discounts.rateNotValid = true;
+        discounts.publishAnswer = new RateNotValid();
       });
 
       await publishThroughTheForm(form, { ...spicesDiscount, rate: '150' });

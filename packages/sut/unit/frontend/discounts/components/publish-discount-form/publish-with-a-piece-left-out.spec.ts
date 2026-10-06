@@ -1,6 +1,7 @@
 import { flushPromises, type VueWrapper } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 
+import { NothingToldOfThePublish, PiecesMissing } from '@frontend/discounts/publish-answers';
 import { discountTexts } from '@frontend/discounts/texts';
 
 import { setupSut } from './publish-discount-form-of-an-app';
@@ -8,7 +9,7 @@ import { setupSut } from './publish-discount-form-of-an-app';
 const setupSutRefusingAsMissing = (pieces: string[]) => {
   const { form, discounts } = setupSut();
   vi.mocked(discounts.publish).mockImplementation(async () => {
-    discounts.missing = pieces;
+    discounts.publishAnswer = new PiecesMissing(pieces);
   });
   return { form };
 };
@@ -66,10 +67,10 @@ describe('Component PublishDiscountForm', () => {
         const { form, discounts } = setupSut();
         vi.mocked(discounts.publish)
           .mockImplementationOnce(async () => {
-            discounts.missing = ['item'];
+            discounts.publishAnswer = new PiecesMissing(['item']);
           })
           .mockImplementationOnce(async () => {
-            discounts.missing = [];
+            discounts.publishAnswer = new NothingToldOfThePublish();
           });
         await askToPublish(form);
 

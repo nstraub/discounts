@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { BadRequestException } from '@app/types/rest-api-refusals';
+import { NothingToldOfThePublish, PiecesMissing, RateNotValid } from '@frontend/discounts/publish-answers';
 import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from './discounts-store-of-an-app';
@@ -51,7 +52,7 @@ describe('Store discounts', () => {
 
       await discounts.publish({ ...spicesDiscount, rate: '150' });
 
-      expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(true);
+      expect(discounts.publishAnswer, 'the answer the store holds').to.be.instanceOf(RateNotValid);
     });
     it('should no longer hold the rate as not valid once the next discount is published', async () => {
       const { restApi, discounts } = setupSut();
@@ -60,14 +61,14 @@ describe('Store discounts', () => {
 
       await discounts.publish(spicesDiscount);
 
-      expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(false);
+      expect(discounts.publishAnswer, 'the answer the store holds').not.to.be.instanceOf(RateNotValid);
     });
     it('should not hold the rate as not valid when the refusal names other fields and none as missing', async () => {
       const { discounts } = setupSutRefusing(new BadRequestException('POST /discounts answered 400', [], ['storeName']));
 
       await discounts.publish(spicesDiscount);
 
-      expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(false);
+      expect(discounts.publishAnswer, 'the answer the store holds').not.to.be.instanceOf(RateNotValid);
     });
   });
   describe('publishing a discount with a piece left out', () => {
@@ -76,28 +77,28 @@ describe('Store discounts', () => {
 
       await discounts.publish({ rate: '20', storeName: spicesDiscount.storeName });
 
-      expect(discounts.missing, 'the pieces held as missing').to.deep.equal(['item', 'storeAddress']);
+      expect(discounts.publishAnswer, 'the answer the store holds').to.deep.equal(new PiecesMissing(['item', 'storeAddress']));
     });
     it('should hold other pieces as missing when the refusal lists others', async () => {
       const { discounts } = setupSutRefusing(aRefusalListingAsMissing(['rate']));
 
       await discounts.publish(spicesDiscountWithoutItsRate);
 
-      expect(discounts.missing, 'the pieces held as missing').to.deep.equal(['rate']);
+      expect(discounts.publishAnswer, 'the answer the store holds').to.deep.equal(new PiecesMissing(['rate']));
     });
     it('should not hold the rate as not valid when the refusal lists it as missing', async () => {
       const { discounts } = setupSutRefusing(aRefusalListingAsMissing(['rate']));
 
       await discounts.publish(spicesDiscountWithoutItsRate);
 
-      expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(false);
+      expect(discounts.publishAnswer, 'the answer the store holds').not.to.be.instanceOf(RateNotValid);
     });
     it('should not hold the rate as not valid when only other pieces are missing', async () => {
       const { discounts } = setupSutRefusing(aRefusalListingAsMissing(['item']));
 
       await discounts.publish({ rate: spicesDiscount.rate, storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
 
-      expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(false);
+      expect(discounts.publishAnswer, 'the answer the store holds').not.to.be.instanceOf(RateNotValid);
     });
     it('should no longer hold any piece as missing once the next discount is published', async () => {
       const { restApi, discounts } = setupSut();
@@ -106,7 +107,7 @@ describe('Store discounts', () => {
 
       await discounts.publish(spicesDiscount);
 
-      expect(discounts.missing, 'the pieces held as missing').to.deep.equal([]);
+      expect(discounts.publishAnswer, 'the answer the store holds').to.be.instanceOf(NothingToldOfThePublish);
     });
   });
   describe('publishing a discount refused for another reason', () => {

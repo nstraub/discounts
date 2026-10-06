@@ -20,7 +20,7 @@ const publish = async (): Promise<void> => {
   <form @submit.prevent="publish">
     <TypedDiscountFields
       v-model="discount"
-      :missing="discounts.missing"
+      :answer="discounts.publishAnswer"
     />
     <button
       type="submit"
@@ -30,10 +30,10 @@ const publish = async (): Promise<void> => {
       {{ discountTexts.publish }}
     </button>
     <p
-      v-if="discounts.rateNotValid"
+      v-if="discounts.publishAnswer.told(discountTexts)"
       role="status"
     >
-      {{ discountTexts.rateNotValid }}
+      {{ discounts.publishAnswer.told(discountTexts) }}
     </p>
   </form>
 </template>
