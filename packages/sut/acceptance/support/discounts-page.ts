@@ -57,7 +57,8 @@ export class DiscountsPage {
   }
 
   private async publishedEntryOn(discount: ExampleDiscount): Promise<Locator> {
-    const shown = this.page.getByTestId('published-discount').filter({ hasText: discount.item });
+    const text = this.page.getByTestId('published-discount-text').filter({ hasText: discount.item });
+    const shown = this.page.getByTestId('published-discount').filter({ has: text });
     await shown.first().waitFor().catch(() => assert.fail(`the page shows no published discount on ${discount.item}`));
     return shown;
   }
