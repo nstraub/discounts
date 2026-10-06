@@ -2,7 +2,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { countRequest, countResponse, requestRejection } from '@app/types/discounts';
-import { longTextInAnyCharacters, spicesDiscount } from '@sut/support/example-discounts';
+import { longTextInAnyCharacters, spicesDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
 import { answersInTurnToBodiesThatAreNotObjects, statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
@@ -12,7 +12,7 @@ type ExampleDiscount = typeof spicesDiscount;
 
 const useACouponFor = async (http: Http, published: { id: string }, discount: ExampleDiscount) => {
   const code: string = (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
-  await http.post('/redemptions').send({ code, storeName: discount.storeName, storeAddress: discount.storeAddress });
+  await http.post('/redemptions').send({ code, ...theStoreOf(discount) });
   return code;
 };
 
@@ -30,7 +30,7 @@ const setupSutCountingJsonText = async () => {
 };
 
 const countTheStoreOf = (http: Http, discount: ExampleDiscount = spicesDiscount) =>
-  http.post('/stores/counts').send({ storeName: discount.storeName, storeAddress: discount.storeAddress });
+  http.post('/stores/counts').send(theStoreOf(discount));
 
 describe('POST /stores/counts', () => {
   describe('success', () => {
@@ -82,7 +82,7 @@ describe('POST /stores/counts', () => {
       const response = await countTheStoreOf(http, aDiscountInAnyText);
 
       expect(response.status).to.equal(201);
-      expect(countRequest.safeParse({ storeName: aDiscountInAnyText.storeName, storeAddress: aDiscountInAnyText.storeAddress }).error).to.equal(undefined);
+      expect(countRequest.safeParse(theStoreOf(aDiscountInAnyText)).error).to.equal(undefined);
     });
     it('should keep the count response schema no stricter than a discount\'s id, item and rate and a number of sales', async () => {
       const aDiscountInAnyText = { ...spicesDiscount, ...longTextInAnyCharacters };

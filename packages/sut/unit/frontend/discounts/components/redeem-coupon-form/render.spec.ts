@@ -3,11 +3,9 @@ import { describe, expect, it } from 'vitest';
 
 import RedeemCouponForm from '@frontend/discounts/components/RedeemCouponForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
-import { produceDiscount, spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, spicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { aFormOfferingTheStores, theStorePickersUnder, theStoresOfferedUnder, whetherEachStorePickerUnderRequiresAStore } from '../a-form-offering-the-stores';
-
-const theStoreOf = ({ storeName, storeAddress }: typeof produceDiscount) => ({ storeName, storeAddress });
 
 const theCornerGrocery = theStoreOf(produceDiscount);
 

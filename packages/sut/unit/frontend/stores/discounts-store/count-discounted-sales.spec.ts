@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
+import { spicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { setupSut } from './discounts-store-of-an-app';
-
-const theStoreOf = ({ storeName, storeAddress }: typeof spicesDiscount) => ({ storeName, storeAddress });
 
 describe('Store discounts', () => {
   describe('counting the discounted sales', () => {

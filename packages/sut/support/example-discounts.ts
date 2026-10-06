@@ -10,6 +10,8 @@ export const longTextInAnyCharacters = {
   storeAddress: 'Calle Ñuñoa 4; piso 2 '.repeat(500),
 };
 
+export const theStoreOf = ({ storeName, storeAddress }: { storeName: string; storeAddress: string }) => ({ storeName, storeAddress });
+
 export const publishedSpicesDiscount = { id: 'spices-id', ...spicesDiscount };
 
 export const publishedProduceDiscount = { id: 'produce-id', ...produceDiscount };

@@ -3,11 +3,9 @@ import { describe, expect, it } from 'vitest';
 
 import CountDiscountedSalesForm from '@frontend/discounts/components/CountDiscountedSalesForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
-import { stephaniesProduceDiscount } from '@sut/support/example-discounts';
+import { stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { aFormOfferingTheStores, theStorePickersUnder, theStoresOfferedUnder, whetherEachStorePickerUnderRequiresAStore } from '../a-form-offering-the-stores';
-
-const theStoreOf = ({ storeName, storeAddress }: typeof stephaniesProduceDiscount) => ({ storeName, storeAddress });
 
 const stephaniesMarket = theStoreOf(stephaniesProduceDiscount);
 
