@@ -147,7 +147,15 @@ describe('Component PublishedDiscounts', () => {
   });
 
   describe('A2 injection through the hook', () => {
-    it.todo('should show a hook written as markup as plain text, never as markup');
+    it('should show a hook written as markup as plain text, never as markup', () => {
+      const writtenAsMarkup = '<b>New</b> supplier <img src="x" onerror="alert(1)">';
+      const list = setupSut({ discounts: [{ ...publishedSpicesDiscount, hook: writtenAsMarkup }] });
+
+      const hook = list.get('[data-testid="published-hook"]');
+
+      expect(hook.element.textContent).to.equal(writtenAsMarkup);
+      expect(hook.element.children, 'elements made from the hook').to.have.length(0);
+    });
     it.todo('should show a web address in a hook as plain text, never as a link');
   });
 });
