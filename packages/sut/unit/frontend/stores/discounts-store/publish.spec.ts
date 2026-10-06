@@ -78,7 +78,13 @@ describe('Store discounts', () => {
 
       expect(discounts.missing, 'the pieces held as missing').to.deep.equal(['rate']);
     });
-    it.todo('should not hold the rate as not valid when the refusal lists it as missing');
+    it('should not hold the rate as not valid when the refusal lists it as missing', async () => {
+      const { discounts } = setupSutRefusing(aRefusalListingAsMissing(['rate']));
+
+      await discounts.publish(spicesDiscountWithoutItsRate);
+
+      expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(false);
+    });
     it.todo('should not hold the rate as not valid when the refusal lists only other pieces as missing');
     it.todo('should no longer hold any piece as missing once the next discount is published');
   });
