@@ -20,8 +20,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
     await load();
   };
   const getCoupon = async (id: string): Promise<void> => {
-    await restApi.post(`/discounts/${id}/coupons`, {});
-    coupon.value = { token: '7K3QX9M2PD', storeName: "Mike's Groceries" };
+    coupon.value = await restApi.post<CouponResponse>(`/discounts/${id}/coupons`, {});
   };
   return { published, coupon, publish, load, changeRate, getCoupon };
 });

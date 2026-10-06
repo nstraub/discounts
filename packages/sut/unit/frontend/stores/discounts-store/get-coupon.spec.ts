@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { couponForTheSpicesDiscount } from '@sut/support/example-discounts';
+import { couponForTheProduceDiscount, couponForTheSpicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from './discounts-store-of-an-app';
 
@@ -27,6 +27,14 @@ describe('Store discounts', () => {
       await discounts.getCoupon('spices-id');
 
       expect(discounts.coupon).to.deep.equal(couponForTheSpicesDiscount);
+    });
+    it('should hold another coupon got for another discount', async () => {
+      const { restApi, discounts } = setupSut();
+      restApi.post.mockResolvedValue(couponForTheProduceDiscount);
+
+      await discounts.getCoupon('produce-id');
+
+      expect(discounts.coupon).to.deep.equal(couponForTheProduceDiscount);
     });
     it.todo('should keep the coupon got when the page is opened again');
 
