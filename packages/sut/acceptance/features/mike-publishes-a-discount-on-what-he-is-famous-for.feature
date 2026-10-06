@@ -61,3 +61,68 @@ Feature: Mike publishes a discount on what he is famous for
     When someone publishes discounts far faster than any store owner would
     Then they are slowed down
     And people can still see every discount published before
+
+  @wip
+  Scenario Outline: Mike publishes a discount at any rate up to 100%
+    When Mike publishes a discount of <rate> on an item
+    Then people can see it immediately
+
+    Examples:
+      | rate  |
+      | 20%   |
+      | 12.5% |
+      | 100%  |
+
+  # Which ways of writing a rate are accepted is not settled. The proposal beside the question: a
+  # decimal comma is accepted, the % sign is optional, surrounding spaces are trimmed, a trailing zero
+  # names the same rate, and the rate is shown without a needless .0. The last three rows have no
+  # proposal yet.
+  @todo
+  Scenario Outline: Mike writes a rate in another way
+    When Mike publishes a discount of <rate> on an item
+    Then people can see it at the rate it names
+
+    Examples:
+      | rate   |
+      | 12,5%  |
+      | 20 %   |
+      | 20     |
+      | 12.50% |
+      | .5%    |
+      | 05%    |
+      | +20%   |
+
+  # A rate such as 33.3 has no exact binary form, so a rate kept as a binary number would drift.
+  @todo
+  Scenario: Mike publishes a discount at a rate a computer cannot hold exactly
+    When Mike publishes a discount of 33.3% on an item
+    Then people can see it at exactly that rate
+
+  # Not settled. The proposal beside the question: a rate in a computer's notation is not valid.
+  @todo
+  Scenario Outline: Mike gives a rate in a computer's notation
+    Given Mike tries to publish a discount
+    When he gives a rate of <rate>
+    Then he is told the rate is not valid
+    And the discount is not published
+
+    Examples:
+      | rate     |
+      | 1e2      |
+      | 0x14     |
+      | Infinity |
+
+  @todo
+  Scenario: Mike gives a rate far longer than any rate
+    Given Mike tries to publish a discount
+    When he gives a rate far longer than any rate could be
+    Then he is told the rate is not valid
+    And the discount is not published
+
+  # A discount of 100 % gives the item away, and anyone can get as many coupons for it as they like:
+  # a risk for the store owner, with no behaviour proposed.
+  @todo
+  Scenario: Someone takes coupons by the hundred for a discount of 100%
+    Given Mike has published a discount of 100% on an item
+    When someone gets coupons for it far faster than anyone deciding to try it would
+    Then every coupon they get gives the item away
