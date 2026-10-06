@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
 import type { ChangeRateRequest, CountRequest, CountResponse, CouponResponse, DiscountResponse, PublishDiscountRequest } from '@app/types/discounts';
+import { BadRequestException } from '@app/types/rest-api-refusals';
 
 import { useRestApi } from '../rest-api-key';
 
@@ -23,9 +24,11 @@ export const useDiscountsStore = defineStore('discounts', () => {
     try {
       await restApi.post('/discounts', discount);
       rateNotValid.value = false;
-    } catch {
+    } catch (refusal) {
       rateNotValid.value = true;
-      missing.value = ['item', 'storeAddress'];
+      if (refusal instanceof BadRequestException) {
+        missing.value = refusal.missing;
+      }
     }
   };
   const load = async (): Promise<void> => {
