@@ -16,6 +16,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const published = ref<DiscountResponse[]>([]);
   const coupon = ref<CouponResponse>();
   const redemption = ref<RedemptionResponse>();
+  const couponAlreadyUsed = ref(false);
   const counted = ref<CountResponse>();
   const stores = computed(() => theDistinctStoresPublishing(published.value));
   const publish = async (discount: Partial<PublishDiscountRequest>): Promise<void> => {
@@ -32,10 +33,14 @@ export const useDiscountsStore = defineStore('discounts', () => {
     coupon.value = await restApi.post<CouponResponse>(`/discounts/${id}/coupons`, {});
   };
   const redeemCoupon = async (request: RedemptionRequest): Promise<void> => {
-    redemption.value = await restApi.post<RedemptionResponse>('/redemptions', request);
+    try {
+      redemption.value = await restApi.post<RedemptionResponse>('/redemptions', request);
+    } catch {
+      couponAlreadyUsed.value = true;
+    }
   };
   const countDiscountedSales = async (store: CountRequest): Promise<void> => {
     counted.value = await restApi.post<CountResponse>('/stores/counts', store);
   };
-  return { published, stores, coupon, publish, load, changeRate, getCoupon, redemption, redeemCoupon, counted, countDiscountedSales };
+  return { published, stores, coupon, publish, load, changeRate, getCoupon, redemption, couponAlreadyUsed, redeemCoupon, counted, countDiscountedSales };
 });

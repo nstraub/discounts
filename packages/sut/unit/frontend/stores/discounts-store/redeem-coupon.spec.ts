@@ -44,6 +44,13 @@ describe('Store discounts', () => {
     });
   });
   describe('redeeming a coupon already used', () => {
-    it.todo('should hold that the coupon has already been used');
+    it('should hold that the coupon has already been used', async () => {
+      const { restApi, discounts } = setupSut();
+      restApi.post.mockRejectedValue(new Error('POST /redemptions answered 409'));
+
+      await discounts.redeemCoupon({ code: '7K3QX9M2PD', storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
+
+      expect(discounts.couponAlreadyUsed, 'whether the coupon is held as already used').to.equal(true);
+    });
   });
 });
