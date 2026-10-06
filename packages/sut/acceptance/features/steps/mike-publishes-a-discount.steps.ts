@@ -2,11 +2,11 @@ import { Then, When } from '@cucumber/cucumber';
 
 import { spicesDiscount } from '@sut/support/example-discounts';
 
-import { DiscountsPage, openSomeoneElsesDiscountsPage } from '../../support/discounts-page';
+import { openSomeoneElsesDiscountsPage, ownDiscountsPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
 
 const publishAsMike = async (world: PlaywrightWorld, discount: typeof spicesDiscount): Promise<void> => {
-  const mikesPage = new DiscountsPage(world.page);
+  const mikesPage = ownDiscountsPage(world);
   await mikesPage.open();
   await mikesPage.publish(discount);
   world.publishedDiscount = discount;
