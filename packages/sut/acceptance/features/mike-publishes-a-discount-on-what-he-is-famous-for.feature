@@ -125,3 +125,15 @@ Feature: Mike publishes a discount on what he is famous for
     Given Mike has published a discount of 100% on an item
     When someone gets coupons for it far faster than anyone deciding to try it would
     Then every coupon they get gives the item away
+
+  @wip
+  Scenario: Mike's earlier discounts stay published
+    Given Mike has published a discount on an item
+    When Mike publishes a discount on another item
+    Then people can see both
+
+  @todo
+  Scenario: Mike's earlier discount keeps its coupons when he publishes another
+    Given Sue has a coupon for Mike's discount
+    When Mike publishes a discount on another item
+    Then Sue's coupon still applies at Mike's store
