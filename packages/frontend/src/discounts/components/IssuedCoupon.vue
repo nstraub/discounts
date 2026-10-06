@@ -14,7 +14,7 @@ const code = computed(() => `${props.coupon.token.slice(0, charactersInAGroup)} 
 <template>
   <section data-testid="issued-coupon">
     <p data-testid="coupon-store">
-      {{ discountTexts.yourCouponToUseAt }} Mike's Groceries
+      {{ discountTexts.yourCouponToUseAt }} {{ coupon.storeName }}
     </p>
     <p data-testid="coupon-code">
       {{ code }}

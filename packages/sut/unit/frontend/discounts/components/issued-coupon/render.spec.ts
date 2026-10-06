@@ -29,6 +29,11 @@ describe('Component IssuedCoupon', () => {
 
       expect(shown.get('[data-testid="coupon-store"]').text()).to.equal(`${discountTexts.yourCouponToUseAt} ${couponForTheSpicesDiscount.storeName}`);
     });
+    it('should show the store another coupon is for', () => {
+      const shown = setupSut({ coupon: couponForTheProduceDiscount });
+
+      expect(shown.get('[data-testid="coupon-store"]').text()).to.equal(`${discountTexts.yourCouponToUseAt} ${couponForTheProduceDiscount.storeName}`);
+    });
     it.todo('should show the address of its store and the item it is for');
   });
 });
