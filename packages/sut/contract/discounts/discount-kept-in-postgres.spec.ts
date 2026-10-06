@@ -73,6 +73,14 @@ describe('a discount kept in PostgreSQL', () => {
 
       expect(loaded?.toJSON().hook).to.equal(hook);
     });
-    it.todo('should keep a hook with accents, apostrophes and emoji verbatim');
+    it('should keep a hook with accents, apostrophes and emoji verbatim', async () => {
+      const { keep, loadOnItsOwnConnection } = await setupSut();
+      const hook = "Tomates d'Ángel, recién llegados 🍅";
+      await keep({ ...spicesDiscount, hook });
+
+      const [loaded] = await loadOnItsOwnConnection();
+
+      expect(loaded?.toJSON().hook).to.equal(hook);
+    });
   });
 });
