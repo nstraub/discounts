@@ -8,6 +8,8 @@ import { redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithAnotherCouponOf
 
 const aCodeNobodyIssued = 'ZZZZZZZZZZ';
 
+const oneCharacterAwayFrom = (code: string) => code.slice(0, -1) + (code.endsWith('0') ? '1' : '0');
+
 describe('POST /redemptions', () => {
   describe('a code nobody issued', () => {
     it('should answer 404 with a body matching the error schema for a well-formed code nobody issued', async () => {
@@ -60,6 +62,13 @@ describe('POST /redemptions', () => {
   });
 
   describe('A3 handle guessing (no accounts)', () => {
-    it.todo('should answer 404 for a code one character away from an issued coupon\'s, that coupon staying unused');
+    it('should answer 404 for a code one character away from an issued coupon\'s, that coupon staying unused', async () => {
+      const sut = await setupSutWithAnotherCouponOfTheSameDiscount();
+
+      const response = await redeemAtTheStoreOf(sut.http, oneCharacterAwayFrom(sut.code));
+
+      expect(response.status).to.equal(404);
+      expect(await theDiscountsAndCouponsKept(sut.client)).to.deep.equal(keptAsIssued(sut));
+    });
   });
 });
