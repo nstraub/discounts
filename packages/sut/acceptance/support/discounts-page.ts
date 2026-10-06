@@ -29,6 +29,11 @@ export class DiscountsPage {
     const entry = await this.publishedEntryOn(discount);
     await entry.getByTestId('new-rate').fill(newRate);
     await entry.getByTestId('change-rate').click();
+    await this.untilTheEntryShowsTheRate(entry, newRate);
+  }
+
+  private async untilTheEntryShowsTheRate(entry: Locator, rate: string): Promise<void> {
+    await entry.getByTestId('published-rate').filter({ hasText: `${rate}%` }).first().waitFor();
   }
 
   async verifyShows(discount: ExampleDiscount): Promise<void> {
