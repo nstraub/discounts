@@ -54,6 +54,13 @@ describe('Component PublishDiscountForm', () => {
         storeAddress: '3 Hill Road',
       });
     });
+    it('should publish a rate exactly as Mike wrote it, such as 12,5', async () => {
+      const { form, discounts } = setupSut();
+
+      await publishThroughTheForm(form, { ...spicesDiscount, rate: '12,5' });
+
+      expect(vi.mocked(discounts.publish).mock.lastCall?.at(0)?.rate).to.equal('12,5');
+    });
     it('should clear every field once the discount is published', async () => {
       const { form } = setupSut();
 
