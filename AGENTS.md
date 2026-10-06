@@ -158,6 +158,19 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
 - **`src/app.module.ts`:** the root NestJS module; it imports the context's module.
 - **`src/migrate.ts`:** the deploy-time migrator. It applies the migrations in
   `src/discounts/infra/migrations/` to `DATABASE_URL`; the image runs it before `main.js`.
+- **`src/discounts/application/`:** `discount-service.ts` (`publish()`, `published()`) and, in
+  `domain/`, the `Discount` aggregate, `DiscountDetails`, `DiscountFactory`, the `DiscountPublished`
+  event and two ports, `DiscountRepository` and `DomainEventPublisher`. `Discount.publish()` raises the
+  event through the port.
+- **`src/discounts/infra/`:** `discounts.controller.ts` (`POST /discounts` answers 201 with a
+  `Location`; `GET /discounts`), `parsed-by.ts` (`ParsedBy`, the zod pipe that parses a request; a
+  failure is a 400 `requestRejection`, and there is no exception filter),
+  `discount-drizzle-repository.ts`, `event-emitter-domain-event-publisher.ts` (the adapter over
+  EventEmitter2), `discounts.module.ts` (the wiring). The request and response schemas
+  (`publishDiscountRequest`, `discountResponse`, `publishedDiscountsResponse`, `requestRejection
+  {statusCode, message, fields?}`) are in `@app/types/discounts`.
+- **The rate** is text end to end (column, schema, domain, page), kept exactly as written
+  (migration `0003_rate_as_written`).
 - **`src/discounts/infra/database.module.ts`:** the one connection pool, exported as the Drizzle
   `database` provider and closed in `onApplicationShutdown`.
 - **Database:** `packages/backend/drizzle.config.ts` reads the Drizzle schema from
@@ -166,7 +179,9 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   with `yarn db:generate` (`--name <name>`; `--custom` for a data migration), apply with
   `yarn db:migrate`. A new table is declared in `schema.ts` and exported from it, or drizzle-kit does
   not see it. A migration a deploy has applied is never edited (Drizzle skips older ones and the
-  production volume is kept): add a new one. Skill: `database-migrations`.
+  production volume is kept): add a new one. A migration that cannot be generated back is written by
+  hand in `migrations/drizzle-down/<tag>.sql`; a down that loses data says so on its first line.
+  Skill: `database-migrations`.
 
 ## 6. Frontend architecture
 
@@ -174,7 +189,9 @@ One web app covers the whole product, so it is built to production quality from 
 first slice.
 
 - **Feature-first folders:** `src/<feature>/{views,components,services,...}`.
-- **Routing:** split into `router/routes-*.ts` modules merged in `router/index.ts`.
+- **Routing:** split into `router/routes-*.ts` modules merged in `router/index.ts`, with hash history (`#/`), so a reload
+  of the statically served app keeps its route: the discounts page is `#/`, the walking skeleton's
+  greeting `#/walking-skeleton`.
 - **State:** Pinia stores in `src/stores/`.
 - **HTTP:** every backend call goes through `RestApi` in `packages/types`.
 - **Browser capabilities:** services in `src/*/services/`.
@@ -202,6 +219,12 @@ first slice.
   Skills: `writing-unit-tests`, `naming-tests-by-behaviour`.
 - **Contract tests (`contract/`):** supertest against the wired app and a real
   database. Skill: `contract-testing`.
+- **Contract support:** `contract/support/` holds `app.ts` (`setupSut`, the wired app),
+  `discount-repository.ts` (the repository over a database), `discounts-table.ts` (reading the table's
+  constraints and inserting a row missing a column) and `migrations.ts`. A migration spec runs on a
+  database of its own, `app_migration_test`, created empty and dropped when the test finishes, since it
+  runs a schema backward and forward again. The discounts the specs publish are shared in
+  `@sut/support/example-discounts`.
 - **Tags:** `@wip` marks the scenario being built (run it with `yarn test:wip`); `@todo` marks a
   recorded missing case whose steps are written and whose step definitions are not. Both are
   excluded from `yarn test:bdd`.
