@@ -22,7 +22,7 @@ const whatTheFieldTells = (form: VueWrapper, field: string) =>
 
 describe('Component PublishDiscountForm', () => {
   describe('publishing a discount with a piece left out', () => {
-    it('should tell Mike the item is missing beside the item\'s field when the publish is refused for it', async () => {
+    it('should tell Mike the item is missing beside its field when refused for it', async () => {
       const { form } = setupSutRefusingAsMissing(['item']);
 
       await form.get('[data-testid="publish-discount"]').trigger('click');
@@ -30,9 +30,9 @@ describe('Component PublishDiscountForm', () => {
 
       expect(whatTheFieldTells(form, 'discount-item'), "what the item's field tells").to.equal(discountTexts.itemMissing);
     });
-    it.todo('should tell Mike the rate is missing beside the rate\'s field when the publish is refused for it');
-    it.todo('should tell Mike the store name is missing beside the store name\'s field when the publish is refused for it');
-    it.todo('should tell Mike the store address is missing beside the store address\'s field when the publish is refused for it');
+    it.todo('should tell Mike the rate is missing beside its field when refused for it');
+    it.todo('should tell Mike the store name is missing beside its field when refused for it');
+    it.todo('should tell Mike the store address is missing beside its field when refused for it');
 
     describe('state', () => {
       it.todo('should not tell Mike anything is missing before a publish is refused');
