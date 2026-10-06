@@ -1,8 +1,8 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
-import { countResponse, requestRejection } from '@app/types/discounts';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { countRequest, countResponse, requestRejection } from '@app/types/discounts';
+import { longTextInAnyCharacters, spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
 
@@ -66,7 +66,15 @@ describe('POST /stores/counts', () => {
   });
 
   describe('strictness', () => {
-    it.todo('should keep the count request schema no stricter than any text for a store\'s name and address');
+    it('should keep the count request schema no stricter than any text for a store\'s name and address', async () => {
+      const aDiscountInAnyText = { ...spicesDiscount, ...longTextInAnyCharacters };
+      const { http } = await setupSutWithACouponUsedFor(aDiscountInAnyText);
+
+      const response = await countTheStoreOf(http, aDiscountInAnyText);
+
+      expect(response.status).to.equal(201);
+      expect(countRequest.safeParse({ storeName: aDiscountInAnyText.storeName, storeAddress: aDiscountInAnyText.storeAddress }).error).to.equal(undefined);
+    });
     it.todo('should keep the count response schema no stricter than a discount\'s id, item and rate and a number of sales');
   });
 
