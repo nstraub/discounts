@@ -11,7 +11,8 @@ import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-
 const setupSut = () => {
   const events = mock<DomainEventPublisher>();
   const factory = new DiscountFactory(events);
-  return { events, discountWith: (details: ConstructorParameters<typeof DiscountDetails>[0]) => factory.create(new DiscountDetails(details)) };
+  const discountWith = (details: ConstructorParameters<typeof DiscountDetails>[0]) => factory.create(new DiscountDetails(details));
+  return { events, discountWith, discountAt: (rate: string) => discountWith({ ...spicesDiscount, rate }) };
 };
 
 const lastEventOf = (events: MockProxy<DomainEventPublisher>) => {
@@ -90,8 +91,8 @@ describe('class Discount', () => {
   describe('publishing a discount at a rate its rules refuse', () => {
     describe('the rejection', () => {
       it('should raise DiscountPublicationRejected carrying the rate and that it is not valid', () => {
-        const { events, discountWith } = setupSut();
-        const discount = discountWith({ ...spicesDiscount, rate: '150' });
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('150');
 
         discount.publish();
 
@@ -99,8 +100,8 @@ describe('class Discount', () => {
         expect(lastRejectionOf(events)).to.include({ rate: '150', reason: 'not valid' });
       });
       it('should not raise DiscountPublished when its rate is refused', () => {
-        const { events, discountWith } = setupSut();
-        const discount = discountWith({ ...spicesDiscount, rate: '150' });
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('150');
 
         discount.publish();
 
@@ -110,8 +111,8 @@ describe('class Discount', () => {
 
     describe('boundary', () => {
       it('should accept a rate of 20, a whole number above 0 and at most 100', () => {
-        const { events, discountWith } = setupSut();
-        const discount = discountWith({ ...spicesDiscount, rate: '20' });
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('20');
 
         discount.publish();
 
@@ -119,48 +120,48 @@ describe('class Discount', () => {
       });
       it.todo('should accept a rate of 12.5, with one decimal place');
       it('should accept a rate of 100, the highest a rate may be', () => {
-        const { events, discountWith } = setupSut();
-        const discount = discountWith({ ...spicesDiscount, rate: '100' });
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('100');
 
         discount.publish();
 
         expect(lastEventOf(events)).to.be.instanceOf(DiscountPublished);
       });
       it('should accept a rate of 0.1, the lowest a rate may be', () => {
-        const { events, discountWith } = setupSut();
-        const discount = discountWith({ ...spicesDiscount, rate: '0.1' });
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('0.1');
 
         discount.publish();
 
         expect(lastEventOf(events)).to.be.instanceOf(DiscountPublished);
       });
       it('should refuse a rate of 0, its rejection naming the rate as not valid', () => {
-        const { events, discountWith } = setupSut();
-        const discount = discountWith({ ...spicesDiscount, rate: '0' });
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('0');
 
         discount.publish();
 
         expect(lastRejectionOf(events)).to.include({ rate: '0', reason: 'not valid' });
       });
       it('should refuse a negative rate such as -10, its rejection naming the rate as not valid', () => {
-        const { events, discountWith } = setupSut();
-        const discount = discountWith({ ...spicesDiscount, rate: '-10' });
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('-10');
 
         discount.publish();
 
         expect(lastRejectionOf(events)).to.include({ rate: '-10', reason: 'not valid' });
       });
       it('should refuse a rate of 100.1, just above 100, its rejection naming the rate as not valid', () => {
-        const { events, discountWith } = setupSut();
-        const discount = discountWith({ ...spicesDiscount, rate: '100.1' });
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('100.1');
 
         discount.publish();
 
         expect(lastRejectionOf(events)).to.include({ rate: '100.1', reason: 'not valid' });
       });
       it('should refuse a rate of 150, its rejection naming the rate as not valid', () => {
-        const { events, discountWith } = setupSut();
-        const discount = discountWith({ ...spicesDiscount, rate: '150' });
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('150');
 
         discount.publish();
 
