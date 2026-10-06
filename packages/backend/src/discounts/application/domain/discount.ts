@@ -1,7 +1,7 @@
-import { Coupon } from './coupon.js';
-import { CountedSales } from './counted-sales.js';
+import type { CountedSales } from './counted-sales.js';
 import { CouponIssued } from './coupon-issued.js';
 import type { CouponToken } from './coupon-token.js';
+import type { Coupons } from './coupons.js';
 import type { DiscountDetails } from './discount-details.js';
 import { DiscountedSalesCounted } from './discounted-sales-counted.js';
 import { DiscountPublicationRejected } from './discount-publication-rejected.js';
@@ -9,14 +9,14 @@ import { DiscountPublished } from './discount-published.js';
 import { DiscountRate } from './discount-rate.js';
 import { DiscountRateChanged } from './discount-rate-changed.js';
 import type { DomainEventPublisher } from './domain-event-publisher.js';
-import { IssuedCoupon } from './issued-coupon.js';
+import type { IssuedCoupon } from './issued-coupon.js';
 import { RedeemedCoupon } from './redeemed-coupon.js';
 
 export class Discount {
   constructor(
     private readonly id: string,
     private details: DiscountDetails,
-    private coupons: Coupon[],
+    private readonly coupons: Coupons,
     private readonly events: DomainEventPublisher,
   ) {}
 
@@ -33,23 +33,23 @@ export class Discount {
   }
 
   issueCoupon(token: CouponToken): IssuedCoupon {
-    this.coupons = [...this.coupons, new Coupon(token, false, false, this.events)];
+    const issued = this.coupons.issue(token, this.details);
     this.events.publish(new CouponIssued(this.id, token.toJSON()));
-    return new IssuedCoupon(token, this.details.toJSON().storeName);
+    return issued;
   }
 
   redeemCoupon(token: CouponToken): RedeemedCoupon {
-    this.coupons.filter((coupon) => coupon.isIdentifiedBy(token)).forEach((coupon) => coupon.redeem(this.id));
+    this.coupons.redeem(token, this.id);
     return new RedeemedCoupon(this.details.toJSON().item);
   }
 
   count(): CountedSales {
-    const discountedSales = this.coupons.reduce((sales, coupon) => coupon.countInto(sales), 0);
-    this.events.publish(new DiscountedSalesCounted(this.id, discountedSales));
-    return new CountedSales(this.id, this.details, discountedSales);
+    const counted = this.coupons.countSinceTheLastCount(this.id, this.details);
+    this.events.publish(new DiscountedSalesCounted(this.id, counted.toJSON().discountedSales));
+    return counted;
   }
 
-  toJSON(): { id: string; coupons: ReturnType<Coupon['toJSON']>[] } & ReturnType<DiscountDetails['toJSON']> {
-    return { id: this.id, ...this.details.toJSON(), coupons: this.coupons.map((coupon) => coupon.toJSON()) };
+  toJSON(): { id: string; coupons: ReturnType<Coupons['toJSON']> } & ReturnType<DiscountDetails['toJSON']> {
+    return { id: this.id, ...this.details.toJSON(), coupons: this.coupons.toJSON() };
   }
 }
