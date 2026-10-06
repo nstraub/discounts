@@ -6,7 +6,11 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 import { setupSut } from '../support/app';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
 
+type Http = Awaited<ReturnType<typeof setupSut>>['http'];
+
 const ratesTheScenarioRefuses = ['150', '100.5', '12.25', '0', '-10'];
+
+const publishAtTheRate = (http: Http, rate: string) => http.post('/discounts').send({ ...spicesDiscount, rate });
 
 describe('POST /discounts with a rate that is not valid', () => {
   describe('the rate refused', () => {
@@ -15,7 +19,7 @@ describe('POST /discounts with a rate that is not valid', () => {
       const answers = [];
 
       for (const rate of ratesTheScenarioRefuses) {
-        answers.push(await http.post('/discounts').send({ ...spicesDiscount, rate }));
+        answers.push(await publishAtTheRate(http, rate));
       }
 
       const statusAndFields = answers.map((answer) => [answer.status, requestRejection.parse(answer.body).fields]);
@@ -24,14 +28,14 @@ describe('POST /discounts with a rate that is not valid', () => {
     it('should answer with a body matching the error schema when the rate is not valid', async () => {
       const { http } = await setupSut();
 
-      const response = await http.post('/discounts').send({ ...spicesDiscount, rate: '150' });
+      const response = await publishAtTheRate(http, '150');
 
       expect(bodiesNotMatchingTheErrorSchema([response])).to.deep.equal([]);
     });
     it('should publish nothing when the rate is not valid, listing no discount afterwards', async () => {
       const { http } = await setupSut();
 
-      await http.post('/discounts').send({ ...spicesDiscount, rate: '150' });
+      await publishAtTheRate(http, '150');
 
       const listed = await http.get('/discounts');
       expect(listed.body).to.deep.equal([]);
