@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { CouponIssued } from '@backend/discounts/application/domain/coupon-issued';
+import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { aServiceOverTheKeptSpicesDiscount } from './a-service-over-the-kept-spices-discount';
 
@@ -22,7 +23,13 @@ describe('class DiscountService', () => {
 
       expect(events.publish).to.have.been.calledWith(new CouponIssued('spices-id', '7K3QX9M2PD'));
     });
-    it.todo('should answer with the coupon\'s token and the store it is for');
+    it('should answer with the coupon\'s token and the store it is for', async () => {
+      const { service } = setupSut();
+
+      const answered = await service.issueCoupon('spices-id');
+
+      expect(answered).to.deep.equal({ token: '7K3QX9M2PD', storeName: spicesDiscount.storeName });
+    });
 
     describe('state', () => {
       it.todo('should report that there is no such discount when no discount has that id, issuing nothing');
