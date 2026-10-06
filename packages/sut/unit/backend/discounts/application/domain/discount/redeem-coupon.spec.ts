@@ -4,9 +4,10 @@ import { CouponAlreadyUsedException } from '@backend/discounts/application/domai
 import { CouponNotForThisStoreException } from '@backend/discounts/application/domain/coupon-not-for-this-store-exception';
 import { CouponRedemptionRejected } from '@backend/discounts/application/domain/coupon-redemption-rejected';
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
+import type { Discount } from '@backend/discounts/application/domain/discount';
 import { Store } from '@backend/discounts/application/domain/store';
-import { publishedProduceDiscount, publishedSpicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
-import { atTheSpicesStore } from '@sut/support/example-stores';
+import { publishedProduceDiscount, publishedSpicesDiscount, theStoreOf } from '@sut/support/example-discounts';
+import { atStephaniesStore, atTheSpicesStore } from '@sut/support/example-stores';
 
 import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
 
@@ -14,6 +15,8 @@ const setupSutWithItsEvents = ({ kept = publishedSpicesDiscount, coupons = [{ to
   const { events, factory } = aSpicesDiscountWithItsEvents();
   return { events, discount: factory.reconstitute({ ...kept, coupons }) };
 };
+
+const tryingItsCouponAtStephaniesStore = (discount: Discount) => () => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atStephaniesStore);
 
 const setupSut = (options: Parameters<typeof setupSutWithItsEvents>[0] = {}) => setupSutWithItsEvents(options).discount;
 
@@ -72,13 +75,13 @@ describe('class Discount', () => {
     it('should refuse its coupon at another store, the coupon staying unused', () => {
       const discount = setupSut();
 
-      expect(() => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), new Store(theStoreOf(stephaniesProduceDiscount)))).to.throw(CouponNotForThisStoreException);
+      expect(tryingItsCouponAtStephaniesStore(discount)).to.throw(CouponNotForThisStoreException);
       expect(discount.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: false, counted: false }]);
     });
     it('should raise CouponRedemptionRejected carrying its id, the coupon\'s token and that the coupon is not for that store', () => {
       const { events, discount } = setupSutWithItsEvents();
 
-      expect(() => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), new Store(theStoreOf(stephaniesProduceDiscount)))).to.throw(CouponNotForThisStoreException);
+      expect(tryingItsCouponAtStephaniesStore(discount)).to.throw(CouponNotForThisStoreException);
 
       expect(events.publish).to.have.been.calledWith(new CouponRedemptionRejected(publishedSpicesDiscount.id, '7K3QX9M2PD', 'not for this store'));
     });
