@@ -109,6 +109,15 @@ describe('GET /discounts', () => {
     it.todo('should list every other discount when one kept before the rules would be refused by them');
   });
   describe('a rate kept before the rate rules', () => {
-    it.todo('should list a discount kept before the rate rules at a rate they refuse, as written, matching the response schema');
+    it('should list a discount kept before the rate rules at a rate they refuse, as written, matching the response schema', async () => {
+      const { client, http } = await setupSut();
+      const { item, storeName, storeAddress } = spicesDiscount;
+      await client.query('INSERT INTO app.discounts (id, item, rate, store_name, store_address) VALUES ($1, $2, $3, $4, $5)', ['kept-before-the-rate-rules', item, 'a fifth', storeName, storeAddress]);
+
+      const response = await http.get('/discounts');
+
+      expect(publishedDiscountsResponse.safeParse(response.body).error).to.equal(undefined);
+      expect(response.body.map((discount: { rate: unknown }) => discount.rate)).to.deep.equal(['a fifth']);
+    });
   });
 });
