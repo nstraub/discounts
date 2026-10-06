@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 
 import type { Locator, Page } from 'playwright';
 
+import type { PlaywrightWorld } from './playwright-world';
+
 type ExampleDiscount = { item: string; rate: string; storeName: string; storeAddress: string };
 
 export class DiscountsPage {
@@ -82,3 +84,9 @@ export class DiscountsPage {
     return shown;
   }
 }
+
+export const openSomeoneElsesDiscountsPage = async (world: PlaywrightWorld): Promise<DiscountsPage> => {
+  const discountsPage = new DiscountsPage(await world.openSomeoneElsesPage());
+  await discountsPage.open();
+  return discountsPage;
+};

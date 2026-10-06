@@ -1,6 +1,6 @@
 import { Then, When } from '@cucumber/cucumber';
 
-import { DiscountsPage } from '../../support/discounts-page';
+import { DiscountsPage, openSomeoneElsesDiscountsPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
 
 const spicesDiscount = {
@@ -17,7 +17,6 @@ When('Mike publishes a discount on an item', async function (this: PlaywrightWor
 });
 
 Then('people can see it immediately', async function (this: PlaywrightWorld) {
-  const peoplesPage = new DiscountsPage(await this.openSomeoneElsesPage());
-  await peoplesPage.open();
+  const peoplesPage = await openSomeoneElsesDiscountsPage(this);
   await peoplesPage.verifyShows(spicesDiscount);
 });

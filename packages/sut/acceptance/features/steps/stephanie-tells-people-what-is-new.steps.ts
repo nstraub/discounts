@@ -1,6 +1,6 @@
 import { Given, Then } from '@cucumber/cucumber';
 
-import { DiscountsPage } from '../../support/discounts-page';
+import { DiscountsPage, openSomeoneElsesDiscountsPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
 
 const stephaniesProduceDiscount = { item: 'Organic produce', rate: '15', storeName: "Stephanie's Market", storeAddress: '8 Orchard Lane' };
@@ -8,8 +8,7 @@ const stephaniesProduceDiscount = { item: 'Organic produce', rate: '15', storeNa
 const newSupplier = 'Our produce now comes from a new supplier';
 
 Given('Stephanie has published a discount on produce', async function (this: PlaywrightWorld) {
-  const stephaniesPage = new DiscountsPage(await this.openSomeoneElsesPage());
-  await stephaniesPage.open();
+  const stephaniesPage = await openSomeoneElsesDiscountsPage(this);
   await stephaniesPage.publishWithItsHook(stephaniesProduceDiscount, newSupplier);
   this.publishedDiscount = stephaniesProduceDiscount;
 });

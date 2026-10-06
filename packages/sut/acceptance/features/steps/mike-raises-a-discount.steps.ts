@@ -2,7 +2,7 @@ import { Given, Then, When } from '@cucumber/cucumber';
 
 import { spicesDiscount } from '@sut/support/example-discounts';
 
-import { DiscountsPage } from '../../support/discounts-page';
+import { DiscountsPage, openSomeoneElsesDiscountsPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
 
 const raisedRate = '30';
@@ -29,7 +29,6 @@ When('he lowers its rate', async function (this: PlaywrightWorld) {
 });
 
 Then('people can see the new rate immediately', async function (this: PlaywrightWorld) {
-  const peoplesPage = new DiscountsPage(await this.openSomeoneElsesPage());
-  await peoplesPage.open();
+  const peoplesPage = await openSomeoneElsesDiscountsPage(this);
   await peoplesPage.verifyShowsOnceAtTheRate(spicesDiscount, this.newRate);
 });
