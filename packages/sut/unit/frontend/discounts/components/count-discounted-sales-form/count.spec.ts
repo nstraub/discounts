@@ -25,7 +25,7 @@ const mikesSpicesCounted = { id: 'spices-id', item: spicesDiscount.item, rate: s
 const whatTheCountShowsFor = (form: VueWrapper, testId: string) => form.findAll(`[data-testid="${testId}"]`).map((shown) => shown.text());
 
 const theNumbersCountedUnderTheirCaptions = (form: VueWrapper) =>
-  form.findAll('[data-testid="counted-sales"]').map((number) => ({ caption: number.element.previousElementSibling?.textContent?.trim(), number: number.text() }));
+  form.findAll('[data-testid="counted-sales"]').map((number) => `${number.element.previousElementSibling?.textContent?.trim()} ${number.text()}`);
 
 const countThroughTheForm = async (form: VueWrapper, storeShown: string): Promise<void> => {
   const picker = form.get<HTMLSelectElement>('select');
@@ -83,7 +83,7 @@ describe('Component CountDiscountedSalesForm', () => {
 
       await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
 
-      expect(theNumbersCountedUnderTheirCaptions(form), 'the numbers counted').to.deep.equal([{ caption: discountTexts.discountedSales, number: '2' }]);
+      expect(theNumbersCountedUnderTheirCaptions(form), 'the numbers counted').to.deep.equal([`${discountTexts.discountedSales} 2`]);
     });
 
     describe('state', () => {
