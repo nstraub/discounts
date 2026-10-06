@@ -7,6 +7,7 @@ import { longTextInAnyCharacters, spicesDiscount, theStoreOf } from '@sut/suppor
 import { type Http, setupSut } from '../support/app';
 import { answersInTurnToBodiesThatAreNotObjects, statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
+import { redeemAtTheStoreOf } from '../support/redemptions';
 
 type ExampleDiscount = typeof spicesDiscount;
 
@@ -171,6 +172,15 @@ describe('POST /stores/counts', () => {
     it.todo('should answer 503 with a body matching the error schema when the store\'s discounts cannot be counted, restarting nothing');
   });
   describe('a coupon used twice', () => {
-    it.todo('should count once a coupon whose second use was refused');
+    it('should count once a coupon whose second use was refused', async () => {
+      const { http, published, code } = await setupSutWithACouponUsedFor();
+      await redeemAtTheStoreOf(http, code);
+
+      const response = await countTheStoreOf(http);
+
+      expect(response.body, 'the discounted sales of the coupon used twice').to.deep.equal([
+        { id: published.id, item: spicesDiscount.item, rate: spicesDiscount.rate, discountedSales: 1 },
+      ]);
+    });
   });
 });
