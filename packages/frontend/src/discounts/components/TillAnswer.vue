@@ -8,14 +8,14 @@ const discounts = useDiscountsStore();
 </script>
 
 <template>
-  <DiscountApplies
-    v-if="discounts.redemption"
-    :redemption="discounts.redemption"
-  />
   <p
     v-if="discounts.couponAlreadyUsed"
     role="status"
   >
     {{ discountTexts.couponAlreadyUsed }}
   </p>
+  <DiscountApplies
+    v-else-if="discounts.redemption"
+    :redemption="discounts.redemption"
+  />
 </template>
