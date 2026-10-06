@@ -50,6 +50,13 @@ describe('Component ChangeRateForm', () => {
 
         expect(vi.mocked(discounts.changeRate).mock.lastCall?.[1].rate).to.equal(undefined);
       });
+      it('should change to a rate of nothing but spaces as left out, like a blank one', async () => {
+        const { form, discounts } = setupSut();
+
+        await changeThroughTheForm(form, '   ');
+
+        expect(vi.mocked(discounts.changeRate).mock.lastCall?.[1].rate).to.equal(undefined);
+      });
     });
   });
 });

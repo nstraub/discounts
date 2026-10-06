@@ -10,7 +10,7 @@ export const discountToPublish = ({ rate, ...others }: ReturnType<typeof nothing
 };
 
 export const changeToMake = (newRate: string): Partial<ChangeRateRequest> => {
-  if (newRate === '') {
+  if (newRate.trim() === '') {
     return {};
   }
   return { rate: newRate };
