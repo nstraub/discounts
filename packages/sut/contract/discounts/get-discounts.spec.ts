@@ -85,6 +85,13 @@ describe('GET /discounts', () => {
 
       expect(response.body.map((discount: { hook: unknown }) => discount.hook)).to.deep.equal([spicesDiscountWithItsHook.hook]);
     });
-    it.todo('should list a discount published without a hook with no hook');
+    it('should list a discount published without a hook with no hook', async () => {
+      const { http } = await setupSut();
+      await http.post('/discounts').send(spicesDiscount);
+
+      const response = await http.get('/discounts');
+
+      expect(response.body.at(0)).to.not.have.property('hook');
+    });
   });
 });
