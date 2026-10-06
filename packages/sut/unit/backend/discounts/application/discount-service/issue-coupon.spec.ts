@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { CouponIssued } from '@backend/discounts/application/domain/coupon-issued';
+
 import { aServiceOverTheKeptSpicesDiscount } from './a-service-over-the-kept-spices-discount';
 
 const setupSut = aServiceOverTheKeptSpicesDiscount;
@@ -13,7 +15,13 @@ describe('class DiscountService', () => {
 
       expect(repository.save.mock.lastCall?.at(0)?.toJSON()).to.deep.include({ id: 'spices-id', coupons: ['7K3QX9M2PD'] });
     });
-    it.todo('should announce CouponIssued once the coupon is kept');
+    it('should announce CouponIssued for the coupon the discount named issues', async () => {
+      const { events, service } = setupSut();
+
+      await service.issueCoupon('spices-id');
+
+      expect(events.publish).to.have.been.calledWith(new CouponIssued('spices-id', '7K3QX9M2PD'));
+    });
     it.todo('should answer with the coupon\'s token and the store it is for');
 
     describe('state', () => {
