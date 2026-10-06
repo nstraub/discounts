@@ -40,7 +40,8 @@ export class DiscountDrizzleRepository implements DiscountRepository {
 
   async withId(id: string): Promise<Discount | undefined> {
     const rows = await this.database.select(theColumnsOfADiscount).from(discounts).where(eq(discounts.id, id));
-    return rows.map((row) => this.rebuilt(row, [])).at(0);
+    const issued = await this.database.select({ token: coupons.token }).from(coupons).where(eq(coupons.discountId, id)).orderBy(coupons.id);
+    return rows.map((row) => this.rebuilt(row, issued.map((coupon) => coupon.token))).at(0);
   }
 
   private rebuilt(row: typeof discounts.$inferSelect, issued: string[]): Discount {
