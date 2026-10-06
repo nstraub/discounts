@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from './discounts-store-of-an-app';
 
@@ -29,6 +29,14 @@ describe('Store discounts', () => {
       await discounts.redeemCoupon({ code: '7K3QX9M2PD', storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
 
       expect(discounts.redemption).to.deep.equal({ item: 'Peruvian spices' });
+    });
+    it('should hold another item when the redemption answers with another', async () => {
+      const { restApi, discounts } = setupSut();
+      restApi.post.mockResolvedValue({ item: produceDiscount.item });
+
+      await discounts.redeemCoupon({ code: 'R4WZ0BH8NE', storeName: produceDiscount.storeName, storeAddress: produceDiscount.storeAddress });
+
+      expect(discounts.redemption).to.deep.equal({ item: 'Fresh produce' });
     });
 
     describe('dependency failure', () => {
