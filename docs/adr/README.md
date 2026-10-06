@@ -2,7 +2,8 @@
 
 A decision that chose between alternatives a later reader will ask about gets one record here. Copy
 `template.md` to `NNNN-decision-title.md` and add a row below. A decision with no alternative weighed
-gets none.
+gets none. A decision a later one replaces, in whole or in part, keeps its record: its status says
+which ADR supersedes it and what part.
 
 | ADR | Title | Status | Date |
 |-----|-------|--------|------|
@@ -13,4 +14,5 @@ gets none.
 | [0005](0005-coupons-are-entities-inside-the-discount-aggregate.md) | Coupons are entities inside the Discount aggregate, not an aggregate of their own | accepted | 2026-10-05 |
 | [0006](0006-one-transaction-per-discount-when-counting.md) | A count restarts each discount in its own transaction; a store's discounts become consistent eventually | accepted | 2026-10-05 |
 | [0007](0007-one-change-at-a-time-to-a-discount-with-a-row-lock.md) | A change to a discount runs in one transaction with the discount's row locked | accepted | 2026-10-06 |
-| [0008](0008-coupons-collection-and-discount-events-inside-the-aggregate.md) | Discount delegates coupon bookkeeping to a Coupons collection and event building to DiscountEvents, and keeps deciding | accepted | 2026-10-06 |
+| [0008](0008-coupons-collection-and-discount-events-inside-the-aggregate.md) | Discount delegates coupon bookkeeping to a Coupons collection and event building to DiscountEvents, and keeps deciding | accepted, in part superseded by 0009 | 2026-10-06 |
+| [0009](0009-each-entity-raises-its-own-events.md) | Each entity raises its own events; no class builds or publishes them for others | accepted | 2026-10-06 |

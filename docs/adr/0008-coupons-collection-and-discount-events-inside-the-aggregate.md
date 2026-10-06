@@ -1,7 +1,7 @@
 # ADR-0008: Discount delegates coupon bookkeeping and event building, and keeps deciding
 
 **Date**: 2026-10-06
-**Status**: accepted
+**Status**: accepted; the `DiscountEvents` decision and Alternative 1 are superseded by ADR-0009
 
 ## Context
 
