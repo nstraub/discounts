@@ -9,7 +9,7 @@ export class DiscountChanges {
   constructor(private readonly repository: DiscountRepository) {}
 
   async toTheOneWithId<Answer>(id: string, change: Change<Answer>): Promise<Answer> {
-    return this.keptAfter((await this.repository.withId(id))!, change);
+    return this.repository.changing(async (repository) => this.keptThrough(repository, (await repository.withId(id))!, change));
   }
 
   async toTheOneThatIssued<Answer>(token: CouponToken, change: Change<Answer>): Promise<Answer> {

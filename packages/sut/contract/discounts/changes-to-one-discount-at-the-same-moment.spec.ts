@@ -48,6 +48,22 @@ describe('changes to one discount at the same moment', () => {
         codes.map(() => ({ rateChanged: true, redemptionKept: true })),
       );
     });
+    it('should keep a change of a discount\'s rate made while coupons are issued for it at the same moment', async () => {
+      const { http, published } = await setupSutWithACouponFor();
+      const races = Array.from({ length: timesTheRaceIsRun }, (_, race) => String(race + 30));
+      const issueOne = () => issueACouponFor(http, published);
+
+      const keptAfterEachRace = await oneRaceAfterAnother(races, async (rate) => {
+        const [first, second, , third, fourth] = await Promise.all([issueOne(), issueOne(), changeTheRateOf(http, published, rate), issueOne(), issueOne()]);
+        const [listed] = (await http.get('/discounts')).body;
+        const used = await Promise.all([first, second, third, fourth].map((issued) => redeemAtTheStoreOf(http, issued)));
+        return { rateChanged: listed.rate === rate, statusesUsingTheIssued: used.map((response) => response.status) };
+      });
+
+      expect(keptAfterEachRace, 'the rate and the coupons issued kept after each race').to.deep.equal(
+        races.map(() => ({ rateChanged: true, statusesUsingTheIssued: [201, 201, 201, 201] })),
+      );
+    });
     it('should answer each of the changes as it would alone, never refusing one for a change kept meanwhile', async () => {
       const { http, published, codes } = await setupSutWithACouponForEachRace();
 
