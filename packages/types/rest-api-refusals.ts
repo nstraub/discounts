@@ -1,3 +1,5 @@
+import { requestRejection } from '@app/types/request-rejection';
+
 const badRequest = 400;
 
 const unprocessableContent = 422;
@@ -15,10 +17,10 @@ export class BadRequestException extends RestApiException {
   }
 }
 
-export const refuseANotOkAnswer = (request: string, response: Response): void => {
+export const refuseANotOkAnswer = async (request: string, response: Response): Promise<void> => {
   const answered = `${request} answered ${response.status}`;
   if (response.status === badRequest) {
-    throw new BadRequestException(answered, ['item']);
+    throw new BadRequestException(answered, requestRejection.parse(await response.json()).missing ?? []);
   }
   if (response.status === unprocessableContent) {
     throw new UnprocessableContentException(answered);

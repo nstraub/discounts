@@ -78,6 +78,13 @@ describe('class FetchRestApi', () => {
       expect(refusal).to.be.instanceOf(BadRequestException);
       expect(refusal).to.deep.include({ missing: ['item'] });
     });
+    it('should carry other fields when a 400 lists others as missing', async () => {
+      const { restApi } = await setupSut();
+
+      const refusal = await refusalOf(restApi.post('/discounts', { ...spicesDiscount, storeName: '', storeAddress: '' }));
+
+      expect(refusal).to.deep.include({ missing: ['storeName', 'storeAddress'] });
+    });
   });
 
   describe('getting', () => {
