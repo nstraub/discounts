@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import type { ChangeRateRequest, CountRequest, CountResponse, CouponResponse, DiscountResponse, PublishDiscountRequest, RedemptionRequest, RedemptionResponse } from '@app/types/discounts';
+import type { ChangeRateRequest, CountRequest, CountResponse, CouponResponse, DiscountResponse, PublishDiscountRequest } from '@app/types/discounts';
 
 import { useRestApi } from '../rest-api-key';
 
@@ -15,8 +15,6 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const restApi = useRestApi();
   const published = ref<DiscountResponse[]>([]);
   const coupon = ref<CouponResponse>();
-  const redemption = ref<RedemptionResponse>();
-  const couponAlreadyUsed = ref(false);
   const rateNotValid = ref(false);
   const counted = ref<CountResponse>();
   const stores = computed(() => theDistinctStoresPublishing(published.value));
@@ -38,16 +36,8 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const getCoupon = async (id: string): Promise<void> => {
     coupon.value = await restApi.post<CouponResponse>(`/discounts/${id}/coupons`, {});
   };
-  const redeemCoupon = async (request: RedemptionRequest): Promise<void> => {
-    try {
-      redemption.value = await restApi.post<RedemptionResponse>('/redemptions', request);
-      couponAlreadyUsed.value = false;
-    } catch {
-      couponAlreadyUsed.value = true;
-    }
-  };
   const countDiscountedSales = async (store: CountRequest): Promise<void> => {
     counted.value = await restApi.post<CountResponse>('/stores/counts', store);
   };
-  return { published, stores, coupon, publish, rateNotValid, load, changeRate, getCoupon, redemption, couponAlreadyUsed, redeemCoupon, counted, countDiscountedSales };
+  return { published, stores, coupon, publish, rateNotValid, load, changeRate, getCoupon, counted, countDiscountedSales };
 });

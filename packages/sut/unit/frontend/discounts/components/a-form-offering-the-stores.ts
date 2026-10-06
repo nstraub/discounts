@@ -4,6 +4,7 @@ import { onTestFinished } from 'vitest';
 import type { Component } from 'vue';
 
 import { useDiscountsStore } from '@frontend/stores/discounts-store';
+import { useTillStore } from '@frontend/stores/till-store';
 import { type spicesDiscount, theStoreOf } from '@sut/support/example-discounts';
 import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
@@ -11,7 +12,7 @@ export const aFormOfferingTheStores = (form: Component, stores: ReadonlyArray<{ 
   const { pinia, global } = aTestingDiscountsStore();
   const mounted = mount(form, { attachTo: document.body, props: { stores }, global });
   onTestFinished(() => mounted.unmount());
-  return { form: mounted, discounts: useDiscountsStore(pinia) };
+  return { form: mounted, discounts: useDiscountsStore(pinia), till: useTillStore(pinia) };
 };
 
 export const aFormOfferingTheStoresOf = (form: Component, discounts: ReadonlyArray<typeof spicesDiscount>) => aFormOfferingTheStores(form, discounts.map(theStoreOf));

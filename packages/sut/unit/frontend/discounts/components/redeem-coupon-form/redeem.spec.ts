@@ -12,8 +12,8 @@ const setupSut = () => aFormOfferingTheStoresOf(RedeemCouponForm, [spicesDiscoun
 
 const setupSutRedeemingTo = (item: string) => {
   const sut = setupSut();
-  vi.mocked(sut.discounts.redeemCoupon).mockImplementation(async () => {
-    sut.discounts.redemption = { item };
+  vi.mocked(sut.till.redeemCoupon).mockImplementation(async () => {
+    sut.till.redemption = { item };
   });
   return sut;
 };
@@ -31,18 +31,18 @@ const whatTheTillTells = () => queryAllByRole(document.body, 'status').map((told
 describe('Component RedeemCouponForm', () => {
   describe('redeeming the coupon Sue shows', () => {
     it('should redeem the code as typed at the store picked', async () => {
-      const { form, discounts } = setupSut();
+      const { form, till } = setupSut();
 
       await redeemThroughTheForm(form, "Mike's Groceries, 12 Market Street", '7k3qx 9m2pd');
 
-      expect(discounts.redeemCoupon).to.have.been.calledWith({ code: '7k3qx 9m2pd', storeName: "Mike's Groceries", storeAddress: '12 Market Street' });
+      expect(till.redeemCoupon).to.have.been.calledWith({ code: '7k3qx 9m2pd', storeName: "Mike's Groceries", storeAddress: '12 Market Street' });
     });
     it('should redeem at another store when Stephanie picks another', async () => {
-      const { form, discounts } = setupSut();
+      const { form, till } = setupSut();
 
       await redeemThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane", 'R4WZ0-BH8NE');
 
-      expect(discounts.redeemCoupon).to.have.been.calledWith({ code: 'R4WZ0-BH8NE', storeName: "Stephanie's Market", storeAddress: '8 Orchard Lane' });
+      expect(till.redeemCoupon).to.have.been.calledWith({ code: 'R4WZ0-BH8NE', storeName: "Stephanie's Market", storeAddress: '8 Orchard Lane' });
     });
     it('should say the discount applies once the coupon is redeemed', async () => {
       const { form } = setupSutRedeemingTo(spicesDiscount.item);
@@ -86,8 +86,8 @@ describe('Component RedeemCouponForm', () => {
   describe('a coupon already used', () => {
     it('should tell Stephanie the coupon has already been used', async () => {
       const sut = setupSut();
-      vi.mocked(sut.discounts.redeemCoupon).mockImplementation(async () => {
-        sut.discounts.couponAlreadyUsed = true;
+      vi.mocked(sut.till.redeemCoupon).mockImplementation(async () => {
+        sut.till.couponAlreadyUsed = true;
       });
 
       await redeemThroughTheForm(sut.form, "Mike's Groceries, 12 Market Street", '7k3qx 9m2pd');
@@ -96,9 +96,9 @@ describe('Component RedeemCouponForm', () => {
     });
     it('should not say the discount applies when the coupon has already been used', async () => {
       const sut = setupSut();
-      sut.discounts.redemption = { item: spicesDiscount.item };
-      vi.mocked(sut.discounts.redeemCoupon).mockImplementation(async () => {
-        sut.discounts.couponAlreadyUsed = true;
+      sut.till.redemption = { item: spicesDiscount.item };
+      vi.mocked(sut.till.redeemCoupon).mockImplementation(async () => {
+        sut.till.couponAlreadyUsed = true;
       });
 
       await redeemThroughTheForm(sut.form, "Mike's Groceries, 12 Market Street", '7k3qx 9m2pd');

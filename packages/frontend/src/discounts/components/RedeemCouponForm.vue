@@ -3,7 +3,7 @@ import { ref } from 'vue';
 
 import type { Store } from '@app/types/discounts';
 
-import { useDiscountsStore } from '../../stores/discounts-store';
+import { useTillStore } from '../../stores/till-store';
 import { discountTexts } from '../texts';
 
 import CaptionedInput from './CaptionedInput.vue';
@@ -12,14 +12,14 @@ import TillAnswer from './TillAnswer.vue';
 
 defineProps<{ stores: Store[] }>();
 
-const discounts = useDiscountsStore();
+const till = useTillStore();
 const picked = ref<Store>();
 const code = ref('');
 
 const theStoreTheRequiredPickerHolds = (): Store => picked.value!;
 
 const redeem = async (): Promise<void> => {
-  await discounts.redeemCoupon({ code: code.value, ...theStoreTheRequiredPickerHolds() });
+  await till.redeemCoupon({ code: code.value, ...theStoreTheRequiredPickerHolds() });
 };
 </script>
 
