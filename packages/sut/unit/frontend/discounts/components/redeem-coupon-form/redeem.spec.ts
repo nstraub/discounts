@@ -34,6 +34,8 @@ const redeemThroughTheForm = async (form: VueWrapper, storeShown: string, code: 
   await form.get('form').trigger('submit');
 };
 
+const noStorePicked = '';
+
 const whatTheTillTells = () => queryAllByRole(document.body, 'status').map((told) => told.textContent).join(' ');
 
 describe('Component RedeemCouponForm', () => {
@@ -80,7 +82,14 @@ describe('Component RedeemCouponForm', () => {
 
         expect(whatTheTillTells(), 'what the till tells').to.equal('');
       });
-      it.todo('should tell Stephanie to say which store she is at when none is picked, redeeming nothing');
+      it('should tell Stephanie to say which store she is at when none is picked, redeeming nothing', async () => {
+        const { form, till } = setupSut();
+
+        await redeemThroughTheForm(form, noStorePicked, '7k3qx 9m2pd');
+
+        expect(whatTheTillTells(), 'what the till tells').to.contain(discountTexts.sayWhichStoreYouAreAt);
+        expect(vi.mocked(till.redeemCoupon).mock.calls, 'the redemptions asked for').to.deep.equal([]);
+      });
     });
 
     describe('dependency failure', () => {

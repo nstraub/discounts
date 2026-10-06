@@ -16,6 +16,7 @@ export const discountTexts = {
   theDiscountAppliesTo: 'The discount applies to',
   couponAlreadyUsed: 'This coupon has already been used.',
   couponNotForYourStore: 'This coupon is not for your store.',
+  sayWhichStoreYouAreAt: 'Say which store you are at.',
   rateNotValid: 'The rate must be above 0 % and at most 100 %, with at most one decimal.',
   store: 'Store',
   countDiscountedSales: 'Count discounted sales',

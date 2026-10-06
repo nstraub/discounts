@@ -16,10 +16,12 @@ const till = useTillStore();
 const picked = ref<Store>();
 const code = ref('');
 
-const theStoreTheRequiredPickerHolds = (): Store => picked.value!;
-
 const redeem = async (): Promise<void> => {
-  await till.redeemCoupon({ code: code.value, ...theStoreTheRequiredPickerHolds() });
+  if (!picked.value) {
+    till.told = discountTexts.sayWhichStoreYouAreAt;
+    return;
+  }
+  await till.redeemCoupon({ code: code.value, ...picked.value });
 };
 </script>
 
