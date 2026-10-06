@@ -71,6 +71,13 @@ describe('class Discount', () => {
     });
   });
   describe('changing the rate of a discount with a hook', () => {
-    it.todo('should keep its hook when its rate changes');
+    it('should keep its hook when its rate changes', () => {
+      const { factory } = setupSut();
+      const discount = factory.reconstitute({ id: 'spices-id', ...spicesDiscount, hook: 'Our spices now come from a new supplier' });
+
+      discount.changeRate('25');
+
+      expect(discount.toJSON().hook).to.equal('Our spices now come from a new supplier');
+    });
   });
 });
