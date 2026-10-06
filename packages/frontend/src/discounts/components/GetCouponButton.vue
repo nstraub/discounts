@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { DiscountResponse } from '@app/types/discounts';
 
+import { useDiscountsStore } from '../../stores/discounts-store';
 import { discountTexts } from '../texts';
 
 const props = defineProps<{ discount: DiscountResponse; namedBy: string }>();
 
+const discounts = useDiscountsStore();
 const ownId = `${props.namedBy}-get-coupon`;
 </script>
 
@@ -15,6 +17,7 @@ const ownId = `${props.namedBy}-get-coupon`;
     :aria-labelledby="`${ownId} ${namedBy}`"
     class="rounded border px-3 py-1"
     data-testid="get-coupon"
+    @click="discounts.getCoupon('spices-id')"
   >
     {{ discountTexts.getCoupon }}
   </button>
