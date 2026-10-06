@@ -26,6 +26,9 @@ const setupSutInTheDocument = ({ discounts = [publishedSpicesDiscount] } = {}) =
 const namingTheWholeOf = ({ item, rate, storeName, storeAddress }: DiscountResponse) => (name: string) =>
   [item, `${rate}%`, storeName, storeAddress].every((shown) => name.includes(shown));
 
+const gettingACouponFor = (discount: DiscountResponse) => (name: string) =>
+  name.startsWith(discountTexts.getCoupon) && namingTheWholeOf(discount)(name);
+
 describe('Component PublishedDiscounts', () => {
   describe('showing a published discount', () => {
     it('should show its item', () => {
@@ -162,6 +165,11 @@ describe('Component PublishedDiscounts', () => {
     it.todo('should show each entry with its own store address when two stores share a name');
   });
   describe('getting a coupon', () => {
-    it.todo('should offer to get a coupon on each entry');
+    it('should offer to get a coupon on each entry', () => {
+      setupSutInTheDocument({ discounts: [publishedSpicesDiscount, publishedProduceDiscount] });
+
+      expect(queryAllByRole(document.body, 'button', { name: gettingACouponFor(publishedSpicesDiscount) })).to.have.length(1);
+      expect(queryAllByRole(document.body, 'button', { name: gettingACouponFor(publishedProduceDiscount) })).to.have.length(1);
+    });
   });
 });
