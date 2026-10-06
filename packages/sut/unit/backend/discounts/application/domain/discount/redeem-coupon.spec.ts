@@ -133,7 +133,11 @@ describe('class Discount', () => {
     });
 
     describe('combination', () => {
-      it.todo('should refuse a coupon already used, tried at another store, as not for that store');
+      it('should refuse a coupon already used, tried at another store, as not for that store', () => {
+        const discount = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: true, counted: false }] });
+
+        expect(tryingItsCouponAt(atStephaniesStore, discount)).to.throw(CouponNotForThisStoreException);
+      });
     });
   });
 });
