@@ -1,5 +1,7 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
+import type { CouponRedemptionRejected } from '@backend/discounts/application/domain/coupon-redemption-rejected';
 import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
 import { theDiscountsKept, theRowKeptFor } from '../support/discounts-table';
@@ -25,7 +27,15 @@ describe('POST /redemptions at a store the coupon is not for', () => {
       expect(kept.rows, 'the coupon kept').to.deep.equal([{ redeemed: false, counted: false }]);
       expect(await theDiscountsKept(client), 'the discount kept').to.deep.equal([theRowKeptFor(published, spicesDiscount)]);
     });
-    it.todo('should publish CouponRedemptionRejected on the application event emitter for the coupon refused at another store');
+    it('should publish CouponRedemptionRejected on the application event emitter for the coupon refused at another store', async () => {
+      const { app, http, published, code } = await setupSutWithACouponFor();
+      const rejected: unknown[] = [];
+      app.get(EventEmitter2).on('coupon.redemption-rejected', ({ discountId, token, reason }: CouponRedemptionRejected) => rejected.push({ discountId, token, reason }));
+
+      await redeemAtTheStoreOf(http, code, stephaniesProduceDiscount);
+
+      expect(rejected, 'the redemptions rejected').to.deep.equal([{ discountId: published.id, token: code, reason: 'not for this store' }]);
+    });
     it.todo('should refuse a coupon at a store with the same name as its own at another address');
   });
 
