@@ -8,7 +8,7 @@ import type { Store } from '../application/domain/store.js';
 
 import { couponsIssuedBy, couponsIssuedByEachDiscount, idsOfTheDiscountsThatIssued, keepTheCouponsIssued } from './coupon-rows.js';
 import type { Database } from './database.module.js';
-import { theColumnsOfADiscount, withNoHookWhenNoneIsKept } from './discount-rows.js';
+import { rebuiltFrom, theColumnsOfADiscount } from './discount-rows.js';
 import { discounts } from './schema.js';
 
 export class DiscountDrizzleRepository implements DiscountRepository {
@@ -30,7 +30,7 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   async withId(id: string): Promise<Discount | undefined> {
     const rows = await this.keptDiscounts().where(eq(discounts.id, id));
     const issued = await couponsIssuedBy(this.database, id);
-    return rows.map((row) => this.rebuilt(row, issued)).at(0);
+    return rows.map((row) => rebuiltFrom(this.factory, row, issued)).at(0);
   }
 
   async withCouponToken(token: CouponToken): Promise<Discount | undefined> {
@@ -50,10 +50,6 @@ export class DiscountDrizzleRepository implements DiscountRepository {
 
   private async rebuiltWithTheirCoupons(rows: (typeof discounts.$inferSelect)[]): Promise<Discount[]> {
     const issued = await couponsIssuedByEachDiscount(this.database, rows.map((row) => row.id));
-    return rows.map((row) => this.rebuilt(row, issued.get(row.id) ?? []));
-  }
-
-  private rebuilt(row: typeof discounts.$inferSelect, issued: ReturnType<Discount['toJSON']>['coupons']): Discount {
-    return this.factory.reconstitute({ ...withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) }), coupons: issued });
+    return rows.map((row) => rebuiltFrom(this.factory, row, issued.get(row.id) ?? []));
   }
 }
