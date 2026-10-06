@@ -5,7 +5,7 @@ import { useDiscountsStore } from '../../stores/discounts-store';
 import { discountTexts } from '../texts';
 import { discountToPublish, nothingTyped } from '../typed-discount';
 
-import CaptionedInput from './CaptionedInput.vue';
+import TypedDiscountFields from './TypedDiscountFields.vue';
 
 const discounts = useDiscountsStore();
 const discount = ref(nothingTyped());
@@ -19,30 +19,9 @@ const publish = async (): Promise<void> => {
 
 <template>
   <form @submit.prevent="publish">
-    <CaptionedInput
-      v-model="discount.item"
-      :caption="discountTexts.item"
-      test-id="discount-item"
-    />
-    <CaptionedInput
-      v-model="discount.rate"
-      :caption="discountTexts.rate"
-      test-id="discount-rate"
-    />
-    <CaptionedInput
-      v-model="discount.storeName"
-      :caption="discountTexts.storeName"
-      test-id="discount-store-name"
-    />
-    <CaptionedInput
-      v-model="discount.storeAddress"
-      :caption="discountTexts.storeAddress"
-      test-id="discount-store-address"
-    />
-    <CaptionedInput
-      v-model="hook"
-      :caption="discountTexts.hook"
-      test-id="discount-hook"
+    <TypedDiscountFields
+      v-model="discount"
+      v-model:hook="hook"
     />
     <button
       type="submit"
