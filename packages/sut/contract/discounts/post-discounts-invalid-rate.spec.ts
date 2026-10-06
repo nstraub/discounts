@@ -1,12 +1,11 @@
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
-import type { DiscountPublicationRejected } from '@backend/discounts/application/domain/discount-publication-rejected';
 import { requestRejection } from '@app/types/request-rejection';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
+import { publicationRejectionsHeardBy } from '../support/publication-rejections';
 
 type Http = Awaited<ReturnType<typeof setupSut>>['http'];
 
@@ -46,17 +45,15 @@ describe('POST /discounts with a rate that is not valid', () => {
     });
     it('should publish DiscountPublicationRejected on the application event emitter for the rate refused', async () => {
       const { app, http } = await setupSut();
-      const rejected: unknown[] = [];
-      app.get(EventEmitter2).on('discount.publication-rejected', ({ rate, reason }: DiscountPublicationRejected) => rejected.push({ rate, reason }));
+      const rejected = publicationRejectionsHeardBy(app);
 
       await publishAtTheRate(http, aRateAbove100);
 
-      expect(rejected).to.deep.equal([{ rate: aRateAbove100, reason: 'not valid' }]);
+      expect(rejected.map(({ rate, reason }) => ({ rate, reason }))).to.deep.equal([{ rate: aRateAbove100, reason: 'not valid' }]);
     });
     it('should publish no DiscountPublicationRejected when the request schema refuses the body before any rule decides', async () => {
       const { app, http } = await setupSut();
-      const rejected: unknown[] = [];
-      app.get(EventEmitter2).on('discount.publication-rejected', (event: DiscountPublicationRejected) => rejected.push(event));
+      const rejected = publicationRejectionsHeardBy(app);
 
       await http.post('/discounts').send({ ...spicesDiscount, rate: Number(aRateAbove100) });
 
