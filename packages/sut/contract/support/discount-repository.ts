@@ -2,6 +2,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import type pg from 'pg';
 import { mock } from 'vitest-mock-extended';
 
+import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
@@ -18,8 +19,14 @@ export const discountRepositoryOn = (client: pg.Client, databaseUrl: string) => 
     await repository.save(discount);
     return discount;
   };
+  const keepWithCouponsIssued = async (details: ConstructorParameters<typeof DiscountDetails>[0], tokens: string[]) => {
+    const discount = await keep(details);
+    tokens.forEach((token) => discount.issueCoupon(CouponToken.keptAs(token)));
+    await repository.save(discount);
+    return discount;
+  };
   const loadOnItsOwnConnection = async () => new DiscountDrizzleRepository(drizzle(await connectToTestDatabase(databaseUrl)), factory).all();
-  return { client, factory, repository, keep, loadOnItsOwnConnection };
+  return { client, factory, repository, keep, keepWithCouponsIssued, loadOnItsOwnConnection };
 };
 
 export const setupSut = async () => {
