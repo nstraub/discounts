@@ -112,7 +112,13 @@ describe('Component PublishDiscountForm', () => {
 
       expect(discounts.publish).to.have.been.calledWith(spicesDiscountWithItsHook);
     });
-    it.todo('should publish no hook when the hook is left empty');
+    it('should publish no hook when the hook is left empty', async () => {
+      const { form, discounts } = setupSut();
+
+      await publishThroughTheForm(form, spicesDiscount);
+
+      expect(vi.mocked(discounts.publish).mock.lastCall?.at(0)).to.not.have.property('hook');
+    });
     it.todo('should clear the hook once the discount is published');
 
     describe('empty', () => {
