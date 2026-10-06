@@ -10,7 +10,7 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 const setupSut = () => {
   const events = mock<DomainEventPublisher>();
   const factory = new DiscountFactory(events);
-  return { events, discountWith: (details: typeof spicesDiscount) => factory.create(new DiscountDetails(details)) };
+  return { events, discountWith: (details: ConstructorParameters<typeof DiscountDetails>[0]) => factory.create(new DiscountDetails(details)) };
 };
 
 describe('class Discount', () => {
@@ -42,7 +42,15 @@ describe('class Discount', () => {
   });
   describe('publishing a discount with a hook', () => {
     describe('the discount published', () => {
-      it.todo('should raise DiscountPublished carrying its hook');
+      it('should raise DiscountPublished carrying its hook', () => {
+        const { events, discountWith } = setupSut();
+        const discount = discountWith({ ...spicesDiscount, hook: 'Our spices now come from a new supplier' });
+
+        discount.publish();
+
+        const [published] = events.publish.mock.lastCall ?? [];
+        expect((published as DiscountPublished).discount.hook).to.equal('Our spices now come from a new supplier');
+      });
       it.todo('should raise DiscountPublished carrying no hook when it has none');
     });
 
