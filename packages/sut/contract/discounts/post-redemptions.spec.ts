@@ -121,12 +121,14 @@ describe('POST /redemptions', () => {
       expect(response.status).to.equal(400);
     });
     it('should answer every error with a body matching the error schema', async () => {
-      const { http } = await setupSut();
+      const { http, code } = await setupSutWithACouponFor();
+      await redeemAtTheStoreOf(http, code);
       const errors = [
         await http.post('/redemptions').send({}),
         await redeemAtTheStoreOf(http, 1234567890 as unknown as string),
         ...(await answersInTurnToBodiesThatAreNotObjects((body) => redeemWrittenAsJson(http, body))),
         await redeemWrittenAsJson(http, '{"code": "7K3QX9M2PD",'),
+        await redeemAtTheStoreOf(http, code),
       ];
 
       expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
@@ -163,7 +165,15 @@ describe('POST /redemptions', () => {
     it.todo('should answer with the rate the coupon applies at');
   });
   describe('a coupon already used', () => {
-    it.todo('should answer 409 with a body matching the error schema when the coupon has already been used');
+    it('should answer 409 with a body matching the error schema when the coupon has already been used', async () => {
+      const { http, code } = await setupSutWithACouponFor();
+      await redeemAtTheStoreOf(http, code);
+
+      const response = await redeemAtTheStoreOf(http, code);
+
+      expect(response.status).to.equal(409);
+      expect(bodiesNotMatchingTheErrorSchema([response])).to.deep.equal([]);
+    });
     it.todo('should keep the coupon used once, its discount and its other coupons as they were');
     it.todo('should publish CouponRedemptionRejected on the application event emitter for the coupon already used');
     it.todo('should refuse a used coupon whose code is sent in lower case, in two groups, the second time');
