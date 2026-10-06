@@ -10,7 +10,7 @@ describe('PATCH /discounts/:id', () => {
       const { http } = await setupSut();
       const published = await http.post('/discounts').send(spicesDiscount);
 
-      const response = await http.patch(published.headers.location).send({ rate: '25' });
+      const response = await http.patch(`/discounts/${published.body.id}`).send({ rate: '25' });
 
       expect(response.status).to.equal(204);
       expect(response.text).to.equal('');
