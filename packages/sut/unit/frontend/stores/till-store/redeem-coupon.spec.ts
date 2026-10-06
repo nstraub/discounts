@@ -104,4 +104,13 @@ describe('Store till', () => {
       expect(till.told, 'what the till tells').not.to.equal(discountTexts.couponNotForYourStore);
     });
   });
+  describe('redeeming with no store said', () => {
+    it('should hold that Stephanie is to say which store she is at', () => {
+      const { till } = setupSut();
+
+      till.noStoreSaid();
+
+      expect(till.told, 'what the till tells').to.equal(discountTexts.sayWhichStoreYouAreAt);
+    });
+  });
 });

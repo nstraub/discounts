@@ -18,5 +18,8 @@ export const useTillStore = defineStore('till', () => {
       told.value = refusal instanceof UnprocessableContentException ? discountTexts.couponNotForYourStore : discountTexts.couponAlreadyUsed;
     }
   };
-  return { told, redeemCoupon };
+  const noStoreSaid = (): void => {
+    told.value = discountTexts.sayWhichStoreYouAreAt;
+  };
+  return { told, redeemCoupon, noStoreSaid };
 });

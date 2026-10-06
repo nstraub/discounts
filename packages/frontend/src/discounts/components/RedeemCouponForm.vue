@@ -18,7 +18,7 @@ const code = ref('');
 
 const redeem = async (): Promise<void> => {
   if (!picked.value) {
-    till.told = discountTexts.sayWhichStoreYouAreAt;
+    till.noStoreSaid();
     return;
   }
   await till.redeemCoupon({ code: code.value, ...picked.value });

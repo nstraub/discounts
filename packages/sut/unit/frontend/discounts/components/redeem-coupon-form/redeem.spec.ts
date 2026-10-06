@@ -84,6 +84,9 @@ describe('Component RedeemCouponForm', () => {
       });
       it('should tell Stephanie to say which store she is at when none is picked, redeeming nothing', async () => {
         const { form, till } = setupSut();
+        vi.mocked(till.noStoreSaid).mockImplementation(() => {
+          till.told = discountTexts.sayWhichStoreYouAreAt;
+        });
 
         await redeemThroughTheForm(form, noStorePicked, '7k3qx 9m2pd');
 
