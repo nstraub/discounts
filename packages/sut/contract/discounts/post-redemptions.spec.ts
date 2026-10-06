@@ -1,8 +1,8 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
-import { redemptionResponse, requestRejection } from '@app/types/discounts';
-import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
+import { redemptionRequest, redemptionResponse, requestRejection } from '@app/types/discounts';
+import { longTextInAnyCharacters, produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
 import { answersInTurnToBodiesThatAreNotObjects, statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
@@ -76,7 +76,15 @@ describe('POST /redemptions', () => {
   });
 
   describe('strictness', () => {
-    it.todo('should keep the redemption request schema no stricter than any text for a code and a store\'s name and address');
+    it('should keep the redemption request schema no stricter than any text for a code and a store\'s name and address', async () => {
+      const { http, code } = await setupSutWithACouponFor();
+      const atAStoreInAnyText = { storeName: longTextInAnyCharacters.storeName, storeAddress: longTextInAnyCharacters.storeAddress };
+
+      const response = await http.post('/redemptions').send({ code, ...atAStoreInAnyText });
+
+      expect(response.status).to.equal(201);
+      expect(redemptionRequest.safeParse({ code: longTextInAnyCharacters.item, ...atAStoreInAnyText }).error).to.equal(undefined);
+    });
     it.todo('should keep the redemption response schema no stricter than the item a discount has');
   });
 
