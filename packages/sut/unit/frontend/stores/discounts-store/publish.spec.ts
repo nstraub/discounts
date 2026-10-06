@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
+import { BadRequestException } from '@app/types/rest-api-refusals';
 import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from './discounts-store-of-an-app';
+
+const aRefusalOfTheRate = new BadRequestException('POST /discounts answered 400', []);
 
 describe('Store discounts', () => {
   describe('publishing a discount', () => {
@@ -35,7 +38,7 @@ describe('Store discounts', () => {
   describe('publishing a discount at a rate that is not valid', () => {
     it('should hold that the rate is not valid when the publish is refused for it', async () => {
       const { restApi, discounts } = setupSut();
-      restApi.post.mockRejectedValue(new Error('POST /discounts answered 400'));
+      restApi.post.mockRejectedValue(aRefusalOfTheRate);
 
       await discounts.publish({ ...spicesDiscount, rate: '150' });
 
@@ -43,7 +46,7 @@ describe('Store discounts', () => {
     });
     it('should no longer hold the rate as not valid once the next discount is published', async () => {
       const { restApi, discounts } = setupSut();
-      restApi.post.mockRejectedValueOnce(new Error('POST /discounts answered 400')).mockResolvedValueOnce(undefined);
+      restApi.post.mockRejectedValueOnce(aRefusalOfTheRate).mockResolvedValueOnce(undefined);
       await discounts.publish({ ...spicesDiscount, rate: '150' });
 
       await discounts.publish(spicesDiscount);
