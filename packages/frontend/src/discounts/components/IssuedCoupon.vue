@@ -3,6 +3,8 @@ import { computed } from 'vue';
 
 import type { CouponResponse } from '@app/types/discounts';
 
+import { discountTexts } from '../texts';
+
 const props = defineProps<{ coupon: CouponResponse }>();
 
 const charactersInAGroup = 5;
@@ -11,6 +13,9 @@ const code = computed(() => `${props.coupon.token.slice(0, charactersInAGroup)} 
 
 <template>
   <section data-testid="issued-coupon">
+    <p data-testid="coupon-store">
+      {{ discountTexts.yourCouponToUseAt }} Mike's Groceries
+    </p>
     <p data-testid="coupon-code">
       {{ code }}
     </p>

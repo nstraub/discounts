@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 
 import IssuedCoupon from '@frontend/discounts/components/IssuedCoupon.vue';
+import { discountTexts } from '@frontend/discounts/texts';
 import { couponForTheProduceDiscount, couponForTheSpicesDiscount } from '@sut/support/example-discounts';
 
 const setupSut = ({ coupon = couponForTheSpicesDiscount } = {}) => mount(IssuedCoupon, { props: { coupon } });
@@ -23,7 +24,11 @@ describe('Component IssuedCoupon', () => {
 
       expect(shown.get('[data-testid="coupon-code"]').text()).to.equal('R4WZ0 BH8NE');
     });
-    it.todo('should show the store it is for under its caption');
+    it('should show the store it is for under its caption', () => {
+      const shown = setupSut();
+
+      expect(shown.get('[data-testid="coupon-store"]').text()).to.equal(`${discountTexts.yourCouponToUseAt} ${couponForTheSpicesDiscount.storeName}`);
+    });
     it.todo('should show the address of its store and the item it is for');
   });
 });

@@ -8,5 +8,6 @@ export const discountTexts = {
   newRate: 'New rate (%)',
   changeRate: 'Change rate',
   getCoupon: 'Get a coupon',
+  yourCouponToUseAt: 'Your coupon, to use at',
   nothingPublished: 'No discount is published yet.',
 };
