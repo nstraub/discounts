@@ -78,3 +78,15 @@ Feature: Mike raises a discount that is not working
     When someone changes discounts far faster than any store owner would
     Then they are slowed down
     And people can still see every discount as it was before the flood
+
+  @wip
+  Scenario: Mike lowers a discount
+    Given Mike has published a discount on an item
+    When he lowers its rate
+    Then people can see the new rate immediately
+
+  @todo
+  Scenario: Mike lowers a discount to the lowest rate allowed
+    Given Mike has published a discount on an item
+    When he lowers its rate to the lowest rate allowed
+    Then people can see the new rate immediately
