@@ -50,14 +50,12 @@ Feature: Mike publishes a discount on what he is famous for
     When Mike publishes a discount on an item and his publishing arrives twice
     Then people can see it once
 
-  # Not built yet: the page showing a discount its publisher has just published without being
-  # loaded again.
   @todo
   Scenario: Mike sees the discount he has just published
     When Mike publishes a discount on an item
     Then he can see it without looking again
 
-  # An open risk: nothing yet limits how fast anyone can publish.
+  # Anyone can publish without an account, so nothing stands in the way of a flood but a limit on speed.
   @todo
   Scenario: Someone floods the page with discounts
     When someone publishes discounts far faster than any store owner would
