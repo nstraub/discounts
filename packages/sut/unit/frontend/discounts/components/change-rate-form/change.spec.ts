@@ -43,7 +43,13 @@ describe('Component ChangeRateForm', () => {
     });
 
     describe('empty', () => {
-      it.todo('should change to a blank rate as left out, never as a rate of zero');
+      it('should change to a blank rate as left out, never as a rate of zero', async () => {
+        const { form, discounts } = setupSut();
+
+        await changeThroughTheForm(form, '');
+
+        expect(vi.mocked(discounts.changeRate).mock.lastCall?.[1].rate).to.equal(undefined);
+      });
     });
   });
 });

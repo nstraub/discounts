@@ -14,6 +14,10 @@ const discounts = useDiscountsStore();
 const newRate = ref('');
 
 const changeRate = async (): Promise<void> => {
+  if (newRate.value === '') {
+    await discounts.changeRate(props.discount.id, {});
+    return;
+  }
   await discounts.changeRate(props.discount.id, { rate: newRate.value });
 };
 </script>
