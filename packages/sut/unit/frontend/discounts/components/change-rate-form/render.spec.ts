@@ -3,13 +3,10 @@ import { describe, expect, it } from 'vitest';
 
 import ChangeRateForm from '@frontend/discounts/components/ChangeRateForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
+import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
 import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
-const spicesDiscount = { id: 'spices-id', item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
-
-const produceDiscount = { id: 'produce-id', item: 'Fresh produce', rate: '10', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' };
-
-const setupSut = ({ discount = spicesDiscount } = {}) => 
+const setupSut = ({ discount = publishedSpicesDiscount } = {}) =>
   mount(ChangeRateForm, {
     props: { discount },
     global: aTestingDiscountsStore().global,
@@ -29,12 +26,12 @@ describe('Component ChangeRateForm', () => {
     it('should name the discount it changes in its label, for a person and a screen reader alike', () => {
       const label = setupSut().get('[data-testid="change-rate-form"]').attributes('aria-label') ?? '';
 
-      expect(label).to.contain(spicesDiscount.item).and.to.contain(spicesDiscount.storeName);
+      expect(label).to.contain(publishedSpicesDiscount.item).and.to.contain(publishedSpicesDiscount.storeName);
     });
     it('should name another discount in the label of its own control', () => {
-      const label = setupSut({ discount: produceDiscount }).get('[data-testid="change-rate-form"]').attributes('aria-label') ?? '';
+      const label = setupSut({ discount: publishedProduceDiscount }).get('[data-testid="change-rate-form"]').attributes('aria-label') ?? '';
 
-      expect(label).to.contain(produceDiscount.item).and.to.contain(produceDiscount.storeName);
+      expect(label).to.contain(publishedProduceDiscount.item).and.to.contain(publishedProduceDiscount.storeName);
     });
   });
 });

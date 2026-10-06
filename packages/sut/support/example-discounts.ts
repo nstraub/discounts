@@ -7,3 +7,7 @@ export const longTextInAnyCharacters = {
   storeName: "D'Ángelo's <b>Bodega</b>",
   storeAddress: 'Calle Ñuñoa 4; piso 2 '.repeat(500),
 };
+
+export const publishedSpicesDiscount = { id: 'spices-id', ...spicesDiscount };
+
+export const publishedProduceDiscount = { id: 'produce-id', ...produceDiscount };

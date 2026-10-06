@@ -3,12 +3,10 @@ import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import ChangeRateForm from '@frontend/discounts/components/ChangeRateForm.vue';
 import { useDiscountsStore } from '@frontend/stores/discounts-store';
-import { produceDiscount } from '@sut/support/example-discounts';
+import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
 import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
-const spicesDiscount = { id: 'spices-id', item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
-
-const setupSut = ({ discount = spicesDiscount } = {}) => {
+const setupSut = ({ discount = publishedSpicesDiscount } = {}) => {
   const { pinia, global } = aTestingDiscountsStore();
   const form = mount(ChangeRateForm, { attachTo: document.body, props: { discount }, global });
   onTestFinished(() => form.unmount());
@@ -30,7 +28,7 @@ describe('Component ChangeRateForm', () => {
       expect(discounts.changeRate).to.have.been.calledWith('spices-id', { rate: '30' });
     });
     it('should change the rate of another discount through that discount\'s own control', async () => {
-      const { form, discounts } = setupSut({ discount: { id: 'produce-id', ...produceDiscount } });
+      const { form, discounts } = setupSut({ discount: publishedProduceDiscount });
 
       await changeThroughTheForm(form, '15');
 
