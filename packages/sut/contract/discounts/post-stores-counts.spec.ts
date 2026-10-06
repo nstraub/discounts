@@ -23,7 +23,11 @@ const setupSutWithACouponUsedFor = async (discount: ExampleDiscount = spicesDisc
   return { ...sut, published, code };
 };
 
-const countWrittenAsJson = (http: Http, body: string) => http.post('/stores/counts').set('Content-Type', 'application/json').send(body);
+const setupSutCountingJsonText = async () => {
+  const sut = await setupSut();
+  const countWrittenAsJson = (body: string) => sut.http.post('/stores/counts').set('Content-Type', 'application/json').send(body);
+  return { ...sut, countWrittenAsJson };
+};
 
 const countTheStoreOf = (http: Http, discount: ExampleDiscount = spicesDiscount) =>
   http.post('/stores/counts').send({ storeName: discount.storeName, storeAddress: discount.storeAddress });
@@ -105,26 +109,26 @@ describe('POST /stores/counts', () => {
       ]);
     });
     it('should answer 400 for a JSON body that is an array, a string, a number or null', async () => {
-      const { http } = await setupSut();
+      const { countWrittenAsJson } = await setupSutCountingJsonText();
 
-      const statuses = await statusesAnsweringBodiesThatAreNotObjects((body) => countWrittenAsJson(http, body));
+      const statuses = await statusesAnsweringBodiesThatAreNotObjects(countWrittenAsJson);
 
       expect(statuses, 'the statuses answering an array, a string, a number and null').to.deep.equal([400, 400, 400, 400]);
     });
     it('should answer 400 for a body that is not valid JSON', async () => {
-      const { http } = await setupSut();
+      const { countWrittenAsJson } = await setupSutCountingJsonText();
 
-      const response = await countWrittenAsJson(http, '{"storeName": "Spice Bazaar",');
+      const response = await countWrittenAsJson('{"storeName": "Spice Bazaar",');
 
       expect(response.status).to.equal(400);
     });
     it('should answer every error with a body matching the error schema', async () => {
-      const { http } = await setupSut();
+      const { http, countWrittenAsJson } = await setupSutCountingJsonText();
       const errors = [
         await http.post('/stores/counts').send({}),
         await http.post('/stores/counts').send({ storeName: 1234567890, storeAddress: 1234567890 }),
-        ...(await answersInTurnToBodiesThatAreNotObjects((body) => countWrittenAsJson(http, body))),
-        await countWrittenAsJson(http, '{"storeName": "Spice Bazaar",'),
+        ...(await answersInTurnToBodiesThatAreNotObjects(countWrittenAsJson)),
+        await countWrittenAsJson('{"storeName": "Spice Bazaar",'),
       ];
 
       expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
