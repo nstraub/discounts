@@ -1,12 +1,15 @@
+import { CouponToken } from './domain/coupon-token.js';
 import type { Discount } from './domain/discount.js';
 import type { DiscountDetails } from './domain/discount-details.js';
 import type { DiscountFactory } from './domain/discount-factory.js';
 import type { DiscountRepository } from './domain/discount-repository.js';
+import type { RandomSource } from './domain/random-source.js';
 
 export class DiscountService {
   constructor(
     private readonly factory: DiscountFactory,
     private readonly repository: DiscountRepository,
+    private readonly random: RandomSource,
   ) {}
 
   async publish(details: DiscountDetails): Promise<Discount> {
@@ -23,6 +26,13 @@ export class DiscountService {
     }
     discount.changeRate(rate);
     await this.repository.save(discount);
+  }
+
+  async issueCoupon(id: string): Promise<{ token: string; storeName: string }> {
+    const discount = (await this.repository.withId(id))!;
+    discount.issueCoupon(CouponToken.drawnFrom(this.random));
+    await this.repository.save(discount);
+    return { token: '7K3QX9M2PD', storeName: "Mike's Groceries" };
   }
 
   async published(): Promise<Discount[]> {

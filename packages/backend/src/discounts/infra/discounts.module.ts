@@ -22,7 +22,7 @@ import { GreetingController } from './greeting.controller.js';
     {
       provide: DiscountService,
       useFactory: (factory: DiscountFactory, db: Database) =>
-        new DiscountService(factory, new DiscountDrizzleRepository(db, factory)),
+        new DiscountService(factory, new DiscountDrizzleRepository(db, factory), (values) => crypto.getRandomValues(values)),
       inject: [DiscountFactory, database],
     },
   ],

@@ -2,6 +2,7 @@ import { mock } from 'vitest-mock-extended';
 import { describe, expect, it } from 'vitest';
 
 import { InMemoryDiscountRepository } from '@backend/app/mocks/in-memory-discount-repository';
+import { aSourceDrawing } from '@backend/app/mocks/random-sources';
 import { DiscountService } from '@backend/discounts/application/discount-service';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
@@ -11,7 +12,7 @@ const setupSut = () => {
   const factory = new DiscountFactory(mock<DomainEventPublisher>());
   const repository = new InMemoryDiscountRepository();
   const keep = (discount: typeof publishedSpicesDiscount) => repository.save(factory.reconstitute({ ...discount, coupons: [] }));
-  return { keep, service: new DiscountService(factory, repository) };
+  return { keep, service: new DiscountService(factory, repository, aSourceDrawing('7K3QX9M2PD')) };
 };
 
 describe('class DiscountService', () => {
