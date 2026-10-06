@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { DiscountedSalesCounted } from '@backend/discounts/application/domain/discounted-sales-counted';
 import { publishedSpicesDiscount } from '@sut/support/example-discounts';
 
 import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
@@ -25,7 +26,15 @@ describe('class Discount', () => {
 
         expect(counted.toJSON().discountedSales).to.equal(3);
       });
-      it.todo('should raise DiscountedSalesCounted carrying its id and the number of sales counted');
+      it('should raise DiscountedSalesCounted carrying its id and the number of sales counted', () => {
+        const { events, discount } = setupSut({ coupons: threeRedeemedCoupons });
+
+        discount.count();
+
+        const [raised] = events.publish.mock.lastCall ?? [];
+        expect(raised).to.be.instanceOf(DiscountedSalesCounted);
+        expect(raised).to.deep.include({ discountId: publishedSpicesDiscount.id, discountedSales: 3 });
+      });
     });
 
     describe('state', () => {

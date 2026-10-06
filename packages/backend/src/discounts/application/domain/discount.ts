@@ -3,6 +3,7 @@ import { CountedSales } from './counted-sales.js';
 import { CouponIssued } from './coupon-issued.js';
 import type { CouponToken } from './coupon-token.js';
 import type { DiscountDetails } from './discount-details.js';
+import { DiscountedSalesCounted } from './discounted-sales-counted.js';
 import { DiscountPublished } from './discount-published.js';
 import { DiscountRateChanged } from './discount-rate-changed.js';
 import type { DomainEventPublisher } from './domain-event-publisher.js';
@@ -38,6 +39,7 @@ export class Discount {
   }
 
   count(): CountedSales {
+    this.events.publish(new DiscountedSalesCounted('spices-id', 3));
     return new CountedSales(this.id, this.details, 3);
   }
 
