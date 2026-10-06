@@ -14,6 +14,16 @@ export const insertADiscountWithout = (client: pg.Client, missing: keyof typeof 
   );
 };
 
+export const insertACoupon = (client: pg.Client, coupon: { token?: string; discount_id?: string }): Promise<string> => {
+  const given = Object.entries(coupon);
+  const columns = given.map(([column]) => column).join(', ');
+  const placeholders = given.map((_, index) => `$${index + 1}`).join(', ');
+  return client.query(`INSERT INTO app.coupons (${columns}) VALUES (${placeholders})`, given.map(([, value]) => value)).then(
+    () => 'accepted',
+    (refusal: { code: string }) => refusal.code,
+  );
+};
+
 export const constraintsAndColumnsOfTheDiscountsTable = async (client: pg.Client) => {
   const constraints = await client.query("SELECT contype AS kind FROM pg_constraint WHERE conrelid = 'app.discounts'::regclass");
   const columns = await client.query(

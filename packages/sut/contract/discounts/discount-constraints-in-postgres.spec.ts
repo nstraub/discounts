@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { setupSut } from '../support/discount-repository';
-import { constraintsAndColumnsOfTheDiscountsTable, insertADiscountWithout } from '../support/discounts-table';
+import { constraintsAndColumnsOfTheDiscountsTable, insertACoupon, insertADiscountWithout } from '../support/discounts-table';
 
 describe('the discounts table refusing what Discount refuses', () => {
   it('should refuse a discount without an item: 23502, NOT NULL mirrors "a discount has an item"', async () => {
@@ -57,7 +57,15 @@ describe('the discounts table refusing what Discount refuses', () => {
     });
   });
   describe('its coupons', () => {
-    it.todo('should refuse two coupons with one token: 23505, unique mirrors "a coupon is identified by its token alone"');
+    it('should refuse two coupons with one token: 23505, unique mirrors "a coupon is identified by its token alone"', async () => {
+      const { client } = await setupSut();
+      await insertADiscountWithout(client, 'hook');
+      await insertACoupon(client, { token: '7K3QX9M2PD', discount_id: 'constraint-id' });
+
+      const outcome = await insertACoupon(client, { token: '7K3QX9M2PD', discount_id: 'constraint-id' });
+
+      expect(outcome).to.equal('23505');
+    });
     it.todo('should refuse a coupon without a token: 23502, NOT NULL mirrors "a coupon has a token"');
     it.todo('should refuse a coupon of no kept discount: 23503, the foreign key mirrors "a coupon belongs to its discount"');
   });
