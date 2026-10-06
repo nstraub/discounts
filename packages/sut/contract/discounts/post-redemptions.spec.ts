@@ -5,9 +5,11 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
 
-const aCouponForTheSpicesDiscount = async (http: Http): Promise<string> => {
-  const published = await publishTheSpicesDiscount(http);
-  return (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
+const setupSutWithACouponForTheSpicesDiscount = async () => {
+  const sut = await setupSut();
+  const published = await publishTheSpicesDiscount(sut.http);
+  const code: string = (await sut.http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
+  return { ...sut, published, code };
 };
 
 const redeemAtTheSpicesStore = (http: Http, code: string) =>
@@ -16,8 +18,7 @@ const redeemAtTheSpicesStore = (http: Http, code: string) =>
 describe('POST /redemptions', () => {
   describe('success', () => {
     it('should answer 201 with the item of the discount the coupon is for', async () => {
-      const { http } = await setupSut();
-      const code = await aCouponForTheSpicesDiscount(http);
+      const { http, code } = await setupSutWithACouponForTheSpicesDiscount();
 
       const response = await redeemAtTheSpicesStore(http, code);
 
@@ -25,8 +26,7 @@ describe('POST /redemptions', () => {
       expect(response.body).to.deep.equal({ item: spicesDiscount.item });
     });
     it('should answer with a body matching the redemption response schema', async () => {
-      const { http } = await setupSut();
-      const code = await aCouponForTheSpicesDiscount(http);
+      const { http, code } = await setupSutWithACouponForTheSpicesDiscount();
 
       const response = await redeemAtTheSpicesStore(http, code);
 
