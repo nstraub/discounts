@@ -6,6 +6,7 @@ import type { DiscountDetails } from './domain/discount-details.js';
 import type { DiscountFactory } from './domain/discount-factory.js';
 import type { DiscountRepository } from './domain/discount-repository.js';
 import type { IssuedCoupon } from './domain/issued-coupon.js';
+import { NoSuchDiscountException } from './domain/no-such-discount-exception.js';
 import type { RandomSource } from './domain/random-source.js';
 import type { RedeemedCoupon } from './domain/redeemed-coupon.js';
 import type { Store } from './domain/store.js';
@@ -30,7 +31,7 @@ export class DiscountService {
   async changeRate(id: string, rate: string): Promise<void> {
     const discount = await this.repository.withId(id);
     if (!discount) {
-      return;
+      throw new NoSuchDiscountException();
     }
     await this.changes.keptAfter(discount, (found) => found.changeRate(rate));
   }
