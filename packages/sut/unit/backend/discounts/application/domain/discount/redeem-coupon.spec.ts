@@ -122,7 +122,14 @@ describe('class Discount', () => {
     });
 
     describe('state', () => {
-      it.todo('should redeem at its own store a coupon refused at another store before');
+      it('should redeem at its own store a coupon refused at another store before', () => {
+        const discount = setupSut();
+        expect(tryingItsCouponAt(atStephaniesStore, discount)).to.throw(CouponNotForThisStoreException);
+
+        tryingItsCouponAt(atTheSpicesStore, discount)();
+
+        expect(discount.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true, counted: false }]);
+      });
     });
 
     describe('combination', () => {
