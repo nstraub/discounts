@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { oneRaceAfterAnother, timesTheRaceIsRun } from '../support/at-the-same-moment';
-import { issueACouponFor, redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithACouponForEachRace } from '../support/redemptions';
+import { countTheStoreOf } from '../support/counts';
+import { askForACouponFor, issueACouponFor, redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithACouponForEachRace } from '../support/redemptions';
 
 describe('changes to one discount at the same moment', () => {
   describe('A4 concurrency', () => {
@@ -46,7 +47,23 @@ describe('changes to one discount at the same moment', () => {
         codes.map(() => ({ rateChanged: true, redemptionKept: true })),
       );
     });
-    it.todo('should answer each of the changes as it would alone, never refusing one for a change kept meanwhile');
+    it('should answer each of the changes as it would alone, never refusing one for a change kept meanwhile', async () => {
+      const { http, published, codes } = await setupSutWithACouponForEachRace();
+
+      const statusesOfEachRace = await oneRaceAfterAnother(codes, async (code) => {
+        const changes = await Promise.all([
+          redeemAtTheStoreOf(http, code),
+          askForACouponFor(http, published),
+          http.patch(`/discounts/${published.id}`).send({ rate: '25' }),
+          countTheStoreOf(http),
+        ]);
+        return changes.map((response) => response.status);
+      });
+
+      expect(statusesOfEachRace, 'the statuses answering a redemption, an issue, a change of rate and a count at once').to.deep.equal(
+        codes.map(() => [201, 201, 204, 201]),
+      );
+    });
     it.todo('should keep the rate of the later of two changes of rate made at the same moment');
   });
 });

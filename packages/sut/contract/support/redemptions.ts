@@ -5,8 +5,9 @@ import { timesTheRaceIsRun } from './at-the-same-moment';
 
 type ExampleDiscount = typeof spicesDiscount;
 
-export const issueACouponFor = async (http: Http, published: { id: string }): Promise<string> =>
-  (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
+export const askForACouponFor = (http: Http, published: { id: string }) => http.post(`/discounts/${published.id}/coupons`).send({});
+
+export const issueACouponFor = async (http: Http, published: { id: string }): Promise<string> => (await askForACouponFor(http, published)).body.token;
 
 export const setupSutWithACouponFor = async (discount: ExampleDiscount = spicesDiscount) => {
   const sut = await setupSut();
