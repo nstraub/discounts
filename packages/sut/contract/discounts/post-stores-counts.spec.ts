@@ -5,7 +5,8 @@ import { countRequest, countResponse, requestRejection } from '@app/types/discou
 import { longTextInAnyCharacters, spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
-import { statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
+import { answersInTurnToBodiesThatAreNotObjects, statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
+import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
 
 type ExampleDiscount = typeof spicesDiscount;
 
@@ -116,7 +117,17 @@ describe('POST /stores/counts', () => {
 
       expect(response.status).to.equal(400);
     });
-    it.todo('should answer every error with a body matching the error schema');
+    it('should answer every error with a body matching the error schema', async () => {
+      const { http } = await setupSut();
+      const errors = [
+        await http.post('/stores/counts').send({}),
+        await http.post('/stores/counts').send({ storeName: 1234567890, storeAddress: 1234567890 }),
+        ...(await answersInTurnToBodiesThatAreNotObjects((body) => countWrittenAsJson(http, body))),
+        await countWrittenAsJson(http, '{"storeName": "Spice Bazaar",'),
+      ];
+
+      expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
+    });
   });
 
   describe('not found', () => {
