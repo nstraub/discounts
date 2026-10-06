@@ -49,7 +49,15 @@ describe('class Discount', () => {
 
         expect(counted.toJSON().discountedSales, 'the sales since the last count').to.equal(1);
       });
-      it.todo('should count a coupon issued before its last count and redeemed after it');
+      it('should count a coupon issued before its last count and redeemed after it', () => {
+        const { discount } = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: false }] });
+        discount.count();
+        discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+
+        const counted = discount.count();
+
+        expect(counted.toJSON().discountedSales, 'the sales since the last count').to.equal(1);
+      });
       it.todo('should not count a coupon issued and not yet redeemed');
     });
 
