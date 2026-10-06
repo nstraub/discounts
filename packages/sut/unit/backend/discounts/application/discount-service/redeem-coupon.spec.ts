@@ -117,7 +117,11 @@ describe('class DiscountService', () => {
 
       await expect(service.redeemCoupon('ZZZZZZZZZZ', atTheSpicesStore)).rejects.to.be.instanceOf(NoCouponHasTheCodeException);
     });
-    it.todo('should report a code that cannot be a coupon\'s as one nobody issued');
+    it('should report a code that cannot be a coupon\'s as one nobody issued', async () => {
+      const { service } = setupSut();
+
+      await expect(service.redeemCoupon('7K3QX', atTheSpicesStore)).rejects.to.be.instanceOf(NoCouponHasTheCodeException);
+    });
     it.todo('should keep nothing and announce nothing when no coupon has the code');
   });
 });
