@@ -1,6 +1,8 @@
+import { queryAllByRole } from '@testing-library/dom';
 import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, onTestFinished } from 'vitest';
 
+import type { DiscountResponse } from '@app/types/discounts';
 import PublishedDiscounts from '@frontend/discounts/components/PublishedDiscounts.vue';
 import { discountTexts } from '@frontend/discounts/texts';
 import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
@@ -11,6 +13,18 @@ const setupSut = ({ discounts = [publishedSpicesDiscount] } = {}) =>
     props: { discounts },
     global: aTestingDiscountsStore().global,
   });
+
+const setupSutInTheDocument = ({ discounts = [publishedSpicesDiscount] } = {}) => {
+  const list = mount(PublishedDiscounts, {
+    attachTo: document.body,
+    props: { discounts },
+    global: aTestingDiscountsStore().global,
+  });
+  onTestFinished(() => list.unmount());
+};
+
+const namingTheWholeOf = ({ item, rate, storeName, storeAddress }: DiscountResponse) => (name: string) =>
+  [item, `${rate}%`, storeName, storeAddress].every((shown) => name.includes(shown));
 
 describe('Component PublishedDiscounts', () => {
   describe('showing a published discount', () => {
@@ -96,15 +110,11 @@ describe('Component PublishedDiscounts', () => {
     it.todo('should present each discount to a screen reader as one entry with its item, rate, store name and store address');
   });
   describe('changing a rate', () => {
-    it('should offer to change the rate on each entry', () => {
-      const list = setupSut({ discounts: [publishedSpicesDiscount, publishedProduceDiscount] });
+    it('should offer to change the rate on each entry, named by what the entry shows', () => {
+      setupSutInTheDocument({ discounts: [publishedSpicesDiscount, publishedProduceDiscount] });
 
-      const [spicesControl, produceControl] = list
-        .findAll('[data-testid="published-discount"]')
-        .map((entry) => entry.get('[data-testid="change-rate-form"]').attributes('aria-label') ?? '');
-
-      expect(spicesControl).to.contain(publishedSpicesDiscount.item);
-      expect(produceControl).to.contain(publishedProduceDiscount.item);
+      expect(queryAllByRole(document.body, 'form', { name: namingTheWholeOf(publishedSpicesDiscount) })).to.have.length(1);
+      expect(queryAllByRole(document.body, 'form', { name: namingTheWholeOf(publishedProduceDiscount) })).to.have.length(1);
     });
   });
 });

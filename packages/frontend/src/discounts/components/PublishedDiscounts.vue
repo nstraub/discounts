@@ -23,6 +23,7 @@ defineProps<{ discounts: DiscountResponse[] }>();
       data-testid="published-discount"
     >
       <div
+        :id="`published-discount-${discount.id}-text`"
         class="flex gap-2"
         data-testid="published-discount-text"
       >
@@ -31,7 +32,10 @@ defineProps<{ discounts: DiscountResponse[] }>();
         <span data-testid="published-store-name">{{ discount.storeName.trim() }}</span>
         <span data-testid="published-store-address">{{ discount.storeAddress.trim() }}</span>
       </div>
-      <ChangeRateForm :discount="discount" />
+      <ChangeRateForm
+        :discount="discount"
+        :named-by="`published-discount-${discount.id}-text`"
+      />
     </li>
   </ul>
 </template>

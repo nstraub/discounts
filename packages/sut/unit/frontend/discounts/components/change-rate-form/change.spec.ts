@@ -8,7 +8,7 @@ import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-stor
 
 const setupSut = ({ discount = publishedSpicesDiscount } = {}) => {
   const { pinia, global } = aTestingDiscountsStore();
-  const form = mount(ChangeRateForm, { attachTo: document.body, props: { discount }, global });
+  const form = mount(ChangeRateForm, { attachTo: document.body, props: { discount, namedBy: 'entry-text' }, global });
   onTestFinished(() => form.unmount());
   return { form, discounts: useDiscountsStore(pinia) };
 };

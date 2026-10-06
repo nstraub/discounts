@@ -9,7 +9,7 @@ import { changeToMake } from '../typed-discount';
 
 import CaptionedInput from './CaptionedInput.vue';
 
-const props = defineProps<{ discount: DiscountResponse }>();
+const props = defineProps<{ discount: DiscountResponse; namedBy: string }>();
 
 const discounts = useDiscountsStore();
 const newRate = ref('');
@@ -21,7 +21,7 @@ const changeRate = async (): Promise<void> => {
 
 <template>
   <form
-    :aria-label="`${discount.item}, ${discount.storeName}`"
+    :aria-labelledby="namedBy"
     data-testid="change-rate-form"
     @submit.prevent="changeRate"
   >
