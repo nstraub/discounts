@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { CouponRedeemed } from '@backend/discounts/application/domain/coupon-redeemed';
+import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
 
@@ -22,7 +23,13 @@ describe('class DiscountService', () => {
 
       expect(events.publish).to.have.been.calledWith(new CouponRedeemed('spices-id', '7K3QX9M2PD'));
     });
-    it.todo('should answer with the item of the discount the coupon is for');
+    it('should answer with the item of the discount the coupon is for', async () => {
+      const { service } = setupSut();
+
+      const redeemed = await service.redeemCoupon('7K3QX9M2PD');
+
+      expect(redeemed.toJSON()).to.deep.equal({ item: spicesDiscount.item });
+    });
 
     describe('combination', () => {
       it.todo('should redeem the coupon whose code is typed in lower case, in two groups');
