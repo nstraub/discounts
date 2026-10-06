@@ -162,7 +162,14 @@ describe('Component PublishedDiscounts', () => {
     it.todo('should show a web address in a hook as plain text, never as a link');
   });
   describe('showing where each store is', () => {
-    it.todo('should show each entry with its own store address when two stores share a name');
+    it('should show each entry with its own store address when two stores share a name', () => {
+      const sameNameElsewhere = { ...publishedProduceDiscount, storeName: publishedSpicesDiscount.storeName };
+      const list = setupSut({ discounts: [publishedSpicesDiscount, sameNameElsewhere] });
+
+      const addresses = list.findAll('[data-testid="published-discount"]').map((entry) => entry.get('[data-testid="published-store-address"]').text());
+
+      expect(addresses, 'the store address on each entry').to.deep.equal(['12 Market Street', '3 Hill Road']);
+    });
   });
   describe('getting a coupon', () => {
     it('should offer to get a coupon on each entry', () => {
