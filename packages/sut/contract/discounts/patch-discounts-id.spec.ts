@@ -1,11 +1,9 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
-import { requestRejection } from '@app/types/discounts';
-
 import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
 import { statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
-import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
+import { bodiesNotMatchingTheErrorSchema, theFieldsNamedBy } from '../support/error-schema';
 
 const patchTheDiscount = (http: Http, id: string) => http.patch(`/discounts/${id}`);
 
@@ -52,7 +50,7 @@ describe('PATCH /discounts/:id', () => {
       const notText = await patchTheDiscount(http, published.id).send({ rate: 25 });
 
       expect([missing.status, notText.status]).to.deep.equal([400, 400]);
-      expect([requestRejection.parse(missing.body).fields, requestRejection.parse(notText.body).fields]).to.deep.equal([['rate'], ['rate']]);
+      expect(theFieldsNamedBy(missing, notText)).to.deep.equal([['rate'], ['rate']]);
     });
     it('should answer 400 for a JSON body that is an array, a string, a number or null', async () => {
       const { http } = await setupSut();

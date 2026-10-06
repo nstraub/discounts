@@ -1,13 +1,13 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
-import { countRequest, countResponse, requestRejection } from '@app/types/discounts';
+import { countRequest, countResponse } from '@app/types/discounts';
 import { longTextInAnyCharacters, spicesDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
 import { answersInTurnToBodiesThatAreNotObjects, statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
 import { countTheStoreOf } from '../support/counts';
-import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
+import { bodiesNotMatchingTheErrorSchema, theFieldsNamedBy } from '../support/error-schema';
 import { redeemAtTheStoreOf } from '../support/redemptions';
 
 type ExampleDiscount = typeof spicesDiscount;
@@ -106,10 +106,7 @@ describe('POST /stores/counts', () => {
       const notText = await http.post('/stores/counts').send(aStoreNotInText);
 
       expect([missing.status, notText.status]).to.deep.equal([400, 400]);
-      expect([requestRejection.parse(missing.body).fields, requestRejection.parse(notText.body).fields]).to.deep.equal([
-        ['storeName', 'storeAddress'],
-        ['storeName', 'storeAddress'],
-      ]);
+      expect(theFieldsNamedBy(missing, notText)).to.deep.equal([['storeName', 'storeAddress'], ['storeName', 'storeAddress']]);
     });
     it('should answer 400 for a JSON body that is an array, a string, a number or null', async () => {
       const { countWrittenAsJson } = await setupSutCountingJsonText();

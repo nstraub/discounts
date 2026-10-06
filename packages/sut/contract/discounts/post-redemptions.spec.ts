@@ -1,13 +1,13 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
-import { redemptionRequest, redemptionResponse, requestRejection } from '@app/types/discounts';
+import { redemptionRequest, redemptionResponse } from '@app/types/discounts';
 import { longTextInAnyCharacters, produceDiscount, spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
 import { oneRaceAfterAnother } from '../support/at-the-same-moment';
 import { answersInTurnToBodiesThatAreNotObjects, statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
-import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
+import { bodiesNotMatchingTheErrorSchema, theFieldsNamedBy } from '../support/error-schema';
 import { redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithACouponForEachRace, setupSutWithAnotherCouponOfTheSameDiscount } from '../support/redemptions';
 
 const redeemWrittenAsJson = (http: Http, body: string) => http.post('/redemptions').set('Content-Type', 'application/json').send(body);
@@ -93,7 +93,7 @@ describe('POST /redemptions', () => {
       const notText = await redeemAtTheStoreOf(http, 1234567890 as unknown as string);
 
       expect([missing.status, notText.status]).to.deep.equal([400, 400]);
-      expect([requestRejection.parse(missing.body).fields, requestRejection.parse(notText.body).fields]).to.deep.equal([['code'], ['code']]);
+      expect(theFieldsNamedBy(missing, notText)).to.deep.equal([['code'], ['code']]);
     });
     it('should answer 400 for a JSON body that is an array, a string, a number or null', async () => {
       const { http } = await setupSut();
