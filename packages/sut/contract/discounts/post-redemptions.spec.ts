@@ -138,7 +138,15 @@ describe('POST /redemptions', () => {
   });
 
   describe('A3 handle guessing (no accounts)', () => {
-    it.todo('should answer with no coupon token, neither the one redeemed nor another');
+    it('should answer with no coupon token, neither the one redeemed nor another', async () => {
+      const { http, published, code } = await setupSutWithACouponFor();
+      const another: string = (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
+
+      const response = await redeemAtTheStoreOf(http, code);
+
+      expect(Object.keys(response.body), 'what the answer carries').to.deep.equal(['item']);
+      expect(response.text).to.not.contain(code).and.not.contain(another);
+    });
     it.todo('should give the same answer to a malformed code and to a well-formed one nobody issued');
     it.todo('should throttle codes tried from one source far faster than anyone takes coupons at a till');
   });
