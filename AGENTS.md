@@ -141,7 +141,9 @@ is npm's DefinitelyTyped scope and would shadow it), one module per file through
 `exports` map (`./*` → `./*.ts`). Every package that uses it declares
 `"@app/types": "workspace:*"` and imports it as a package, without an extension:
 `import type { RestApi } from '@app/types/rest-api'`. Today it holds `rest-api` (the `RestApi`
-abstraction, with `get`, `put`, `post` and `patch`, and `FetchRestApi`) and `greeting` (the wire type). It is not a path alias: the
+abstraction, with `get`, `put`, `post` and `patch`, and `FetchRestApi`), `rest-api-refusals` (the
+refusals `FetchRestApi` throws, such as `UnprocessableContentException` for a 422), `discounts` (the
+request and response schemas) and `greeting` (the wire type). It is not a path alias: the
 backend runs its compiled output, and Node resolves the package through `node_modules`
 and strips the `.ts` types on the symlink's real path.
 
@@ -181,10 +183,12 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   coupon through `couponResponse`. They are kept in the `coupons` table (migration `0005`, lossy down),
   written and read with their discount (`infra/coupon-rows.ts`).
 - **Redeeming:** `Coupon` is an entity inside the aggregate that owns single use (`redeem()` raises
-  `CouponRedeemed`); `Discount.redeemCoupon(token)` answers with the item. `CouponToken.read(code)`
+  `CouponRedeemed`); `Discount.redeemCoupon(token, store)` refuses a coupon of another store (`Store.equals`:
+  name and address exactly) and answers with the item. The discount's coupons live in `Coupons`, a
+  collection inside the aggregate; `DiscountEvents` builds and publishes the events `Discount` raises. `CouponToken.read(code)`
   normalises a typed code. `DiscountService.redeemCoupon(code)` loads the discount through
   `DiscountRepository.withCouponToken`. `infra/redemptions.controller.ts` serves `POST /redemptions`
-  (201 `{ item }`); it parses only the code. Migration `0006` adds `coupons.redeemed` (lossy down).
+  (201 `{ item }`; 422 for another store's coupon; 409 already used; 400 for a missing or blank store). Migration `0006` adds `coupons.redeemed` (lossy down).
 - **Counting:** `Discount.count()` counts the coupons redeemed since the last count, marks them
   counted (`Coupon` holds `redeemed` and `counted`) and raises `DiscountedSalesCounted`.
   `DiscountService.count(store)` goes through `DiscountChanges` (`application/discount-changes.ts`),
@@ -193,7 +197,7 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   `infra/store-counts.controller.ts` serves `POST /stores/counts` (201). Migration `0007` adds
   `coupons.counted` (lossy down).
 - **Single use and concurrency:** `Coupon.redeem` refuses a coupon already redeemed
-  (`CouponRedemptionRejected`; `POST /redemptions` answers 409). `DiscountChanges` runs issuing,
+  (`CouponRedemptionRejected`; `POST /redemptions` answers 409; 'not for this store' answers 422). `DiscountChanges` runs issuing,
   redeeming and counting through `DiscountRepository.changing(work)`: one transaction, the discount's
   row locked (`SELECT … FOR UPDATE`), so concurrent changes to one discount are serialised. `changeRate`
   stays outside `changing`, last write winning.
@@ -225,7 +229,8 @@ first slice.
 - **Routing:** split into `router/routes-*.ts` modules merged in `router/index.ts`, with hash history (`#/`), so a reload
   of the statically served app keeps its route: the discounts page is `#/`, the walking skeleton's
   greeting `#/walking-skeleton`.
-- **State:** Pinia stores in `src/stores/`.
+- **State:** Pinia stores in `src/stores/`; the till store holds one answer, an object of
+  `discounts/till-answers.ts` that tells its own caption.
 - **HTTP:** every backend call goes through `RestApi` in `packages/types`.
 - **Browser capabilities:** services in `src/*/services/`.
 - **UI copy:** a `texts` module per feature.
@@ -270,7 +275,9 @@ first slice.
   table, rate, hook, coupons and coupon-count migration specs. A random source in a spec is `aSourceDrawing(token)`
   (`@backend/app/mocks/random-sources`); `couponForTheSpicesDiscount`, `stephaniesProduceDiscount` are
   among the shared examples; `contract/support/discounts-table.ts` has `insertACoupon` and
-  `migrations.ts` has `migrateBackwardPast`.
+  `migrations.ts` has `migrateBackwardPast`. The stores a spec redeems at are `atTheSpicesStore` and
+  `atStephaniesStore` (`sut/support/example-stores.ts`); `theFieldsNamedBy` is in
+  `contract/support/error-schema.ts`; `theDiscountsKept` and `theRowKeptFor` are in `discounts-table.ts`.
 - **Tags:** `@wip` marks the scenario being built (run it with `yarn test:wip`); `@todo` marks a
   recorded missing case whose steps are written and whose step definitions are not. Both are
   excluded from `yarn test:bdd`.
