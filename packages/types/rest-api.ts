@@ -16,31 +16,27 @@ export class FetchRestApi implements RestApi {
   }
 
   async put(path: string, body: unknown): Promise<void> {
-    await fetch(`${this.baseUrl}${path}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    await this.sendAsJson('PUT', path, body);
   }
 
   async post<Response>(path: string, body: unknown): Promise<Response> {
-    const response = await fetch(`${this.baseUrl}${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    const response = await this.sendAsJson('POST', path, body);
     return this.bodyOfAnOkAnswer<Response>(`POST ${path}`, response);
   }
 
   async patch(path: string, body: unknown): Promise<void> {
-    const response = await fetch(`${this.baseUrl}${path}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    const response = await this.sendAsJson('PATCH', path, body);
     if (!response.ok) {
       throw new RestApiException(`PATCH ${path} answered ${response.status}`);
     }
+  }
+
+  private sendAsJson(method: string, path: string, body: unknown): Promise<Response> {
+    return fetch(`${this.baseUrl}${path}`, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
   }
 
   private async bodyOfAnOkAnswer<Body>(request: string, response: Response): Promise<Body> {
