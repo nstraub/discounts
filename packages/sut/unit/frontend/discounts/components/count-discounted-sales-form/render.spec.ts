@@ -1,3 +1,4 @@
+import { queryAllByRole } from '@testing-library/dom';
 import { describe, expect, it } from 'vitest';
 
 import CountDiscountedSalesForm from '@frontend/discounts/components/CountDiscountedSalesForm.vue';
@@ -32,6 +33,10 @@ describe('Component CountDiscountedSalesForm', () => {
       const offered = theStoresOfferedUnder(discountTexts.store, "Stephanie's Market, 8 Orchard Lane");
       expect(offered, "Stephanie's Market offered by its name and address").to.have.length(1);
     });
-    it.todo('should offer to count the discounted sales under its caption');
+    it('should offer to count the discounted sales under its caption', () => {
+      setupSut();
+
+      expect(queryAllByRole(document.body, 'button', { name: discountTexts.countDiscountedSales }), 'count buttons').to.have.length(1);
+    });
   });
 });

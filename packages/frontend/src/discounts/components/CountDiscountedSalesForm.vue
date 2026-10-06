@@ -16,5 +16,11 @@ defineProps<{ stores: Store[] }>();
       :caption="discountTexts.store"
       :stores="stores"
     />
+    <button
+      type="submit"
+      class="rounded border px-3 py-1"
+    >
+      {{ discountTexts.countDiscountedSales }}
+    </button>
   </form>
 </template>
