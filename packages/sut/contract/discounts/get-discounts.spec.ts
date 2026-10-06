@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { publishedDiscountsResponse } from '@app/types/discounts';
 import { longTextInAnyCharacters, produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
-import { setupSut } from '../support/app';
+import { publishTheSpicesDiscount, setupSut } from '../support/app';
 
 describe('GET /discounts', () => {
   describe('success', () => {
@@ -95,6 +95,14 @@ describe('GET /discounts', () => {
     });
   });
   describe('A3 handle guessing (no accounts)', () => {
-    it.todo('should list no coupon token with any discount once coupons have been issued');
+    it('should list no coupon token with any discount once coupons have been issued', async () => {
+      const { http } = await setupSut();
+      const published = await publishTheSpicesDiscount(http);
+      const coupon = await http.post(`/discounts/${published.id}/coupons`).send({});
+
+      const response = await http.get('/discounts');
+
+      expect(response.text).to.not.contain(coupon.body.token);
+    });
   });
 });
