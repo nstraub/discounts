@@ -1,5 +1,7 @@
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 
+import { redemptionResponse } from '@app/types/discounts';
+
 import { DiscountService } from '../application/discount-service.js';
 
 @Controller('redemptions')
@@ -8,7 +10,7 @@ export class RedemptionsController {
 
   @Post()
   async redeem(@Body('code') code: string) {
-    await this.discounts.redeemCoupon(code);
-    return { item: 'Peruvian spices' };
+    const redeemed = await this.discounts.redeemCoupon(code);
+    return redemptionResponse.parse(redeemed.toJSON());
   }
 }

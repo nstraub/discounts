@@ -2,7 +2,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { redemptionResponse } from '@app/types/discounts';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
 
@@ -25,6 +25,15 @@ describe('POST /redemptions', () => {
 
       expect(response.status).to.equal(201);
       expect(response.body).to.deep.equal({ item: spicesDiscount.item });
+    });
+    it('should answer with the item of another discount when the coupon is for that one', async () => {
+      const { http } = await setupSut();
+      const published = (await http.post('/discounts').send(produceDiscount)).body;
+      const code: string = (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
+
+      const response = await http.post('/redemptions').send({ code, storeName: produceDiscount.storeName, storeAddress: produceDiscount.storeAddress });
+
+      expect(response.body).to.deep.equal({ item: produceDiscount.item });
     });
     it('should answer with a body matching the redemption response schema', async () => {
       const { http, code } = await setupSutWithACouponForTheSpicesDiscount();
