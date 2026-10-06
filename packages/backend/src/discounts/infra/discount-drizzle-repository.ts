@@ -31,11 +31,15 @@ export class DiscountDrizzleRepository implements DiscountRepository {
 
   async all(): Promise<Discount[]> {
     const rows = await this.database.select(theColumnsOfADiscount).from(discounts);
-    return rows.map((row) => this.factory.reconstitute(withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) })));
+    return rows.map((row) => this.rebuilt(row));
   }
 
   async withId(id: string): Promise<Discount | undefined> {
     const rows = await this.database.select(theColumnsOfADiscount).from(discounts).where(eq(discounts.id, id));
-    return rows.map((row) => this.factory.reconstitute(withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) }))).at(0);
+    return rows.map((row) => this.rebuilt(row)).at(0);
+  }
+
+  private rebuilt(row: typeof discounts.$inferSelect): Discount {
+    return this.factory.reconstitute(withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) }));
   }
 }
