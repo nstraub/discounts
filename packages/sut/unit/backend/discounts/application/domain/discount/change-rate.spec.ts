@@ -51,7 +51,14 @@ describe('class Discount', () => {
     });
 
     describe('state', () => {
-      it.todo('should hold the later rate when its rate is changed twice');
+      it('should hold the later rate when its rate is changed twice', () => {
+        const { discount } = setupSut();
+        discount.changeRate('25');
+
+        discount.changeRate('30');
+
+        expect(discount.toJSON().rate).to.equal('30');
+      });
       it.todo('should accept a change to the rate it already has, staying as it is');
     });
 
