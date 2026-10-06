@@ -41,14 +41,16 @@ describe('Component ChangeRateForm', () => {
       expect(setupSut().get('[data-testid="change-rate"]').text()).to.equal(discountTexts.changeRate);
     });
     it('should take its name from the element naming its discount, for a person and a screen reader alike', () => {
-      setupSutNamedBy('spices-text', 'Peruvian spices 20% Mike\'s Groceries 12 Market Street');
+      const name = 'Peruvian spices 20% Mike\'s Groceries 12 Market Street';
+      setupSutNamedBy('spices-text', name);
 
-      expect(queryAllByRole(document.body, 'form', { name: 'Peruvian spices 20% Mike\'s Groceries 12 Market Street' })).to.have.length(1);
+      expect(queryAllByRole(document.body, 'form', { name })).to.have.length(1);
     });
     it('should take another name from the element naming another discount', () => {
-      setupSutNamedBy('produce-text', 'Fresh produce 10% Corner Grocery 3 Hill Road');
+      const name = 'Fresh produce 10% Corner Grocery 3 Hill Road';
+      setupSutNamedBy('produce-text', name);
 
-      expect(queryAllByRole(document.body, 'form', { name: 'Fresh produce 10% Corner Grocery 3 Hill Road' })).to.have.length(1);
+      expect(queryAllByRole(document.body, 'form', { name })).to.have.length(1);
     });
   });
 });
