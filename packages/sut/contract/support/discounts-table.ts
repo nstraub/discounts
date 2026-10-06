@@ -1,5 +1,7 @@
 import type pg from 'pg';
 
+import { spicesDiscount } from '@sut/support/example-discounts';
+
 import { discountRepositoryOn } from './discount-repository';
 
 const aDiscountRow = { id: "'constraint-id'", item: "'Peruvian spices'", rate: "'20'", store_name: "'Mike''s Groceries'", store_address: "'12 Market Street'", hook: "'Our spices now come from a new supplier'" };
@@ -37,6 +39,14 @@ export const aDiscountKeptBefore = { id: 'kept-before', item: 'Saffron', rate: '
 const insertADiscountKeptBefore = async (client: pg.Client): Promise<void> => {
   const { id, item, rate, storeName, storeAddress } = aDiscountKeptBefore;
   await client.query('INSERT INTO app.discounts (id, item, rate, store_name, store_address) VALUES ($1, $2, $3, $4, $5)', [id, item, rate, storeName, storeAddress]);
+};
+
+export const aDiscountKeptAndLoadedBackAfterMigratingForward = async (sut: { client: pg.Client; databaseUrl: string; migrateForward: () => Promise<void> }) => {
+  await sut.migrateForward();
+  const { keep, loadOnItsOwnConnection } = discountRepositoryOn(sut.client, sut.databaseUrl);
+  const kept = await keep(spicesDiscount);
+  const [loaded] = await loadOnItsOwnConnection();
+  return { kept: kept.toJSON(), loaded: loaded?.toJSON() };
 };
 
 export const aDiscountKeptBeforeAsReadAfterMigratingForward = async (sut: { client: pg.Client; databaseUrl: string; migrateForward: () => Promise<void> }) => {

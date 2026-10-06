@@ -3,7 +3,12 @@ import { describe, expect, it } from 'vitest';
 import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { discountRepositoryOn } from '../support/discount-repository';
-import { aDiscountKeptBefore, aDiscountKeptBeforeAsReadAfterMigratingForward, constraintsAndColumnsOfTheDiscountsTable } from '../support/discounts-table';
+import {
+  aDiscountKeptAndLoadedBackAfterMigratingForward,
+  aDiscountKeptBefore,
+  aDiscountKeptBeforeAsReadAfterMigratingForward,
+  constraintsAndColumnsOfTheDiscountsTable,
+} from '../support/discounts-table';
 import { migrateBackwardPast, setupSut } from '../support/migrations';
 
 const theMigration = '0004_add_discount_hook';
@@ -53,13 +58,10 @@ describe('the migration that adds the hook to discounts', () => {
     expect(readBack).to.deep.equal({ ...aDiscountKeptBefore, coupons: [] });
   });
   it('should keep and load back, as the deployed version does, a discount without a hook on the migrated table', async () => {
-    const { client, databaseUrl, migrateForward } = await setupSut();
-    await migrateForward();
-    const { keep, loadOnItsOwnConnection } = discountRepositoryOn(client, databaseUrl);
-    const kept = await keep(spicesDiscount);
+    const sut = await setupSut();
 
-    const [loaded] = await loadOnItsOwnConnection();
+    const { kept, loaded } = await aDiscountKeptAndLoadedBackAfterMigratingForward(sut);
 
-    expect(loaded?.toJSON()).to.deep.equal(kept.toJSON());
+    expect(loaded).to.deep.equal(kept);
   });
 });
