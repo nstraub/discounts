@@ -21,7 +21,7 @@ export class CouponToken {
 
   static read(typed: string): CouponToken {
     const withoutSeparators = typed.toUpperCase().replaceAll(separatorsTypedBetweenOrAroundTheGroups, '');
-    if (withoutSeparators.length < charactersInAToken) {
+    if (withoutSeparators.length !== charactersInAToken) {
       throw new NoCouponHasTheCodeException();
     }
     return new CouponToken(withoutSeparators.replaceAll(theLetterTypedForAZero, '0').replaceAll(theLettersTypedForAOne, '1'));

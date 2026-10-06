@@ -61,7 +61,9 @@ describe('class CouponToken', () => {
       it('should read no token from a code of nine characters', () => {
         expect(() => CouponToken.read('7K3QX9M2P')).to.throw(NoCouponHasTheCodeException);
       });
-      it.todo('should read no token from a code of eleven characters');
+      it('should read no token from a code of eleven characters', () => {
+        expect(() => CouponToken.read('7K3QX9M2PDX')).to.throw(NoCouponHasTheCodeException);
+      });
     });
 
     describe('type', () => {
