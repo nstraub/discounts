@@ -36,7 +36,7 @@ const textIdOf = (discount: DiscountResponse): string => `published-discount-${d
         <span
           v-if="discount.hook"
           data-testid="published-hook"
-        >{{ discount.hook }}</span>
+        >{{ discount.hook.trim() }}</span>
       </div>
       <ChangeRateForm
         :discount="discount"

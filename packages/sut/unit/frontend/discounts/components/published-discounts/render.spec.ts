@@ -8,7 +8,7 @@ import { discountTexts } from '@frontend/discounts/texts';
 import { publishedProduceDiscount, publishedSpicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
-const setupSut = ({ discounts = [publishedSpicesDiscount] } = {}) =>
+const setupSut = ({ discounts = [publishedSpicesDiscount] }: { discounts?: DiscountResponse[] } = {}) =>
   mount(PublishedDiscounts, {
     props: { discounts },
     global: aTestingDiscountsStore().global,
@@ -138,7 +138,11 @@ describe('Component PublishedDiscounts', () => {
       expect(spices?.get('[data-testid="published-hook"]').text()).to.equal(spicesDiscountWithItsHook.hook);
       expect(produce?.find('[data-testid="published-hook"]').exists(), 'a hook on the entry of a discount without one').to.equal(false);
     });
-    it.todo('should show its hook without its surrounding spaces');
+    it('should show its hook without its surrounding spaces', () => {
+      const list = setupSut({ discounts: [{ ...publishedSpicesDiscount, hook: `  ${spicesDiscountWithItsHook.hook}\n` }] });
+
+      expect(list.get('[data-testid="published-hook"]').element.textContent).to.equal(spicesDiscountWithItsHook.hook);
+    });
     it.todo('should keep the line breaks its hook is written with');
   });
 
