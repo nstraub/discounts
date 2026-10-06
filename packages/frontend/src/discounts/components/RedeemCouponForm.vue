@@ -13,7 +13,9 @@ defineProps<{ stores: Pick<DiscountResponse, 'storeName' | 'storeAddress'>[] }>(
       <select
         required
         class="rounded border border-gray-400 px-2 py-1"
-      />
+      >
+        <option>Corner Grocery, 3 Hill Road</option>
+      </select>
     </label>
   </form>
 </template>

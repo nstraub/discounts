@@ -29,7 +29,12 @@ describe('Component RedeemCouponForm', () => {
 
       expect(theStorePickers().map((picker) => picker.required), 'the store picker required').to.deep.equal([true]);
     });
-    it.todo('should offer each store it is given as its name and address');
+    it('should offer each store it is given as its name and address', () => {
+      setupSut({ stores: [theCornerGrocery] });
+
+      const offered = theStorePickers().flatMap((picker) => queryAllByRole(picker, 'option', { name: 'Corner Grocery, 3 Hill Road' }));
+      expect(offered, 'the Corner Grocery offered by its name and address').to.have.length(1);
+    });
     it.todo('should ask for the coupon\'s code under its caption');
     it.todo('should offer to redeem the coupon under its caption');
   });
