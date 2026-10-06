@@ -14,7 +14,8 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   ) {}
 
   async save(discount: Discount): Promise<void> {
-    await this.database.insert(discounts).values(discount.toJSON());
+    const state = discount.toJSON();
+    await this.database.insert(discounts).values(state).onConflictDoUpdate({ target: discounts.id, set: state });
   }
 
   async all(): Promise<Discount[]> {

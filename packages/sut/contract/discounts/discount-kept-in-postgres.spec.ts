@@ -31,6 +31,15 @@ describe('a discount kept in PostgreSQL', () => {
 
     expect(loaded?.toJSON()).to.deep.include(writtenWithAccents);
   });
-  it.todo('should save a discount at a changed rate and load it back equal, in a separate transaction');
+  it('should save a discount at a changed rate and load it back equal, in a separate transaction', async () => {
+    const { keep, repository, loadOnItsOwnConnection } = await setupSut();
+    const discount = await keep(spicesDiscount);
+    discount.changeRate('25');
+
+    await repository.save(discount);
+
+    const loaded = await loadOnItsOwnConnection();
+    expect(loaded.map((kept) => kept.toJSON())).to.deep.equal([{ id: discount.toJSON().id, ...spicesDiscount, rate: '25' }]);
+  });
   it.todo('should change only the discount named, the other keeping its rate');
 });
