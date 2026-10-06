@@ -39,4 +39,16 @@ describe('the migration that keeps the rate as written', () => {
     const [loaded] = await loadOnItsOwnConnection();
     expect(loaded?.toJSON(), 'the discount, forward again').to.deep.include(spicesDiscount);
   });
+  it('should refuse to run backward while a rate is not a number: lossy, a rate such as 12,5 cannot go back', async () => {
+    const { client, databaseUrl, migrateForward } = await setupSut();
+    await migrateForward();
+    await discountRepositoryOn(client, databaseUrl).keep(aRateWrittenWithAComma);
+
+    const refusal = await migrateBackward(client, theMigration).then(
+      () => 'went back',
+      (error: { code: string }) => error.code,
+    );
+
+    expect(refusal, 'invalid text representation of a number').to.equal('22P02');
+  });
 });
