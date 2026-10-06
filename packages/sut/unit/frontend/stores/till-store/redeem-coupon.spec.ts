@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { UnprocessableContentException } from '@app/types/rest-api';
 import { produceDiscount, spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from './till-store-of-an-app';
@@ -64,6 +65,13 @@ describe('Store till', () => {
     });
   });
   describe('redeeming a coupon at another store', () => {
-    it.todo('should hold that the coupon is not for the store picked');
+    it('should hold that the coupon is not for the store picked', async () => {
+      const { restApi, till } = setupSut();
+      restApi.post.mockRejectedValue(new UnprocessableContentException('POST /redemptions answered 422'));
+
+      await till.redeemCoupon({ code: '7K3QX9M2PD', storeName: stephaniesProduceDiscount.storeName, storeAddress: stephaniesProduceDiscount.storeAddress });
+
+      expect(till.couponNotForThisStore, 'whether the coupon is held as not for the store picked').to.equal(true);
+    });
   });
 });
