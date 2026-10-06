@@ -1,7 +1,32 @@
-import { describe, it } from 'vitest';
+import type pg from 'pg';
+import { describe, expect, it } from 'vitest';
+
+import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
+import { spicesDiscount } from '@sut/support/example-discounts';
+
+import { discountRepositoryOn, isKeptAndLoadedBackOnEmptiedTables } from '../support/discount-repository';
+import { setupSut } from '../support/migrations';
+
+const keepADiscountWithASaleCounted = async (client: pg.Client, databaseUrl: string) => {
+  const { repository, keepWithCouponsIssued } = discountRepositoryOn(client, databaseUrl);
+  const kept = await keepWithCouponsIssued(spicesDiscount, ['7K3QX9M2PD']);
+  kept.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+  kept.count();
+  await repository.save(kept);
+  return kept;
+};
+
+const theCountedSaleLoadedBackAsKept = (client: pg.Client, databaseUrl: string) =>
+  isKeptAndLoadedBackOnEmptiedTables(client, databaseUrl, keepADiscountWithASaleCounted);
 
 describe('the migration that lets a discount\'s sales be counted', () => {
-  it.todo('should migrate forward from empty, the counted-sales round-trip lines passing on the result');
+  it('should migrate forward from empty, the counted-sales round-trip lines passing on the result', async () => {
+    const { client, databaseUrl, migrateForward } = await setupSut();
+
+    await migrateForward();
+
+    expect(await theCountedSaleLoadedBackAsKept(client, databaseUrl), 'a counted sale loaded back as kept').to.equal(true);
+  });
   it.todo('should run backward to sales that cannot be counted, their lines passing, and forward again, the count lines passing: lossy, every count is lost and the sales counted before count again');
   it.todo('should count, in the first count after the migration, the coupons redeemed before it');
   it.todo('should keep and load back, as the deployed version does, a discount with a redeemed coupon on the migrated schema');
