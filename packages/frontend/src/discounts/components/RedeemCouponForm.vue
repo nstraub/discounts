@@ -3,7 +3,11 @@ import type { DiscountResponse } from '@app/types/discounts';
 
 import { discountTexts } from '../texts';
 
-defineProps<{ stores: Pick<DiscountResponse, 'storeName' | 'storeAddress'>[] }>();
+type Store = Pick<DiscountResponse, 'storeName' | 'storeAddress'>;
+
+defineProps<{ stores: Store[] }>();
+
+const theNameAndAddressOf = (store: Store) => `${store.storeName}, ${store.storeAddress}`;
 </script>
 
 <template>
@@ -16,9 +20,9 @@ defineProps<{ stores: Pick<DiscountResponse, 'storeName' | 'storeAddress'>[] }>(
       >
         <option
           v-for="store in stores"
-          :key="`${store.storeName}, ${store.storeAddress}`"
+          :key="theNameAndAddressOf(store)"
         >
-          {{ store.storeName }}, {{ store.storeAddress }}
+          {{ theNameAndAddressOf(store) }}
         </option>
       </select>
     </label>
