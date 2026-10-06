@@ -198,7 +198,12 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   row locked (`SELECT … FOR UPDATE`), so concurrent changes to one discount are serialised. `changeRate`
   stays outside `changing`, last write winning.
 - **The rate** is text end to end (column, schema, domain, page), kept exactly as written
-  (migration `0003_rate_as_written`).
+  (migration `0003_rate_as_written`). It is
+  checked only on publishing: `DiscountRate` (above 0, at most 100, at most one decimal) through
+  `Discount.publish(keep)`, which keeps nothing and raises `DiscountPublicationRejected` when the rate
+  is not valid; `POST /discounts` then answers 400 with `fields: ['rate']`. A kept rate is never
+  re-checked. `contract/support/discounts-table.ts` has `insertADiscountRow`, which inserts a row
+  without the rule, for rates kept before it.
 - **`src/discounts/infra/database.module.ts`:** the one connection pool, exported as the Drizzle
   `database` provider and closed in `onApplicationShutdown`.
 - **Database:** `packages/backend/drizzle.config.ts` reads the Drizzle schema from
