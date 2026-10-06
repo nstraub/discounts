@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { FetchRestApi } from '@app/types/rest-api';
-import { UnprocessableContentException } from '@app/types/rest-api-refusals';
+import { BadRequestException, UnprocessableContentException } from '@app/types/rest-api-refusals';
 import { spicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { setupSut as setupTheApp } from '../../support/app';
@@ -70,7 +70,14 @@ describe('class FetchRestApi', () => {
 
       expect(refusal).to.not.be.instanceOf(UnprocessableContentException);
     });
-    it.todo('should carry the fields a 400 lists as missing in the rejection');
+    it('should carry the fields a 400 lists as missing in the rejection', async () => {
+      const { restApi } = await setupSut();
+
+      const refusal = await refusalOf(restApi.post('/discounts', { ...spicesDiscount, item: '' }));
+
+      expect(refusal).to.be.instanceOf(BadRequestException);
+      expect(refusal).to.deep.include({ missing: ['item'] });
+    });
   });
 
   describe('getting', () => {
