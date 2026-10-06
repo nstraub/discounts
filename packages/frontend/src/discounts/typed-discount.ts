@@ -1,6 +1,6 @@
 import type { ChangeRateRequest, PublishDiscountRequest } from '@app/types/discounts';
 
-export const nothingTyped = () => ({ item: '', rate: '', storeName: '', storeAddress: '' });
+export const nothingTyped = () => ({ item: '', rate: '', storeName: '', storeAddress: '', hook: '' });
 
 const isBlank = (typed: string): boolean => typed.trim() === '';
 
@@ -11,7 +11,7 @@ const withTheHookGiven = (discount: Partial<PublishDiscountRequest>, hook: strin
   return { ...discount, hook };
 };
 
-export const discountToPublish = ({ rate, ...others }: ReturnType<typeof nothingTyped>, hook: string): Partial<PublishDiscountRequest> => {
+export const discountToPublish = ({ rate, hook, ...others }: ReturnType<typeof nothingTyped>): Partial<PublishDiscountRequest> => {
   if (isBlank(rate)) {
     return withTheHookGiven(others, hook);
   }

@@ -9,21 +9,16 @@ import TypedDiscountFields from './TypedDiscountFields.vue';
 
 const discounts = useDiscountsStore();
 const discount = ref(nothingTyped());
-const hook = ref('');
 
 const publish = async (): Promise<void> => {
-  await discounts.publish(discountToPublish(discount.value, hook.value));
+  await discounts.publish(discountToPublish(discount.value));
   discount.value = nothingTyped();
-  hook.value = '';
 };
 </script>
 
 <template>
   <form @submit.prevent="publish">
-    <TypedDiscountFields
-      v-model="discount"
-      v-model:hook="hook"
-    />
+    <TypedDiscountFields v-model="discount" />
     <button
       type="submit"
       class="rounded border px-3 py-1"

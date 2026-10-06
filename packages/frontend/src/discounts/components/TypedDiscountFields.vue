@@ -5,7 +5,6 @@ import type { nothingTyped } from '../typed-discount';
 import CaptionedInput from './CaptionedInput.vue';
 
 const discount = defineModel<ReturnType<typeof nothingTyped>>({ required: true });
-const hook = defineModel<string>('hook', { required: true });
 </script>
 
 <template>
@@ -30,7 +29,7 @@ const hook = defineModel<string>('hook', { required: true });
     test-id="discount-store-address"
   />
   <CaptionedInput
-    v-model="hook"
+    v-model="discount.hook"
     :caption="discountTexts.hook"
     test-id="discount-hook"
   />
