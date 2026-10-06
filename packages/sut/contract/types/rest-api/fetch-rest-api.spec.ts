@@ -59,4 +59,9 @@ describe('class FetchRestApi', () => {
       expect(outcome).to.equal('GET /nowhere answered 404');
     });
   });
+  describe('patching', () => {
+    it.todo('should send the body as JSON to the path with PATCH');
+    it.todo('should resolve when the answer is ok with no content');
+    it.todo('should reject when the answer is not ok');
+  });
 });

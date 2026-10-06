@@ -94,4 +94,8 @@ describe('Component PublishedDiscounts', () => {
     it.todo('should keep every discount readable in full with the text enlarged');
     it.todo('should present each discount to a screen reader as one entry with its item, rate, store name and store address');
   });
+  describe('changing a rate', () => {
+    it.todo('should offer to change the rate on each entry');
+    it.todo('should keep an entry\'s text apart from its control to change the rate');
+  });
 });

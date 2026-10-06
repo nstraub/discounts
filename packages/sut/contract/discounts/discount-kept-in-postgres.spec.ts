@@ -31,4 +31,6 @@ describe('a discount kept in PostgreSQL', () => {
 
     expect(loaded?.toJSON()).to.deep.include(writtenWithAccents);
   });
+  it.todo('should save a discount at a changed rate and load it back equal, in a separate transaction');
+  it.todo('should change only the discount named, the other keeping its rate');
 });
