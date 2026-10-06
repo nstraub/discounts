@@ -113,7 +113,12 @@ describe('class Discount', () => {
 
         expect(tryingItsCouponAt(inOtherCapitals, discount)).to.throw(CouponNotForThisStoreException);
       });
-      it.todo('should refuse its coupon at a store whose name has spaces around it that its own has not');
+      it('should refuse its coupon at a store whose name has spaces around it that its own has not', () => {
+        const discount = setupSut();
+        const withSpacesAroundItsName = new Store({ storeName: ` ${publishedSpicesDiscount.storeName} `, storeAddress: publishedSpicesDiscount.storeAddress });
+
+        expect(tryingItsCouponAt(withSpacesAroundItsName, discount)).to.throw(CouponNotForThisStoreException);
+      });
     });
 
     describe('state', () => {
