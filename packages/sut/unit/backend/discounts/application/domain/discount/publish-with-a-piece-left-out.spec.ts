@@ -7,6 +7,12 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { lastRejectionOf, setupSut } from './publishing-a-discount';
 
+const refusedWith = async (details: Parameters<ReturnType<typeof setupSut>['discountWith']>[0]) => {
+  const { events, keep, discountWith } = setupSut();
+  await expect(discountWith(details).publish(keep)).rejects.to.be.instanceOf(PiecesMissingException);
+  return events;
+};
+
 describe('class Discount', () => {
   describe('publishing a discount with a piece left out', () => {
     describe('the rejection', () => {
@@ -31,9 +37,21 @@ describe('class Discount', () => {
     });
 
     describe('empty', () => {
-      it.todo('should refuse an item that is empty text, its rejection naming the item as missing');
-      it.todo('should refuse a store name that is empty text, its rejection naming the store name as missing');
-      it.todo('should refuse a store address that is empty text, its rejection naming the store address as missing');
+      it('should refuse an item that is empty text, its rejection naming the item as missing', async () => {
+        const events = await refusedWith({ ...spicesDiscount, item: '' });
+
+        expect(lastRejectionOf(events)).to.deep.include({ reason: 'missing', pieces: ['item'] });
+      });
+      it('should refuse a store name that is empty text, its rejection naming the store name as missing', async () => {
+        const events = await refusedWith({ ...spicesDiscount, storeName: '' });
+
+        expect(lastRejectionOf(events)).to.deep.include({ reason: 'missing', pieces: ['storeName'] });
+      });
+      it('should refuse a store address that is empty text, its rejection naming the store address as missing', async () => {
+        const events = await refusedWith({ ...spicesDiscount, storeAddress: '' });
+
+        expect(lastRejectionOf(events)).to.deep.include({ reason: 'missing', pieces: ['storeAddress'] });
+      });
       it.todo('should refuse a rate that is empty text or only blank space, its rejection naming the rate as missing, not as not valid');
     });
 
