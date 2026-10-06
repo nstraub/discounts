@@ -75,7 +75,15 @@ describe('POST /stores/counts', () => {
       expect(response.status).to.equal(201);
       expect(countRequest.safeParse({ storeName: aDiscountInAnyText.storeName, storeAddress: aDiscountInAnyText.storeAddress }).error).to.equal(undefined);
     });
-    it.todo('should keep the count response schema no stricter than a discount\'s id, item and rate and a number of sales');
+    it('should keep the count response schema no stricter than a discount\'s id, item and rate and a number of sales', async () => {
+      const aDiscountInAnyText = { ...spicesDiscount, ...longTextInAnyCharacters };
+      const { http } = await setupSutWithACouponUsedFor(aDiscountInAnyText);
+
+      const response = await countTheStoreOf(http, aDiscountInAnyText);
+
+      expect(response.body[0].item).to.equal(longTextInAnyCharacters.item);
+      expect(countResponse.safeParse(response.body).error).to.equal(undefined);
+    });
   });
 
   describe('malformed request', () => {
