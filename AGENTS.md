@@ -174,6 +174,12 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
 - **The hook** is a discount's optional free text: absent from `DiscountDetails` when there is none,
   optional on the wire, a nullable `hook` column in the database (migration `0004`, lossy down); the
   repository maps a null column to an absent hook.
+- **Coupons** are part of the `Discount` aggregate: `issueCoupon(token)` adds a `CouponToken`
+  (value object, `drawnFrom(random)`; ten Crockford base32 characters) and raises `CouponIssued`; there
+  is no coupon repository and no coupon port. `DiscountService` takes the random source, which
+  `discounts.module.ts` wires as `crypto.getRandomValues`. `POST /discounts/:id/coupons` answers the
+  coupon through `couponResponse`. They are kept in the `coupons` table (migration `0005`, lossy down),
+  written and read with their discount (`infra/coupon-rows.ts`).
 - **The rate** is text end to end (column, schema, domain, page), kept exactly as written
   (migration `0003_rate_as_written`).
 - **`src/discounts/infra/database.module.ts`:** the one connection pool, exported as the Drizzle
@@ -235,7 +241,11 @@ first slice.
   `spicesDiscountWithItsHook`; `discounts-table.ts` also holds `aDiscountKeptBefore` and
   `aDiscountKeptBeforeAsReadAfterMigratingForward`, for a discount kept before a migration. A new
   migration joins `theMigrationsAfterIt` in each earlier migration spec; otherwise the migrator
-  silently skips an earlier migration that a spec ran backward.
+  silently skips an earlier migration that a spec ran backward: today those are the lists in the
+  table, rate and hook migration specs. A random source in a spec is `aSourceDrawing(token)`
+  (`@backend/app/mocks/random-sources`); `couponForTheSpicesDiscount`, `stephaniesProduceDiscount` are
+  among the shared examples; `contract/support/discounts-table.ts` has `insertACoupon` and
+  `migrations.ts` has `migrateBackwardPast`.
 - **Tags:** `@wip` marks the scenario being built (run it with `yarn test:wip`); `@todo` marks a
   recorded missing case whose steps are written and whose step definitions are not. Both are
   excluded from `yarn test:bdd`.
