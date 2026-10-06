@@ -30,7 +30,7 @@ export class Discount {
     return new IssuedCoupon(token, this.details.toJSON().storeName);
   }
 
-  toJSON(): { id: string; coupons: string[] } & ReturnType<DiscountDetails['toJSON']> {
-    return { id: this.id, ...this.details.toJSON(), coupons: this.coupons.map((coupon) => coupon.toJSON().token) };
+  toJSON(): { id: string; coupons: ReturnType<Coupon['toJSON']>[] } & ReturnType<DiscountDetails['toJSON']> {
+    return { id: this.id, ...this.details.toJSON(), coupons: this.coupons.map((coupon) => coupon.toJSON()) };
   }
 }

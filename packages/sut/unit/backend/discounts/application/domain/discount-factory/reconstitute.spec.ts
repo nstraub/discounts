@@ -29,11 +29,11 @@ describe('class DiscountFactory', () => {
   describe('rebuilding a kept discount with its coupons', () => {
     it('should rebuild a kept discount with the coupons it has issued', () => {
       const factory = new DiscountFactory(mock<DomainEventPublisher>());
-      const kept = { id: 'kept-spices-id', ...spicesDiscount, coupons: ['7K3QX9M2PD', 'R4WZ0BH8NE'] };
+      const kept = { id: 'kept-spices-id', ...spicesDiscount, coupons: [{ token: '7K3QX9M2PD', redeemed: false }, { token: 'R4WZ0BH8NE', redeemed: false }] };
 
       const rebuilt = factory.reconstitute(kept);
 
-      expect(rebuilt.toJSON().coupons).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
+      expect(rebuilt.toJSON().coupons).to.deep.equal(kept.coupons);
     });
   });
   describe('rebuilding a kept discount with a redeemed coupon', () => {

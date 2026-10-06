@@ -110,7 +110,7 @@ describe('a discount kept in PostgreSQL', () => {
       await sut.repository.save(found!);
 
       const [loaded] = await sut.loadOnItsOwnConnection();
-      expect(loaded?.toJSON().coupons).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
+      expect(loaded?.toJSON().coupons.map(({ token }) => token)).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
     });
   });
   describe('with a redeemed coupon', () => {

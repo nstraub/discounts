@@ -26,9 +26,9 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   ) {}
 
   async save(discount: Discount): Promise<void> {
-    const { coupons: tokens, ...state } = discount.toJSON();
+    const { coupons, ...state } = discount.toJSON();
     await this.database.insert(discounts).values(state).onConflictDoUpdate({ target: discounts.id, set: state });
-    await keepTheNewlyIssued(this.database, state.id, tokens);
+    await keepTheNewlyIssued(this.database, state.id, coupons.map((coupon) => coupon.token));
   }
 
   async all(): Promise<Discount[]> {
@@ -44,6 +44,6 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   }
 
   private rebuilt(row: typeof discounts.$inferSelect, issued: string[]): Discount {
-    return this.factory.reconstitute({ ...withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) }), coupons: issued });
+    return this.factory.reconstitute({ ...withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) }), coupons: issued.map((token) => ({ token, redeemed: false })) });
   }
 }

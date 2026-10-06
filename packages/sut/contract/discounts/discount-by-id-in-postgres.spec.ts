@@ -32,6 +32,6 @@ describe('a discount found by its id in PostgreSQL', () => {
 
     const found = await repository.withId(produce.toJSON().id);
 
-    expect(found?.toJSON().coupons).to.deep.equal(['R4WZ0BH8NE']);
+    expect(found?.toJSON().coupons.map(({ token }) => token)).to.deep.equal(['R4WZ0BH8NE']);
   });
 });

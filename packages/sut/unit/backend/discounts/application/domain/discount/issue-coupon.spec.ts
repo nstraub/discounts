@@ -16,7 +16,7 @@ describe('class Discount', () => {
 
         discount.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
 
-        expect(discount.toJSON().coupons).to.deep.equal(['7K3QX9M2PD']);
+        expect(discount.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: false }]);
       });
       it('should raise CouponIssued carrying its id and the coupon\'s token', () => {
         const { events, discount } = setupSut();
@@ -44,7 +44,7 @@ describe('class Discount', () => {
 
         discount.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
 
-        expect(discount.toJSON().coupons).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
+        expect(discount.toJSON().coupons.map(({ token }) => token)).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
       });
       it.todo('should issue a second coupon with a token of its own when tried twice, holding both');
     });
