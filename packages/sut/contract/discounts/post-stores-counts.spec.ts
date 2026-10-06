@@ -10,6 +10,12 @@ import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
 
 type ExampleDiscount = typeof spicesDiscount;
 
+const aDiscountInAnyText = { ...spicesDiscount, ...longTextInAnyCharacters };
+
+const jsonCutShort = '{"storeName": "Spice Bazaar",';
+
+const aStoreNotInText = { storeName: 1234567890, storeAddress: 1234567890 };
+
 const useACouponFor = async (http: Http, published: { id: string }, discount: ExampleDiscount) => {
   const code: string = (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
   await http.post('/redemptions').send({ code, ...theStoreOf(discount) });
@@ -76,7 +82,6 @@ describe('POST /stores/counts', () => {
 
   describe('strictness', () => {
     it('should keep the count request schema no stricter than any text for a store\'s name and address', async () => {
-      const aDiscountInAnyText = { ...spicesDiscount, ...longTextInAnyCharacters };
       const { http } = await setupSutWithACouponUsedFor(aDiscountInAnyText);
 
       const response = await countTheStoreOf(http, aDiscountInAnyText);
@@ -85,7 +90,6 @@ describe('POST /stores/counts', () => {
       expect(countRequest.safeParse(theStoreOf(aDiscountInAnyText)).error).to.equal(undefined);
     });
     it('should keep the count response schema no stricter than a discount\'s id, item and rate and a number of sales', async () => {
-      const aDiscountInAnyText = { ...spicesDiscount, ...longTextInAnyCharacters };
       const { http } = await setupSutWithACouponUsedFor(aDiscountInAnyText);
 
       const response = await countTheStoreOf(http, aDiscountInAnyText);
@@ -100,7 +104,7 @@ describe('POST /stores/counts', () => {
       const { http } = await setupSut();
 
       const missing = await http.post('/stores/counts').send({});
-      const notText = await http.post('/stores/counts').send({ storeName: 1234567890, storeAddress: 1234567890 });
+      const notText = await http.post('/stores/counts').send(aStoreNotInText);
 
       expect([missing.status, notText.status]).to.deep.equal([400, 400]);
       expect([requestRejection.parse(missing.body).fields, requestRejection.parse(notText.body).fields]).to.deep.equal([
@@ -118,7 +122,7 @@ describe('POST /stores/counts', () => {
     it('should answer 400 for a body that is not valid JSON', async () => {
       const { countWrittenAsJson } = await setupSutCountingJsonText();
 
-      const response = await countWrittenAsJson('{"storeName": "Spice Bazaar",');
+      const response = await countWrittenAsJson(jsonCutShort);
 
       expect(response.status).to.equal(400);
     });
@@ -126,9 +130,9 @@ describe('POST /stores/counts', () => {
       const { http, countWrittenAsJson } = await setupSutCountingJsonText();
       const errors = [
         await http.post('/stores/counts').send({}),
-        await http.post('/stores/counts').send({ storeName: 1234567890, storeAddress: 1234567890 }),
+        await http.post('/stores/counts').send(aStoreNotInText),
         ...(await answersInTurnToBodiesThatAreNotObjects(countWrittenAsJson)),
-        await countWrittenAsJson('{"storeName": "Spice Bazaar",'),
+        await countWrittenAsJson(jsonCutShort),
       ];
 
       expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
