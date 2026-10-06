@@ -8,7 +8,7 @@ export class CouponToken {
 
   static drawnFrom(random: RandomSource): CouponToken {
     const drawn = random(new Uint8Array(charactersInAToken));
-    return new CouponToken([...drawn].map((value) => crockfordBase32.charAt(value)).join(''));
+    return new CouponToken([...drawn].map((value) => crockfordBase32.charAt(value % crockfordBase32.length)).join(''));
   }
 
   toJSON(): string {
