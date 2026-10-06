@@ -1,3 +1,4 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { spicesDiscount } from '@sut/support/example-discounts';
@@ -5,7 +6,7 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 import { setupSut } from '../support/app';
 import { theDiscountsKept, theRowKeptFor } from '../support/discounts-table';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
-import { redeemAtTheStoreOf, setupSutWithAnotherCouponOfTheSameDiscount } from '../support/redemptions';
+import { redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithAnotherCouponOfTheSameDiscount } from '../support/redemptions';
 
 const aCodeNobodyIssued = 'ZZZZZZZZZZ';
 
@@ -28,7 +29,15 @@ describe('POST /redemptions', () => {
       expect(kept.rows, 'each coupon kept').to.have.deep.members([{ token: code, redeemed: false, counted: false }, { token: other, redeemed: false, counted: false }]);
       expect(await theDiscountsKept(client), 'the discount kept').to.deep.equal([theRowKeptFor(published, spicesDiscount)]);
     });
-    it.todo('should publish nothing on the application event emitter for a code nobody issued');
+    it('should publish nothing on the application event emitter for a code nobody issued', async () => {
+      const { app, http } = await setupSutWithACouponFor();
+      const published: unknown[] = [];
+      app.get(EventEmitter2).onAny((event) => published.push(event));
+
+      await redeemAtTheStoreOf(http, aCodeNobodyIssued);
+
+      expect(published, 'the events published').to.deep.equal([]);
+    });
   });
 
   describe('empty', () => {
