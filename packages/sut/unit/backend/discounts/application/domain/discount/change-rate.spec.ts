@@ -40,7 +40,14 @@ describe('class Discount', () => {
 
         expect(events.publish.mock.lastCall?.at(0)).to.deep.include({ id: 'produce-id', rate: '15' });
       });
-      it.todo('should keep its item, store name and store address when its rate changes');
+      it('should keep its item, store name and store address when its rate changes', () => {
+        const { discount } = setupSut();
+
+        discount.changeRate('25');
+
+        const { item, storeName, storeAddress } = spicesDiscount;
+        expect(discount.toJSON()).to.deep.include({ item, storeName, storeAddress });
+      });
     });
 
     describe('state', () => {
