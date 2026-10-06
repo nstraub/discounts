@@ -51,7 +51,15 @@ describe('class Discount', () => {
         const [published] = events.publish.mock.lastCall ?? [];
         expect((published as DiscountPublished).discount.hook).to.equal('Our spices now come from a new supplier');
       });
-      it.todo('should raise DiscountPublished carrying no hook when it has none');
+      it('should raise DiscountPublished carrying no hook when it has none', () => {
+        const { events, discountWith } = setupSut();
+        const discount = discountWith(spicesDiscount);
+
+        discount.publish();
+
+        const [published] = events.publish.mock.lastCall ?? [];
+        expect((published as DiscountPublished).discount).to.not.have.property('hook');
+      });
     });
 
     describe('empty', () => {
