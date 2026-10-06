@@ -4,6 +4,7 @@ import { mock } from 'vitest-mock-extended';
 import { Coupon } from '@backend/discounts/application/domain/coupon';
 import { CouponAlreadyUsedException } from '@backend/discounts/application/domain/coupon-already-used-exception';
 import { CouponRedeemed } from '@backend/discounts/application/domain/coupon-redeemed';
+import { CouponRedemptionRejected } from '@backend/discounts/application/domain/coupon-redemption-rejected';
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
 import { couponForTheProduceDiscount, publishedProduceDiscount } from '@sut/support/example-discounts';
@@ -57,7 +58,15 @@ describe('class Coupon', () => {
       expect(() => coupon.redeem('spices-id')).to.throw(CouponAlreadyUsedException);
       expect(coupon.toJSON().redeemed).to.equal(true);
     });
-    it.todo('should raise CouponRedemptionRejected carrying its discount\'s id, its token and that it has already been used');
+    it('should raise CouponRedemptionRejected carrying its discount\'s id, its token and that it has already been used', () => {
+      const { events, coupon } = setupSut({ redeemed: true });
+
+      expect(() => coupon.redeem('spices-id')).to.throw(CouponAlreadyUsedException);
+
+      const [raised] = events.publish.mock.lastCall ?? [];
+      expect(raised).to.be.instanceOf(CouponRedemptionRejected);
+      expect(raised).to.deep.include({ discountId: 'spices-id', token: '7K3QX9M2PD', reason: 'already used' });
+    });
     it.todo('should not raise CouponRedeemed again when its second redemption is refused');
 
     describe('state', () => {

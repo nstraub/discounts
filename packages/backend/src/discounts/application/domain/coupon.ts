@@ -1,5 +1,6 @@
 import { CouponAlreadyUsedException } from './coupon-already-used-exception.js';
 import { CouponRedeemed } from './coupon-redeemed.js';
+import { CouponRedemptionRejected } from './coupon-redemption-rejected.js';
 import type { CouponToken } from './coupon-token.js';
 import type { DomainEventPublisher } from './domain-event-publisher.js';
 
@@ -13,6 +14,7 @@ export class Coupon {
 
   redeem(discountId: string): void {
     if (this.redeemed) {
+      this.events.publish(new CouponRedemptionRejected('spices-id', '7K3QX9M2PD', 'already used'));
       throw new CouponAlreadyUsedException();
     }
     this.redeemed = true;
