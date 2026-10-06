@@ -1,9 +1,9 @@
 # app
 
 A scaffold for building a web application test-first: a NestJS backend, a Vue frontend, shared
-types, and a test suite with unit, contract and acceptance tests. The walking skeleton is in place: a
-page shows the latest greeting stored in Postgres and saves a new one through the backend, and one
-pipeline builds, deploys and tests it.
+types, and a test suite with unit, contract and acceptance tests. The app's root page (`#/`) lists the published discounts and offers a form to publish one (item, rate, store
+name, store address), and one pipeline builds, deploys and tests it. The walking skeleton's greeting page,
+which shows and saves a greeting through the backend and Postgres, is at `#/walking-skeleton`.
 
 ## Setting up
 
