@@ -2,15 +2,10 @@ import { DiscountPublicationRejected } from './discount-publication-rejected.js'
 import type { DomainEventPublisher } from './domain-event-publisher.js';
 import { RateNotValidException } from './rate-not-valid-exception.js';
 
-const moreThanOneDecimalPlace = /\.\d{2,}/;
-const aComputersNotation = /[a-z]/i;
+const digitsWithAtMostOneDecimalAfterAPointOrAComma = /^(0|[1-9][0-9]*)([.,][0-9])?$/;
 
 export class DiscountRate {
-  private readonly withADecimalPoint: string;
-
-  constructor(private readonly written: string) {
-    this.withADecimalPoint = written.replace(',', '.');
-  }
+  constructor(private readonly written: string) {}
 
   whenValid<Published>(events: DomainEventPublisher, publish: () => Published): Published {
     if (this.isNotWrittenAsADecimal() || this.isOutOfBounds()) {
@@ -21,15 +16,11 @@ export class DiscountRate {
   }
 
   private isNotWrittenAsADecimal(): boolean {
-    return (
-      Number.isNaN(Number(this.withADecimalPoint)) ||
-      moreThanOneDecimalPlace.test(this.withADecimalPoint) ||
-      aComputersNotation.test(this.written)
-    );
+    return !digitsWithAtMostOneDecimalAfterAPointOrAComma.test(this.written);
   }
 
   private isOutOfBounds(): boolean {
-    const value = Number(this.withADecimalPoint);
+    const value = Number(this.written.replace(',', '.'));
     return value <= 0 || value > 100;
   }
 }

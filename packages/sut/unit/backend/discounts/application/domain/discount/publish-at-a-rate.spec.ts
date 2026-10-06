@@ -33,6 +33,21 @@ describe('class Discount', () => {
           computersNotations.map((rate) => new DiscountPublicationRejected(rate, 'not valid')),
         );
       });
+      it('should refuse a rate written in a way not yet accepted', async () => {
+        const { events, keep, discountAt } = setupSut();
+        const waysNotYetAccepted = [' 20 ', '\t20\n', '+20', '05', '.5', '20.', '12.50'];
+
+        const refusals: unknown[] = [];
+
+        for (const rate of waysNotYetAccepted) {
+          await discountAt(rate).publish(keep).catch((refusal: unknown) => refusals.push(refusal));
+        }
+
+        expect(events.publish.mock.calls.map(([event]) => event)).to.deep.equal(
+          waysNotYetAccepted.map((rate) => new DiscountPublicationRejected(rate, 'not valid')),
+        );
+        expect(refusals).to.deep.equal(waysNotYetAccepted.map(() => new RateNotValidException()));
+      });
     });
   });
   describe('publishing a discount at a rate its rules refuse', () => {
