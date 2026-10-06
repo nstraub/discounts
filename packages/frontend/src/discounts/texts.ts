@@ -10,4 +10,8 @@ export const discountTexts = {
   getCoupon: 'Get a coupon',
   yourCouponToUseAt: 'Your coupon, to use at',
   nothingPublished: 'No discount is published yet.',
+  yourStore: 'Your store',
+  couponCode: 'Coupon code',
+  redeem: 'Redeem',
+  theDiscountAppliesTo: 'The discount applies to',
 };

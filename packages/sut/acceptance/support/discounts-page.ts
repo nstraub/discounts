@@ -60,6 +60,10 @@ export class DiscountsPage {
     assert.ok(store.endsWith(discount.storeName), `Sue's coupon is not to use at ${discount.storeName}: "${store}"`);
   }
 
+  async couponCodeShown(): Promise<string> {
+    return this.page.getByTestId('issued-coupon').getByTestId('coupon-code').innerText();
+  }
+
   async verifyShows(discount: ExampleDiscount): Promise<void> {
     await this.verifyShowsTheDiscount(discount);
     await this.verifyShowsTheStoreOf(discount);

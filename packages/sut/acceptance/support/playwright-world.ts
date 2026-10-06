@@ -4,6 +4,7 @@ import { chromium, type Browser, type BrowserContext, type Page } from 'playwrig
 import { produceDiscount } from '@sut/support/example-discounts';
 
 import { acceptancePort } from './apps-under-test';
+import type { TillPage } from './till-page';
 
 // Below cucumber's 5 s step timeout, so a missing element fails with Playwright's message naming it.
 const pageTimeout = 4_000;
@@ -13,8 +14,10 @@ let browser: Browser;
 export class PlaywrightWorld extends World {
   context!: BrowserContext;
   page!: Page;
-  someoneElsesContext?: BrowserContext;
+  someoneElsesContexts: BrowserContext[] = [];
   publishedDiscount!: typeof produceDiscount;
+  couponCode!: string;
+  till!: TillPage;
   whatIsNew!: string;
   newRate!: string;
 
@@ -33,8 +36,9 @@ export class PlaywrightWorld extends World {
    * @returns that page, aimed at the app under test.
    */
   async openSomeoneElsesPage(): Promise<Page> {
-    this.someoneElsesContext = await browser.newContext({ baseURL: `http://localhost:${acceptancePort}` });
-    const page = await this.someoneElsesContext.newPage();
+    const someoneElsesContext = await browser.newContext({ baseURL: `http://localhost:${acceptancePort}` });
+    this.someoneElsesContexts.push(someoneElsesContext);
+    const page = await someoneElsesContext.newPage();
     page.setDefaultTimeout(pageTimeout);
     return page;
   }
@@ -45,7 +49,7 @@ export class PlaywrightWorld extends World {
    */
   async closePage(): Promise<void> {
     await this.context.close();
-    await this.someoneElsesContext?.close();
+    await Promise.all(this.someoneElsesContexts.map((someoneElsesContext) => someoneElsesContext.close()));
   }
 }
 
