@@ -8,17 +8,19 @@ type Change<Answer> = (discount: Discount) => Answer;
 
 type Lookup = (repository: DiscountRepository) => Promise<Discount | undefined>;
 
+const theOneWithId = (id: string): Lookup => async (repository) => {
+  const discount = await repository.withId(id);
+  if (!discount) {
+    throw new NoSuchDiscountException();
+  }
+  return discount;
+};
+
 export class DiscountChanges {
   constructor(private readonly repository: DiscountRepository) {}
 
   async toTheOneWithId<Answer>(id: string, change: Change<Answer>): Promise<Answer> {
-    return this.toTheOneFound(async (repository) => {
-      const discount = await repository.withId(id);
-      if (!discount) {
-        throw new NoSuchDiscountException();
-      }
-      return discount;
-    }, change);
+    return this.toTheOneFound(theOneWithId(id), change);
   }
 
   async toTheOneThatIssued<Answer>(token: CouponToken, change: Change<Answer>): Promise<Answer> {
