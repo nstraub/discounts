@@ -62,5 +62,10 @@ describe('View DiscountsView', () => {
 
       expect(view.findAllComponents(IssuedCoupon).map((shown) => shown.props('coupon'))).to.deep.equal([couponForTheSpicesDiscount]);
     });
+    it('should show no coupon until Sue decides to try a discount', async () => {
+      const view = await openThePageIssuing(couponForTheSpicesDiscount, [publishedSpicesDiscount]);
+
+      expect(view.findComponent(IssuedCoupon).exists(), 'a coupon shown before Sue decides').to.equal(false);
+    });
   });
 });
