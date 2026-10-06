@@ -1,6 +1,5 @@
 Feature: Stephanie takes the coupon at the till
 
-  @wip
   Scenario: Stephanie redeems a coupon
     Given Sue has a coupon for Stephanie's discount
     When Sue uses it at Stephanie's store
