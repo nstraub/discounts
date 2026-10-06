@@ -123,7 +123,13 @@ describe('Component PublishedDiscounts', () => {
 
       expect(list.get('[data-testid="published-hook"]').text()).to.equal(spicesDiscountWithItsHook.hook);
     });
-    it.todo('should show only its item, rate, store name and store address when it has no hook, with no empty place for one');
+    it('should show only its item, rate, store name and store address when it has no hook, with no empty place for one', () => {
+      const list = setupSut({ discounts: [publishedSpicesDiscount] });
+
+      const shown = list.get('[data-testid="published-discount-text"]').findAll('[data-testid]');
+
+      expect(shown.map((element) => element.attributes('data-testid'))).to.deep.equal(['published-item', 'published-rate', 'published-store-name', 'published-store-address']);
+    });
     it.todo('should show each hook on its own discount\'s entry, the entry without one showing none');
     it.todo('should show its hook without its surrounding spaces');
     it.todo('should keep the line breaks its hook is written with');
