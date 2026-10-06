@@ -7,6 +7,7 @@ import { CouponToken } from '@backend/discounts/application/domain/coupon-token'
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { discountRepositoryOn } from '../support/discount-repository';
+import { insertACoupon, insertADiscountWithout } from '../support/discounts-table';
 import { migrateBackward, setupSut } from '../support/migrations';
 
 const theMigration = '0006_let_a_coupon_be_redeemed';
@@ -51,6 +52,17 @@ describe('the migration that lets a coupon be redeemed', () => {
     expect(foundAgain?.toJSON().coupons, 'forward again, the use lost').to.deep.equal([{ token: '7K3QX9M2PD', redeemed: false }]);
     expect(await theRedeemedCouponLoadedBackAsKept(client, databaseUrl), 'forward again, a redeemed coupon loaded back as kept').to.equal(true);
   });
-  it.todo('should read back unused, through the repository, a coupon issued before the migration');
+  it('should read back unused, through the repository, a coupon issued before the migration', async () => {
+    const { client, databaseUrl, migrateForward } = await setupSut();
+    await migrateForward();
+    await migrateBackward(client, theMigration);
+    await insertADiscountWithout(client, 'hook');
+    await insertACoupon(client, { token: '7K3QX9M2PD', discount_id: 'constraint-id' });
+
+    await migrateForward();
+
+    const readBack = await discountRepositoryOn(client, databaseUrl).repository.withId('constraint-id');
+    expect(readBack?.toJSON().coupons.map(({ redeemed }) => redeemed), 'the coupon issued before, redeemed').to.deep.equal([false]);
+  });
   it.todo('should keep and load back, as the deployed version does, a discount with its coupons on the migrated schema');
 });
