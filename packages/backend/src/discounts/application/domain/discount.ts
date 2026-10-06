@@ -23,7 +23,7 @@ export class Discount {
   }
 
   issueCoupon(token: CouponToken): void {
-    this.coupons = [token];
+    this.coupons = [...this.coupons, token];
     this.events.publish(new CouponIssued(this.id, token.toJSON()));
   }
 

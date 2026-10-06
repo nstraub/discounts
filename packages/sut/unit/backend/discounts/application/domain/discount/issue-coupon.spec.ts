@@ -38,7 +38,14 @@ describe('class Discount', () => {
     });
 
     describe('state', () => {
-      it.todo('should issue a second coupon with a token of its own when tried twice, holding both');
+      it('should issue a second coupon with a token of its own when tried twice, holding both', () => {
+        const { discount } = setupSut();
+        discount.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+
+        discount.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
+
+        expect(discount.toJSON().coupons).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
+      });
     });
   });
 });
