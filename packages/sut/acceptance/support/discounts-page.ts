@@ -42,11 +42,9 @@ export class DiscountsPage {
   }
 
   async verifyShows(discount: ExampleDiscount): Promise<void> {
-    const shown = await this.publishedEntryOn(discount);
-    assert.equal(await shown.getByTestId('published-item').textContent(), discount.item);
-    assert.equal(await shown.getByTestId('published-rate').textContent(), `${discount.rate}%`);
-    assert.equal(await shown.getByTestId('published-store-name').textContent(), discount.storeName);
-    assert.equal(await shown.getByTestId('published-store-address').textContent(), discount.storeAddress);
+    await this.verifyShowsTheDiscount(discount);
+    await this.verifyShowsTheStoreOf(discount);
+    await this.verifyShowsWhereTheStoreIs(discount);
   }
 
   async verifyShowsTheStoreOf(discount: ExampleDiscount): Promise<void> {
