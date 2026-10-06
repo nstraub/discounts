@@ -185,7 +185,14 @@ describe('class Discount', () => {
     });
 
     describe('type', () => {
-      it.todo('should refuse a rate that is not a number, such as a fifth, its rejection naming the rate as not valid');
+      it('should refuse a rate that is not a number, such as a fifth, its rejection naming the rate as not valid', () => {
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('a fifth');
+
+        discount.publish();
+
+        expect(lastRejectionOf(events)).to.include({ rate: 'a fifth', reason: 'not valid' });
+      });
       it.todo('should refuse a rate of 12,25, two decimal places after a decimal comma, its rejection naming the rate as not valid');
       it.todo('should refuse a rate of 0,0, zero written with a decimal comma, its rejection naming the rate as not valid');
     });
