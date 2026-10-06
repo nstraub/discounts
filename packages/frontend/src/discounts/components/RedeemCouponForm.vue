@@ -18,6 +18,7 @@ const theNameAndAddressOf = (store: Store) => `${store.storeName}, ${store.store
         required
         class="rounded border border-gray-400 px-2 py-1"
       >
+        <option value="" />
         <option
           v-for="store in stores"
           :key="theNameAndAddressOf(store)"
