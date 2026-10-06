@@ -28,7 +28,7 @@ describe('Store discounts', () => {
 
       expect(discounts.published).to.deep.equal([{ ...publishedSpicesDiscount, rate: '30' }]);
     });
-    it('should hold the new rate on that discount only, the others keeping theirs', async () => {
+    it('should hold the discounts as listed once the change succeeds', async () => {
       const { restApi, discounts } = setupSut();
       restApi.get.mockResolvedValue([{ ...publishedSpicesDiscount, rate: '30' }, publishedProduceDiscount]);
 
