@@ -8,7 +8,9 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { discountRepositoryOn } from '../support/discount-repository';
 import { insertACoupon } from '../support/discounts-table';
-import { setupSut } from '../support/migrations';
+import { migrateBackward, setupSut, tableStatus } from '../support/migrations';
+
+const theMigration = '0005_create_coupons';
 
 const theCouponLinesPassing = {
   loadedBackAsKept: true,
@@ -40,7 +42,26 @@ describe('the migration that adds the coupons table', () => {
 
     expect(await outcomeOfTheCouponLines(client, databaseUrl)).to.deep.equal(theCouponLinesPassing);
   });
-  it.todo('should run backward to discounts without coupons, their lines passing, and forward again, the coupon lines passing: lossy, every coupon is lost');
+  it('should run backward to discounts without coupons, their lines passing, and forward again, the coupon lines passing: lossy, every coupon is lost', async () => {
+    const { client, databaseUrl, migrateForward } = await setupSut();
+    await migrateForward();
+    const { keep, repository } = discountRepositoryOn(client, databaseUrl);
+    const keptBefore = await keep(spicesDiscount);
+    keptBefore.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+    await repository.save(keptBefore);
+
+    await migrateBackward(client, theMigration);
+
+    expect(await tableStatus(client, 'app.coupons'), 'the coupons table, backward').to.equal(null);
+    const backward = await client.query('SELECT item FROM app.discounts');
+    expect(backward.rows, 'the discount, backward').to.deep.equal([{ item: spicesDiscount.item }]);
+
+    await migrateForward();
+
+    expect(await outcomeOfTheCouponLines(client, databaseUrl), 'forward again').to.deep.equal(theCouponLinesPassing);
+    const foundAgain = await repository.withId(keptBefore.toJSON().id);
+    expect(foundAgain?.toJSON().coupons, 'forward again, the first coupon lost').to.deep.equal([]);
+  });
   it.todo('should read back, through the repository, a discount kept before the migration, with no coupon');
   it.todo('should keep and load back, as the deployed version does, a discount on the migrated schema');
 });
