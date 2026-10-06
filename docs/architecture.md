@@ -56,6 +56,7 @@ C4Component
     Component(countView, "CountView", "Vue view (#/count)", "The count page: loads the published discounts, offers the count form and shows the counted discounts")
     Component(countForm, "CountDiscountedSalesForm", "Vue component", "The store, picked from the stores that publish, and a button to count its discounted sales")
     Component(counted, "CountedDiscounts", "Vue component", "One entry per discount counted: item, rate and the number of discounted sales")
+    Component(answer, "TillAnswer", "Vue component", "The till's answer: that the coupon has already been used, or that the discount applies")
     Component(applies, "DiscountApplies", "Vue component", "Says the discount applies to the item redeemed")
     Component(issuedCoupon, "IssuedCoupon", "Vue component", "Shows the coupon just issued: the store to use it at and its code as two groups of five")
     Component(store, "discounts store", "Pinia", "publish(), load(), changeRate() and getCoupon(), redeemCoupon() and countDiscountedSales(); goes through RestApi, reloads the list after a rate change, holds the coupon just issued, the redemption and the counted discounts, and derives the distinct stores from the published discounts")
@@ -64,21 +65,22 @@ C4Component
   Container_Boundary(backend, "Backend (NestJS)") {
     Component(controller, "DiscountsController", "NestJS controller", "POST /discounts answers 201 with Location; PATCH /discounts/:id answers 204; POST /discounts/:id/coupons answers the coupon; GET /discounts lists"')
     Component(storeCounts, "StoreCountsController", "NestJS controller", "POST /stores/counts answers 201 with each discount counted")
-    Component(redemptions, "RedemptionsController", "NestJS controller", "POST /redemptions answers 201 with the item; reads only the coupon's code")
+    Component(redemptions, "RedemptionsController", "NestJS controller", "POST /redemptions answers 201 with the item, or 409 when the coupon has already been used; reads only the coupon's code")
     Component(parsedBy, "ParsedBy", "Nest pipe, zod", "Parses the request against the shared schema; a failure is a 400 requestRejection")
     Component(service, "DiscountService", "Application service", "publish(), changeRate(), issueCoupon(), redeemCoupon(code), count(store) and published()")
-    Component(changes, "DiscountChanges", "Application collaborator", "The unit of work: loads a discount through the repository port, tells it a change, saves it; one discount per save")
+    Component(changes, "DiscountChanges", "Application collaborator", "The unit of work: runs issuing, redeeming and counting through the repository's changing(work): load, tell, save in one transaction")
     Component(factory, "DiscountFactory", "Domain factory", "create() gives a new identity; reconstitute() rebuilds a kept discount")
     Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails (item, rate, store name, store address, optional hook); publish() raises DiscountPublished, changeRate() raises DiscountRateChanged, issueCoupon() adds a coupon and raises CouponIssued, redeemCoupon(token) redeems it, count() counts the coupons redeemed since the last count and raises DiscountedSalesCounted")
     Component(event, "DiscountPublished", "Domain event", "Carries the discount as published")
     Component(token, "CouponToken", "Value object", "Ten characters of Crockford base32: drawnFrom(random) for a new one, read(code) for a typed one (case, O, I, L and spacing normalised)")
     Component(issued, "IssuedCoupon", "Domain value", "A coupon token and the name of the store it is for")
-    Component(coupon, "Coupon", "Entity in the aggregate", "A token, whether it was redeemed and whether it was counted; owns single use; redeem() raises CouponRedeemed")
+    Component(coupon, "Coupon", "Entity in the aggregate", "A token, whether it was redeemed and whether it was counted; owns single use; redeem() raises CouponRedeemed, and a second redeem() raises CouponRedemptionRejected and refuses")
     Component(couponRedeemed, "CouponRedeemed", "Domain event", "Raised when a coupon is redeemed")
+    Component(redemptionRejected, "CouponRedemptionRejected", "Domain event", "Raised when a coupon already used is redeemed: the discount id, the token and the reason")
     Component(salesCounted, "DiscountedSalesCounted", "Domain event", "Raised per discount counted: its id and its discounted sales")
     Component(couponIssued, "CouponIssued", "Domain event", "Raised when a coupon is issued")
     Component(rateChanged, "DiscountRateChanged", "Domain event", "Carries the discount id and its new rate")
-    Component(repositoryPort, "DiscountRepository", "Port", "save() (inserts or updates), all(), withId(), withCouponToken() and ofStore(store)")
+    Component(repositoryPort, "DiscountRepository", "Port", "save() (inserts or updates), all(), withId(), withCouponToken(), ofStore(store) and changing(work), which runs a change in one transaction")
     Component(publisherPort, "DomainEventPublisher", "Port", "publish(event)")
     Component(repository, "DiscountDrizzleRepository", "Adapter", "Keeps a discount in app.discounts and its coupons in app.coupons (token, redeemed, counted), written and read with it; a null hook column is an absent hook")
     Component(publisher, "EventEmitterDomainEventPublisher", "Adapter", "Emits the event on the application's EventEmitter2")
@@ -102,7 +104,8 @@ C4Component
   Rel(coupon, couponRedeemed, "Raises")
   Rel(view, tillView, "Routes to")
   Rel(tillView, redeemForm, "Shows")
-  Rel(tillView, applies, "Shows")
+  Rel(tillView, answer, "Shows")
+  Rel(answer, applies, "Shows when the coupon was redeemed")
   Rel(redeemForm, storePicker, "Asks through")
   Rel(redeemForm, store, "redeemCoupon()")
   Rel(store, redemptions, "POST /redemptions", "JSON over HTTP")
@@ -116,6 +119,7 @@ C4Component
   Rel(storeCounts, service, "Calls")
   Rel(service, changes, "Changes discounts through")
   Rel(discount, salesCounted, "Raises")
+  Rel(coupon, redemptionRejected, "Raises")
   Rel(form, store, "publish()")
   Rel(changeForm, store, "changeRate()")
   Rel(view, store, "load()")
@@ -311,6 +315,20 @@ sequenceDiagram
   Controller-->>Store: 201, the discounts counted
   Store-->>Rodrigo: CountedDiscounts shows each discount's sales
 ```
+
+### Single use, and one change at a time
+
+A coupon is redeemed once. `Coupon.redeem` on a coupon already redeemed (counted or not) raises
+`CouponRedemptionRejected` with the discount's id, the token and the reason, raises no second
+`CouponRedeemed`, and refuses; `POST /redemptions` answers `409` with a `requestRejection` body, and the
+till shows "This coupon has already been used." through `TillAnswer`, not "the discount applies".
+
+Issuing, redeeming and counting each run through `DiscountRepository.changing(work)`: the Drizzle
+adapter runs the work in one database transaction with a transaction-bound repository, and `withId`
+locks the discount's row (`SELECT … FOR UPDATE`) before it reads the coupons (ADR 0007). Concurrent
+changes to one discount are therefore serialised: a redemption is never lost or counted twice, a
+coupon is never counted in two counts, and nobody is shown a refusal for a change made since they
+looked. `changeRate` runs outside `changing` and keeps last-write-wins on the rate.
 
 Every error answers with the one `requestRejection` schema in `@app/types/discounts`
 (`statusCode`, `message`, optional `fields`); there is no exception filter.
