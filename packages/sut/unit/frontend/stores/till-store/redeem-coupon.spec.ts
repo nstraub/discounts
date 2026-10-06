@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
 import { UnprocessableContentException } from '@app/types/rest-api';
-import { produceDiscount, spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, spicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { setupSut } from './till-store-of-an-app';
+
+const aCodeAtTheSpicesStore = { code: '7K3QX9M2PD', ...theStoreOf(spicesDiscount) };
+
+const setupSutRefusing = (refusal: Error) => {
+  const sut = setupSut();
+  sut.restApi.post.mockRejectedValue(refusal);
+  return sut;
+};
 
 describe('Store till', () => {
   describe('redeeming a coupon', () => {
@@ -46,10 +54,9 @@ describe('Store till', () => {
   });
   describe('redeeming a coupon already used', () => {
     it('should hold that the coupon has already been used', async () => {
-      const { restApi, till } = setupSut();
-      restApi.post.mockRejectedValue(new Error('POST /redemptions answered 409'));
+      const { till } = setupSutRefusing(new Error('POST /redemptions answered 409'));
 
-      await till.redeemCoupon({ code: '7K3QX9M2PD', storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
+      await till.redeemCoupon(aCodeAtTheSpicesStore);
 
       expect(till.couponAlreadyUsed, 'whether the coupon is held as already used').to.equal(true);
     });
@@ -66,8 +73,7 @@ describe('Store till', () => {
   });
   describe('redeeming a coupon at another store', () => {
     it('should hold that the coupon is not for the store picked', async () => {
-      const { restApi, till } = setupSut();
-      restApi.post.mockRejectedValue(new UnprocessableContentException('POST /redemptions answered 422'));
+      const { till } = setupSutRefusing(new UnprocessableContentException('POST /redemptions answered 422'));
 
       await till.redeemCoupon({ code: '7K3QX9M2PD', storeName: stephaniesProduceDiscount.storeName, storeAddress: stephaniesProduceDiscount.storeAddress });
 
