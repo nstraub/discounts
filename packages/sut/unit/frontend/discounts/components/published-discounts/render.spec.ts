@@ -3,10 +3,15 @@ import { describe, expect, it } from 'vitest';
 
 import PublishedDiscounts from '@frontend/discounts/components/PublishedDiscounts.vue';
 import { discountTexts } from '@frontend/discounts/texts';
+import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
 const spicesDiscount = { id: 'spices-id', item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
-const setupSut = ({ discounts = [spicesDiscount] } = {}) => mount(PublishedDiscounts, { props: { discounts } });
+const setupSut = ({ discounts = [spicesDiscount] } = {}) =>
+  mount(PublishedDiscounts, {
+    props: { discounts },
+    global: aTestingDiscountsStore().global,
+  });
 
 describe('Component PublishedDiscounts', () => {
   describe('showing a published discount', () => {

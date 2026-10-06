@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-import type { DiscountResponse, PublishDiscountRequest } from '@app/types/discounts';
+import type { ChangeRateRequest, DiscountResponse, PublishDiscountRequest } from '@app/types/discounts';
 
 import { useRestApi } from '../rest-api-key';
 
@@ -14,5 +14,8 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const load = async (): Promise<void> => {
     published.value = await restApi.get<DiscountResponse[]>('/discounts');
   };
-  return { published, publish, load };
+  const changeRate: (id: string, change: Partial<ChangeRateRequest>) => Promise<void> = async () => {
+    throw new Error('discounts store changeRate is not implemented');
+  };
+  return { published, publish, load, changeRate };
 });

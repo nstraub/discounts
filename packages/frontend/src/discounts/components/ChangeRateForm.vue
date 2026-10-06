@@ -3,20 +3,26 @@ import { ref } from 'vue';
 
 import type { DiscountResponse } from '@app/types/discounts';
 
+import { useDiscountsStore } from '../../stores/discounts-store';
 import { discountTexts } from '../texts';
 
 import CaptionedInput from './CaptionedInput.vue';
 
 defineProps<{ discount: DiscountResponse }>();
 
+const discounts = useDiscountsStore();
 const newRate = ref('');
+
+const changeRate = async (): Promise<void> => {
+  await discounts.changeRate('spices-id', { rate: '30' });
+};
 </script>
 
 <template>
   <form
     :aria-label="`${discount.item}, ${discount.storeName}`"
     data-testid="change-rate-form"
-    @submit.prevent
+    @submit.prevent="changeRate"
   >
     <CaptionedInput
       v-model="newRate"
