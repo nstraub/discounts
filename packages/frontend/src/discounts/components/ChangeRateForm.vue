@@ -13,7 +13,11 @@ const newRate = ref('');
 </script>
 
 <template>
-  <form @submit.prevent>
+  <form
+    aria-label="Peruvian spices, Mike's Groceries"
+    data-testid="change-rate-form"
+    @submit.prevent
+  >
     <CaptionedInput
       v-model="newRate"
       :caption="discountTexts.newRate"
