@@ -31,7 +31,7 @@ export class DiscountsPage {
     await this.page.getByTestId('discount-rate').fill(discount.rate);
     await this.page.getByTestId('discount-store-name').fill(discount.storeName);
     await this.page.getByTestId('discount-store-address').fill(discount.storeAddress);
-    await this.page.getByTestId('publish-discount').click();
+    await this.askToPublish();
     await this.untilTheDiscountIsKeptAndTheFormCleared();
   }
 
@@ -48,6 +48,10 @@ export class DiscountsPage {
 
   async publishAtTheRate(rate: string): Promise<void> {
     await this.page.getByTestId('discount-rate').fill(rate);
+    await this.askToPublish();
+  }
+
+  private async askToPublish(): Promise<void> {
     await this.page.getByTestId('publish-discount').click();
   }
 
@@ -59,7 +63,7 @@ export class DiscountsPage {
   async publishLeavingOut(discount: ExampleDiscount, piece: RequiredPiece): Promise<void> {
     await this.page.getByTestId('discount-rate').fill(discount.rate);
     await this.page.getByTestId(piece.field).fill('');
-    await this.page.getByTestId('publish-discount').click();
+    await this.askToPublish();
   }
 
   async verifyTellsIsMissing(piece: RequiredPiece): Promise<void> {
