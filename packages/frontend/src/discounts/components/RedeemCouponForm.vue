@@ -38,5 +38,11 @@ const code = ref('');
       :caption="discountTexts.couponCode"
       test-id="typed-coupon-code"
     />
+    <button
+      type="submit"
+      class="rounded border px-3 py-1"
+    >
+      {{ discountTexts.redeem }}
+    </button>
   </form>
 </template>

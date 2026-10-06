@@ -55,6 +55,10 @@ describe('Component RedeemCouponForm', () => {
 
       expect(queryAllByRole(document.body, 'textbox', { name: discountTexts.couponCode }), 'code fields under the caption').to.have.length(1);
     });
-    it.todo('should offer to redeem the coupon under its caption');
+    it('should offer to redeem the coupon under its caption', () => {
+      setupSut();
+
+      expect(queryAllByRole(document.body, 'button', { name: discountTexts.redeem }), 'redeem buttons').to.have.length(1);
+    });
   });
 });
