@@ -2,13 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { mock } from 'vitest-mock-extended';
 
 import { CouponAlreadyUsedException } from '@backend/discounts/application/domain/coupon-already-used-exception';
+import { CouponNotForThisStoreException } from '@backend/discounts/application/domain/coupon-not-for-this-store-exception';
 import { CouponRedeemed } from '@backend/discounts/application/domain/coupon-redeemed';
 import { CouponRedemptionRejected } from '@backend/discounts/application/domain/coupon-redemption-rejected';
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import type { DiscountRepository } from '@backend/discounts/application/domain/discount-repository';
 import { Store } from '@backend/discounts/application/domain/store';
 import { publishedProduceDiscount, publishedSpicesDiscount, spicesDiscount, theStoreOf } from '@sut/support/example-discounts';
-import { atTheSpicesStore } from '@sut/support/example-stores';
+import { atStephaniesStore, atTheSpicesStore } from '@sut/support/example-stores';
 
 import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
 
@@ -88,7 +89,11 @@ describe('class DiscountService', () => {
 
       expect(repository.save.mock.lastCall?.at(0)?.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true, counted: false }]);
     });
-    it.todo('should report that the coupon is not for the store given');
+    it('should report that the coupon is not for the store given', async () => {
+      const { service } = setupSut();
+
+      await expect(service.redeemCoupon('7K3QX9M2PD', atStephaniesStore)).rejects.to.be.instanceOf(CouponNotForThisStoreException);
+    });
     it.todo('should keep nothing when the coupon is not for the store given');
     it.todo('should announce CouponRedemptionRejected for the coupon refused at another store');
   });
