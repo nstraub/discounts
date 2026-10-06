@@ -49,7 +49,14 @@ describe('POST /redemptions', () => {
   });
 
   describe('A2 injection', () => {
-    it.todo('should answer a code written as SQL as for a code nobody issued, every discount and coupon left as it was');
+    it('should answer a code written as SQL as for a code nobody issued, every discount and coupon left as it was', async () => {
+      const sut = await setupSutWithAnotherCouponOfTheSameDiscount();
+
+      const response = await redeemAtTheStoreOf(sut.http, "X' OR '1'='1");
+
+      expect(response.status).to.equal(404);
+      expect(await theDiscountsAndCouponsKept(sut.client)).to.deep.equal(keptAsIssued(sut));
+    });
   });
 
   describe('A3 handle guessing (no accounts)', () => {
