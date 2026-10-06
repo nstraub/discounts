@@ -11,6 +11,13 @@ describe('Store discounts', () => {
 
       expect(restApi.patch).to.have.been.calledWith('/discounts/spices-id', { rate: '30' });
     });
+    it('should hand another discount and its new rate over to be changed', async () => {
+      const { restApi, discounts } = setupSut();
+
+      await discounts.changeRate('produce-id', { rate: '15' });
+
+      expect(restApi.patch).to.have.been.calledWith('/discounts/produce-id', { rate: '15' });
+    });
     it.todo('should hold the discount at its new rate once the change succeeds');
     it.todo('should hold the new rate on that discount only, the others keeping theirs');
 
