@@ -34,6 +34,13 @@ describe('Component RedeemCouponForm', () => {
 
       expect(discounts.redeemCoupon).to.have.been.calledWith({ code: '7k3qx 9m2pd', storeName: "Mike's Groceries", storeAddress: '12 Market Street' });
     });
+    it('should redeem at another store when Stephanie picks another', async () => {
+      const { form, discounts } = setupSut();
+
+      await redeemThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane", 'R4WZ0-BH8NE');
+
+      expect(discounts.redeemCoupon).to.have.been.calledWith({ code: 'R4WZ0-BH8NE', storeName: "Stephanie's Market", storeAddress: '8 Orchard Lane' });
+    });
     it.todo('should say the discount applies once the coupon is redeemed');
     it.todo('should name the item the discount is for once the coupon is redeemed');
 

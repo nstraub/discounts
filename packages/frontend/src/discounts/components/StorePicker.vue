@@ -7,6 +7,8 @@ type Store = Pick<DiscountResponse, 'storeName' | 'storeAddress'>;
 
 defineProps<{ stores: Store[] }>();
 
+const picked = defineModel<Store>();
+
 const theNameAndAddressOf = (store: Store) => `${store.storeName}, ${store.storeAddress}`;
 </script>
 
@@ -14,13 +16,15 @@ const theNameAndAddressOf = (store: Store) => `${store.storeName}, ${store.store
   <label class="flex flex-col gap-1">
     {{ discountTexts.yourStore }}
     <select
+      v-model="picked"
       required
       class="rounded border border-gray-400 px-2 py-1"
     >
-      <option value="" />
+      <option :value="undefined" />
       <option
         v-for="store in stores"
         :key="theNameAndAddressOf(store)"
+        :value="store"
       >
         {{ theNameAndAddressOf(store) }}
       </option>

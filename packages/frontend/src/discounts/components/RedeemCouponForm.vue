@@ -9,19 +9,27 @@ import { discountTexts } from '../texts';
 import CaptionedInput from './CaptionedInput.vue';
 import StorePicker from './StorePicker.vue';
 
-defineProps<{ stores: Pick<DiscountResponse, 'storeName' | 'storeAddress'>[] }>();
+type Store = Pick<DiscountResponse, 'storeName' | 'storeAddress'>;
+
+defineProps<{ stores: Store[] }>();
 
 const discounts = useDiscountsStore();
+const picked = ref<Store>();
 const code = ref('');
 
+const theStoreTheRequiredPickerHolds = (): Store => picked.value!;
+
 const redeem = async (): Promise<void> => {
-  await discounts.redeemCoupon({ code: code.value, storeName: "Mike's Groceries", storeAddress: '12 Market Street' });
+  await discounts.redeemCoupon({ code: code.value, ...theStoreTheRequiredPickerHolds() });
 };
 </script>
 
 <template>
   <form @submit.prevent="redeem">
-    <StorePicker :stores="stores" />
+    <StorePicker
+      v-model="picked"
+      :stores="stores"
+    />
     <CaptionedInput
       v-model="code"
       :caption="discountTexts.couponCode"
