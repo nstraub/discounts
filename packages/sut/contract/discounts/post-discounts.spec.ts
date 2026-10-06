@@ -54,7 +54,7 @@ describe('POST /discounts', () => {
     it('should answer 400 naming every missing or mistyped field at once', async () => {
       const { http } = await setupSut();
 
-      const response = await http.post('/discounts').send({ item: spicesDiscount.item, rate: '20' });
+      const response = await http.post('/discounts').send({ item: spicesDiscount.item, rate: 20 });
 
       expect(response.status).to.equal(400);
       expect(requestRejection.parse(response.body).fields).to.have.members(['rate', 'storeName', 'storeAddress']);

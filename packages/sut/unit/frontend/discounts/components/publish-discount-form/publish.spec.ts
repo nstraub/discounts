@@ -37,7 +37,7 @@ describe('Component PublishDiscountForm', () => {
 
       expect(discounts.publish).to.have.been.calledWith({
         item: 'Peruvian spices',
-        rate: 20,
+        rate: '20',
         storeName: "Mike's Groceries",
         storeAddress: '12 Market Street',
       });
@@ -49,7 +49,7 @@ describe('Component PublishDiscountForm', () => {
 
       expect(discounts.publish).to.have.been.calledWith({
         item: 'Fresh produce',
-        rate: 10,
+        rate: '10',
         storeName: 'Corner Grocery',
         storeAddress: '3 Hill Road',
       });
@@ -72,7 +72,7 @@ describe('Component PublishDiscountForm', () => {
 
       expect(discounts.publish).to.have.been.lastCalledWith({
         item: 'Fresh produce',
-        rate: 10,
+        rate: '10',
         storeName: "Mike's Groceries",
         storeAddress: '12 Market Street',
       });

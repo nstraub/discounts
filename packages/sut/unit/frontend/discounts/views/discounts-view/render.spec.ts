@@ -23,15 +23,15 @@ describe('View DiscountsView', () => {
   describe('opening the page', () => {
     it('should show the published discounts when the page opens', async () => {
       const view = await openThePageWhenPublished([
-        { id: 'spices-id', item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' },
+        { id: 'spices-id', item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' },
       ]);
 
       expect(view.findAll('[data-testid="published-item"]').map((item) => item.text())).to.deep.equal(['Peruvian spices']);
     });
     it('should show other published discounts when others are published', async () => {
       const view = await openThePageWhenPublished([
-        { id: 'produce-id', item: 'Fresh produce', rate: 10, storeName: 'Corner Grocery', storeAddress: '3 Hill Road' },
-        { id: 'herbs-id', item: 'Andean herbs', rate: 15, storeName: 'Corner Grocery', storeAddress: '3 Hill Road' },
+        { id: 'produce-id', item: 'Fresh produce', rate: '10', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' },
+        { id: 'herbs-id', item: 'Andean herbs', rate: '15', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' },
       ]);
 
       expect(view.findAll('[data-testid="published-item"]').map((item) => item.text())).to.deep.equal(['Fresh produce', 'Andean herbs']);

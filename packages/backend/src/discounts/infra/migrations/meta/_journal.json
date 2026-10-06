@@ -22,6 +22,13 @@
       "when": 1791241843321,
       "tag": "0002_create_discounts",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791245656254,
+      "tag": "0003_rate_as_written",
+      "breakpoints": true
     }
   ]
 }

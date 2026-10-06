@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const publishDiscountRequest = z.object({
   item: z.string(),
-  rate: z.number(),
+  rate: z.string(),
   storeName: z.string(),
   storeAddress: z.string(),
 });

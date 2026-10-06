@@ -43,6 +43,14 @@ describe('GET /discounts', () => {
       expect(response.body).to.have.deep.members([first.body, second.body]);
       expect(first.body.id).to.not.equal(second.body.id);
     });
+    it('should list a rate exactly as it was written, such as 12,5', async () => {
+      const { http } = await setupSut();
+      await http.post('/discounts').send({ ...spicesDiscount, rate: '12,5' });
+
+      const response = await http.get('/discounts');
+
+      expect(response.body.map((discount: { rate: unknown }) => discount.rate)).to.deep.equal(['12,5']);
+    });
   });
 
   describe('strictness', () => {

@@ -11,6 +11,8 @@ import { migrateBackward, setupSut, tableStatus } from '../support/migrations';
 
 const theMigration = '0002_create_discounts';
 
+const theMigrationsAfterIt = ['0003_rate_as_written'];
+
 const theDiscountLinesPassing = {
   listedWhenNoneKept: [],
   loadedBackAsKept: true,
@@ -19,7 +21,7 @@ const theDiscountLinesPassing = {
   columns: [
     { name: 'id', type: 'text', nullable: 'NO' },
     { name: 'item', type: 'text', nullable: 'NO' },
-    { name: 'rate', type: 'double precision', nullable: 'NO' },
+    { name: 'rate', type: 'text', nullable: 'NO' },
     { name: 'store_address', type: 'text', nullable: 'NO' },
     { name: 'store_name', type: 'text', nullable: 'NO' },
   ],
@@ -57,6 +59,9 @@ describe('the migration that adds the discounts table', () => {
     await migrateForward();
     await discountRepositoryOn(client, databaseUrl).keep(spicesDiscount);
 
+    for (const later of theMigrationsAfterIt.toReversed()) {
+      await migrateBackward(client, later);
+    }
     await migrateBackward(client, theMigration);
 
     expect(await tableStatus(client, 'app.discounts'), 'the discounts table, backward').to.equal(null);

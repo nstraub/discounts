@@ -6,7 +6,7 @@ describe('Store discounts', () => {
   describe('publishing a discount', () => {
     it('should hand the item, rate, store name and store address over to be published', async () => {
       const { restApi, discounts } = setupSut();
-      const spicesDiscount = { item: 'Peruvian spices', rate: 20, storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
+      const spicesDiscount = { item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
       await discounts.publish(spicesDiscount);
 
@@ -14,7 +14,7 @@ describe('Store discounts', () => {
     });
     it('should hand other pieces over when given others', async () => {
       const { restApi, discounts } = setupSut();
-      const produceDiscount = { item: 'Fresh produce', rate: 10, storeName: 'Corner Grocery', storeAddress: '3 Hill Road' };
+      const produceDiscount = { item: 'Fresh produce', rate: '10', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' };
 
       await discounts.publish(produceDiscount);
 
