@@ -10,7 +10,7 @@ vi.unmock('uuid');
 
 const setupSut = () => {
   const factory = new DiscountFactory(mock<DomainEventPublisher>());
-  return { discountWith: (details: typeof spicesDiscount) => factory.create(new DiscountDetails(details)) };
+  return { discountWith: (details: ConstructorParameters<typeof DiscountDetails>[0]) => factory.create(new DiscountDetails(details)) };
 };
 
 describe('class DiscountFactory', () => {
@@ -43,7 +43,13 @@ describe('class DiscountFactory', () => {
     });
   });
   describe('creating a discount with a hook', () => {
-    it.todo('should hold the hook it was created with');
+    it('should hold the hook it was created with', () => {
+      const { discountWith } = setupSut();
+
+      const discount = discountWith({ ...spicesDiscount, hook: 'Our spices now come from a new supplier' });
+
+      expect(discount.toJSON().hook).to.equal('Our spices now come from a new supplier');
+    });
     it.todo('should hold no hook when created without one');
   });
 });
