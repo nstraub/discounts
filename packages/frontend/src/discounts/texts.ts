@@ -16,4 +16,5 @@ export const discountTexts = {
   theDiscountAppliesTo: 'The discount applies to',
   store: 'Store',
   countDiscountedSales: 'Count discounted sales',
+  discountedSales: 'Discounted sales',
 };

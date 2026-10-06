@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { CountResponse } from '@app/types/discounts';
 import CountDiscountedSalesForm from '@frontend/discounts/components/CountDiscountedSalesForm.vue';
+import { discountTexts } from '@frontend/discounts/texts';
 import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
 import { aFormOfferingTheStoresOf } from '../a-form-offering-the-stores';
@@ -17,11 +18,14 @@ const setupSutCountingTo = (counted: CountResponse) => {
   return sut;
 };
 
-const stephaniesProduceCounted = { id: 'produce-id', item: stephaniesProduceDiscount.item, rate: stephaniesProduceDiscount.rate, discountedSales: 3 };
+const stephaniesProduceCounted = { id: 'produce-id', item: stephaniesProduceDiscount.item, rate: stephaniesProduceDiscount.rate, discountedSales: 2 };
 
 const mikesSpicesCounted = { id: 'spices-id', item: spicesDiscount.item, rate: spicesDiscount.rate, discountedSales: 1 };
 
 const whatTheCountShowsFor = (form: VueWrapper, testId: string) => form.findAll(`[data-testid="${testId}"]`).map((shown) => shown.text());
+
+const theNumbersCountedUnderTheirCaptions = (form: VueWrapper) =>
+  form.findAll('[data-testid="counted-sales"]').map((number) => ({ caption: number.element.previousElementSibling?.textContent?.trim(), number: number.text() }));
 
 const countThroughTheForm = async (form: VueWrapper, storeShown: string): Promise<void> => {
   const picker = form.get<HTMLSelectElement>('select');
@@ -74,7 +78,13 @@ describe('Component CountDiscountedSalesForm', () => {
 
       expect(whatTheCountShowsFor(form, 'counted-rate'), 'the rates counted').to.deep.equal(['20%', '15%']);
     });
-    it.todo('should show the number of discounted sales counted for each discount under its caption');
+    it('should show the number of discounted sales counted for each discount under its caption', async () => {
+      const { form } = setupSutCountingTo([stephaniesProduceCounted]);
+
+      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+
+      expect(theNumbersCountedUnderTheirCaptions(form), 'the numbers counted').to.deep.equal([{ caption: discountTexts.discountedSales, number: '2' }]);
+    });
 
     describe('state', () => {
       it.todo('should show no count before the sales are counted');
