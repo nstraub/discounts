@@ -21,6 +21,8 @@ const askToPublish = async (form: VueWrapper): Promise<void> => {
 const whatTheFieldTells = (form: VueWrapper, field: string) =>
   form.findAll(`[data-testid="${field}-field"] [role="status"]`).map((told) => told.text()).join(' ');
 
+const whatTheFormTells = (form: VueWrapper) => form.findAll('[role="status"]').map((told) => told.text()).join(' ');
+
 const theRequiredFields = ['discount-item', 'discount-rate', 'discount-store-name', 'discount-store-address'];
 
 describe('Component PublishDiscountForm', () => {
@@ -91,7 +93,13 @@ describe('Component PublishDiscountForm', () => {
           discountTexts.storeAddressMissing,
         ]);
       });
-      it.todo('should tell Mike the rate is missing, never that it is not valid, when the refusal lists it as missing');
+      it('should tell Mike the rate is missing, never that it is not valid, when listed so', async () => {
+        const { form } = setupSutRefusingAsMissing(['rate']);
+
+        await askToPublish(form);
+
+        expect(whatTheFormTells(form), 'what the form tells').to.contain(discountTexts.rateMissing).and.not.contain(discountTexts.rateNotValid);
+      });
     });
   });
 });
