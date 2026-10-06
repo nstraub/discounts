@@ -1,3 +1,6 @@
+import { DiscountPublicationRejected } from './discount-publication-rejected.js';
+import type { DomainEventPublisher } from './domain-event-publisher.js';
+
 const moreThanOneDecimalPlace = /\.\d{2,}/;
 const aComputersNotation = /[a-z]/i;
 
@@ -8,8 +11,12 @@ export class DiscountRate {
     this.withADecimalPoint = written.replace(',', '.');
   }
 
-  isNotValid(): boolean {
-    return this.isNotWrittenAsADecimal() || this.isOutOfBounds();
+  whenValid(events: DomainEventPublisher, publish: () => void): void {
+    if (this.isNotWrittenAsADecimal() || this.isOutOfBounds()) {
+      events.publish(new DiscountPublicationRejected(this.written, 'not valid'));
+      return;
+    }
+    publish();
   }
 
   private isNotWrittenAsADecimal(): boolean {
