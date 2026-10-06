@@ -17,7 +17,7 @@ const ownId = `${props.namedBy}-get-coupon`;
     :aria-labelledby="`${ownId} ${namedBy}`"
     class="rounded border px-3 py-1"
     data-testid="get-coupon"
-    @click="discounts.getCoupon('spices-id')"
+    @click="discounts.getCoupon(discount.id)"
   >
     {{ discountTexts.getCoupon }}
   </button>
