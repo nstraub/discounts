@@ -141,7 +141,7 @@ is npm's DefinitelyTyped scope and would shadow it), one module per file through
 `exports` map (`./*` → `./*.ts`). Every package that uses it declares
 `"@app/types": "workspace:*"` and imports it as a package, without an extension:
 `import type { RestApi } from '@app/types/rest-api'`. Today it holds `rest-api` (the `RestApi`
-abstraction and `FetchRestApi`) and `greeting` (the wire type). It is not a path alias: the
+abstraction, with `get`, `put`, `post` and `patch`, and `FetchRestApi`) and `greeting` (the wire type). It is not a path alias: the
 backend runs its compiled output, and Node resolves the package through `node_modules`
 and strips the `.ts` types on the symlink's real path.
 
@@ -160,10 +160,12 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   `src/discounts/infra/migrations/` to `DATABASE_URL`; the image runs it before `main.js`.
 - **`src/discounts/application/`:** `discount-service.ts` (`publish()`, `published()`) and, in
   `domain/`, the `Discount` aggregate, `DiscountDetails`, `DiscountFactory`, the `DiscountPublished`
-  event and two ports, `DiscountRepository` and `DomainEventPublisher`. `Discount.publish()` raises the
-  event through the port.
+  and `DiscountRateChanged` events and two ports, `DiscountRepository` (`save` inserts or updates,
+  `all`, `withId`) and `DomainEventPublisher`. `Discount.publish()` and `Discount.changeRate()` raise
+  their events through the port.
 - **`src/discounts/infra/`:** `discounts.controller.ts` (`POST /discounts` answers 201 with a
-  `Location`; `GET /discounts`), `parsed-by.ts` (`ParsedBy`, the zod pipe that parses a request; a
+  `Location`; `PATCH /discounts/:id`, which answers 204 and changes nothing for an id nobody published;
+  `GET /discounts`), `parsed-by.ts` (`ParsedBy`, the zod pipe that parses a request; a
   failure is a 400 `requestRejection`, and there is no exception filter),
   `discount-drizzle-repository.ts`, `event-emitter-domain-event-publisher.ts` (the adapter over
   EventEmitter2), `discounts.module.ts` (the wiring). The request and response schemas
@@ -224,7 +226,9 @@ first slice.
   constraints and inserting a row missing a column) and `migrations.ts`. A migration spec runs on a
   database of its own, `app_migration_test`, created empty and dropped when the test finishes, since it
   runs a schema backward and forward again. The discounts the specs publish are shared in
-  `@sut/support/example-discounts`.
+  `@sut/support/example-discounts` (with `publishedSpicesDiscount`); `contract/support/error-schema.ts`
+  holds `bodiesNotMatchingTheErrorSchema`. Frontend store specs arrange the store with
+  `aTestingDiscountsStore` (`unit/frontend/stores/discounts-store/`).
 - **Tags:** `@wip` marks the scenario being built (run it with `yarn test:wip`); `@todo` marks a
   recorded missing case whose steps are written and whose step definitions are not. Both are
   excluded from `yarn test:bdd`.
