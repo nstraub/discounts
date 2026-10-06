@@ -1,19 +1,11 @@
 import { getByRole, queryAllByRole } from '@testing-library/dom';
-import { DOMWrapper, mount, type VueWrapper } from '@vue/test-utils';
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { DOMWrapper, type VueWrapper } from '@vue/test-utils';
+import { describe, expect, it, vi } from 'vitest';
 
-import PublishDiscountForm from '@frontend/discounts/components/PublishDiscountForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
-import { useDiscountsStore } from '@frontend/stores/discounts-store';
 import { spicesDiscountWithItsHook } from '@sut/support/example-discounts';
-import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
-const setupSut = () => {
-  const { pinia, global } = aTestingDiscountsStore();
-  const form = mount(PublishDiscountForm, { attachTo: document.body, global });
-  onTestFinished(() => form.unmount());
-  return { form, discounts: useDiscountsStore(pinia) };
-};
+import { setupSut } from './publish-discount-form-of-an-app';
 
 const spicesDiscount = { item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
