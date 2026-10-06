@@ -173,7 +173,18 @@ describe('POST /stores/counts', () => {
 
       expect(salesCountedByEachPair, 'the sales two counts at once counted for one coupon redeemed').to.deep.equal(codes.map(() => 1));
     });
-    it.todo('should count a coupon redeemed during a count once, in that count or the next');
+    it('should count a coupon redeemed during a count once, in that count or the next', async () => {
+      const { http, published } = await setupSutWithACouponFor();
+      const codes = await couponsIssuedFor(http, published, timesTheRaceIsRun);
+
+      const salesCountedForEachCoupon = await oneRaceAfterAnother(codes, async (code) => {
+        const [, during] = await Promise.all([redeemAtTheStoreOf(http, code), countTheStoreOf(http)]);
+        const next = await countTheStoreOf(http);
+        return during.body[0].discountedSales + next.body[0].discountedSales;
+      });
+
+      expect(salesCountedForEachCoupon, 'the sales a count during its redemption and the next counted').to.deep.equal(codes.map(() => 1));
+    });
   });
 
   describe('a coupon taken at another store\'s till', () => {
