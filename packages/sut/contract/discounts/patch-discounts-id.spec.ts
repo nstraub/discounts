@@ -2,14 +2,9 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { requestRejection } from '@app/types/discounts';
-import { spicesDiscount } from '@sut/support/example-discounts';
 
-import { setupSut } from '../support/app';
+import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
-
-type Http = Awaited<ReturnType<typeof setupSut>>['http'];
-
-const publishTheSpicesDiscount = async (http: Http): Promise<{ id: string }> => (await http.post('/discounts').send(spicesDiscount)).body;
 
 const bodiesThatAreNotObjects = ['[]', '"25"', '25', 'null'];
 

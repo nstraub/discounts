@@ -3,6 +3,7 @@ import request from 'supertest';
 import { onTestFinished } from 'vitest';
 
 import { AppModule } from '@backend/app.module';
+import { spicesDiscount } from '@sut/support/example-discounts';
 import { resetTestDatabase } from '@sut/support/test-database';
 
 import { connectToTestDatabase } from './test-database';
@@ -28,3 +29,7 @@ export const setupSut = async () => {
   onTestFinished(() => sut.app.close());
   return sut;
 };
+
+export type Http = Awaited<ReturnType<typeof setupSut>>['http'];
+
+export const publishTheSpicesDiscount = async (http: Http): Promise<{ id: string }> => (await http.post('/discounts').send(spicesDiscount)).body;
