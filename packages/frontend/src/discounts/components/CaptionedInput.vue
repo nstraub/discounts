@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ caption: string; testId: string }>();
+defineProps<{ caption: string; testId: string; told?: string }>();
 
 const value = defineModel<string>({ required: true });
 </script>
@@ -14,5 +14,11 @@ const value = defineModel<string>({ required: true });
         :data-testid="testId"
       >
     </label>
+    <p
+      v-if="told"
+      role="status"
+    >
+      {{ told }}
+    </p>
   </div>
 </template>

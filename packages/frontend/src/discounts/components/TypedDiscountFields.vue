@@ -4,6 +4,8 @@ import type { nothingTyped } from '../typed-discount';
 
 import CaptionedInput from './CaptionedInput.vue';
 
+defineProps<{ missing: readonly string[] }>();
+
 const discount = defineModel<ReturnType<typeof nothingTyped>>({ required: true });
 </script>
 
@@ -11,6 +13,7 @@ const discount = defineModel<ReturnType<typeof nothingTyped>>({ required: true }
   <CaptionedInput
     v-model="discount.item"
     :caption="discountTexts.item"
+    :told="missing.includes('item') ? discountTexts.itemMissing : ''"
     test-id="discount-item"
   />
   <CaptionedInput

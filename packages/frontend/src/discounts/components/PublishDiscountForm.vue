@@ -18,7 +18,10 @@ const publish = async (): Promise<void> => {
 
 <template>
   <form @submit.prevent="publish">
-    <TypedDiscountFields v-model="discount" />
+    <TypedDiscountFields
+      v-model="discount"
+      :missing="discounts.missing"
+    />
     <button
       type="submit"
       class="rounded border px-3 py-1"
