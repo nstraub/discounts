@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import { produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/discount-repository';
@@ -93,6 +94,18 @@ describe('a discount kept in PostgreSQL', () => {
     });
   });
   describe('beside another discount', () => {
-    it.todo('should leave an earlier discount and its coupons, redeemed, unused and counted, as they were when another discount is kept');
+    it('should leave an earlier discount and its coupons, redeemed, unused and counted, as they were when another discount is kept', async () => {
+      const { keep, keepWithCouponsIssued, repository, loadOnItsOwnConnection } = await setupSut();
+      const earlier = await keepWithCouponsIssued(spicesDiscount, ['7K3QX9M2PD', 'R4WZ0BH8NE', '3HJN5VQ8WT']);
+      earlier.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+      earlier.count();
+      earlier.redeemCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
+      await repository.save(earlier);
+
+      await keep(produceDiscount);
+
+      const loaded = (await loadOnItsOwnConnection()).find((kept) => kept.toJSON().id === earlier.toJSON().id);
+      expect(loaded?.toJSON(), 'the earlier discount loaded back').to.deep.equal(earlier.toJSON());
+    });
   });
 });
