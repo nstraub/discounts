@@ -35,8 +35,8 @@ export class DiscountsController {
   }
 
   @Post(':id/coupons')
-  async issueCoupon() {
-    return { token: '7K3QX9M2PD', storeName: "Mike's Groceries" };
+  async issueCoupon(@Param('id') id: string) {
+    return this.discounts.issueCoupon(id);
   }
 
   @Get()
