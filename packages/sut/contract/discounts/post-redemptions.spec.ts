@@ -17,6 +17,12 @@ const setupSutWithACouponFor = async (discount: ExampleDiscount = spicesDiscount
   return { ...sut, published, code };
 };
 
+const setupSutWithAnotherCouponOfTheSameDiscount = async () => {
+  const sut = await setupSutWithACouponFor();
+  const other: string = (await sut.http.post(`/discounts/${sut.published.id}/coupons`).send({})).body.token;
+  return { ...sut, other };
+};
+
 const redeemWrittenAsJson = (http: Http, body: string) => http.post('/redemptions').set('Content-Type', 'application/json').send(body);
 
 const redeemAtTheStoreOf = (http: Http, code: string, discount: ExampleDiscount = spicesDiscount) =>
@@ -56,8 +62,7 @@ describe('POST /redemptions', () => {
       expect(redeemed).to.deep.equal([{ discountId: published.id, token: code }]);
     });
     it('should keep the coupon redeemed and its discount\'s other coupons unused', async () => {
-      const { client, http, published, code } = await setupSutWithACouponFor();
-      const other: string = (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
+      const { client, http, code, other } = await setupSutWithAnotherCouponOfTheSameDiscount();
 
       await redeemAtTheStoreOf(http, code);
 
@@ -141,8 +146,7 @@ describe('POST /redemptions', () => {
 
   describe('A3 handle guessing (no accounts)', () => {
     it('should answer with no coupon token, neither the one redeemed nor another', async () => {
-      const { http, published, code } = await setupSutWithACouponFor();
-      const another: string = (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
+      const { http, code, other: another } = await setupSutWithAnotherCouponOfTheSameDiscount();
 
       const response = await redeemAtTheStoreOf(http, code);
 
@@ -175,8 +179,7 @@ describe('POST /redemptions', () => {
       expect(bodiesNotMatchingTheErrorSchema([response])).to.deep.equal([]);
     });
     it('should keep the coupon used once, its discount and its other coupons as they were', async () => {
-      const { client, http, published, code } = await setupSutWithACouponFor();
-      const other: string = (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
+      const { client, http, published, code, other } = await setupSutWithAnotherCouponOfTheSameDiscount();
       await redeemAtTheStoreOf(http, code);
 
       await redeemAtTheStoreOf(http, code);
