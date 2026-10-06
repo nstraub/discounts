@@ -11,6 +11,7 @@ Given('Mike has published a discount on produce', async function (this: Playwrig
   const mikesPage = new DiscountsPage(await this.openSomeoneElsesPage());
   await mikesPage.open();
   await mikesPage.publish(produceDiscount);
+  this.publishedDiscount = produceDiscount;
 });
 
 When('Sue looks for a new store with fresh produce', async function (this: PlaywrightWorld) {
@@ -18,9 +19,9 @@ When('Sue looks for a new store with fresh produce', async function (this: Playw
 });
 
 Then("she finds Mike's store", async function (this: PlaywrightWorld) {
-  await suesPage(this).verifyShowsTheStoreOf(produceDiscount);
+  await suesPage(this).verifyShowsTheStoreOf(this.publishedDiscount);
 });
 
 Then('she sees the discount it offers', async function (this: PlaywrightWorld) {
-  await suesPage(this).verifyShowsTheDiscount(produceDiscount);
+  await suesPage(this).verifyShowsTheDiscount(this.publishedDiscount);
 });

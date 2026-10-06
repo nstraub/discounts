@@ -1,6 +1,8 @@
 import { After, AfterAll, Before, BeforeAll, setWorldConstructor, World } from '@cucumber/cucumber';
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 
+import { produceDiscount } from '@sut/support/example-discounts';
+
 import { acceptancePort } from './apps-under-test';
 
 // Below cucumber's 5 s step timeout, so a missing element fails with Playwright's message naming it.
@@ -12,6 +14,7 @@ export class PlaywrightWorld extends World {
   context!: BrowserContext;
   page!: Page;
   someoneElsesContext?: BrowserContext;
+  publishedDiscount!: typeof produceDiscount;
 
   /**
    * Opens a fresh browser context and page for one scenario, aimed at the app under test.
