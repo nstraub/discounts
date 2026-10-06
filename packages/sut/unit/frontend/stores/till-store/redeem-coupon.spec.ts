@@ -93,5 +93,14 @@ describe('Store till', () => {
 
       expect(till.couponAlreadyUsed, 'whether the coupon is held as already used').to.equal(false);
     });
+    it('should no longer hold a coupon as not for the store picked once the next coupon is redeemed', async () => {
+      const { restApi, till } = setupSut();
+      restApi.post.mockRejectedValueOnce(new UnprocessableContentException('POST /redemptions answered 422')).mockResolvedValueOnce({ item: spicesDiscount.item });
+      await till.redeemCoupon(aCodeAtTheSpicesStore);
+
+      await till.redeemCoupon({ ...aCodeAtTheSpicesStore, code: 'R4WZ0BH8NE' });
+
+      expect(till.couponNotForThisStore, 'whether a coupon is held as not for the store picked').to.equal(false);
+    });
   });
 });
