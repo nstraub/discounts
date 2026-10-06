@@ -86,7 +86,6 @@ Feature: Stephanie gets her produce discount into people's hands
     Then people can see the new rate
     And they still see that the produce comes from a new supplier
 
-  @wip
   Scenario: Sue decides to try Stephanie's produce
     Given Sue has found Stephanie's discount on produce
     When Sue decides to try it
