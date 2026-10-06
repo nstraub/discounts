@@ -26,26 +26,27 @@ export class DiscountService {
     if (!discount) {
       return;
     }
-    discount.changeRate(rate);
-    await this.repository.save(discount);
+    await this.keptAfter(discount, (found) => found.changeRate(rate));
   }
 
   async issueCoupon(id: string): Promise<IssuedCoupon> {
     const discount = (await this.repository.withId(id))!;
-    const coupon = discount.issueCoupon(CouponToken.drawnFrom(this.random));
-    await this.repository.save(discount);
-    return coupon;
+    return this.keptAfter(discount, (found) => found.issueCoupon(CouponToken.drawnFrom(this.random)));
   }
 
   async redeemCoupon(code: string): Promise<RedeemedCoupon> {
     const token = CouponToken.read(code);
     const discount = (await this.repository.withCouponToken(token))!;
-    const redeemed = discount.redeemCoupon(token);
-    await this.repository.save(discount);
-    return redeemed;
+    return this.keptAfter(discount, (found) => found.redeemCoupon(token));
   }
 
   async published(): Promise<Discount[]> {
     return this.repository.all();
+  }
+
+  private async keptAfter<Answer>(discount: Discount, change: (discount: Discount) => Answer): Promise<Answer> {
+    const answer = change(discount);
+    await this.repository.save(discount);
+    return answer;
   }
 }
