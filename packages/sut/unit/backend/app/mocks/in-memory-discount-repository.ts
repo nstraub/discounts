@@ -26,4 +26,8 @@ export class InMemoryDiscountRepository implements DiscountRepository {
     const { storeName, storeAddress } = store.toJSON();
     return [...this.kept.values()].filter((discount) => discount.toJSON().storeName === storeName && discount.toJSON().storeAddress === storeAddress);
   }
+
+  async changing<Answer>(work: (repository: DiscountRepository) => Promise<Answer>): Promise<Answer> {
+    return work(this);
+  }
 }

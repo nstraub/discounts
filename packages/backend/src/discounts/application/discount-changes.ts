@@ -13,7 +13,12 @@ export class DiscountChanges {
   }
 
   async toTheOneThatIssued<Answer>(token: CouponToken, change: Change<Answer>): Promise<Answer> {
-    return this.keptAfter((await this.repository.withCouponToken(token))!, change);
+    return this.repository.changing(async (repository) => {
+      const discount = (await repository.withCouponToken(token))!;
+      const answer = change(discount);
+      await repository.save(discount);
+      return answer;
+    });
   }
 
   async toEachOfTheStore<Answer>(store: Store, change: Change<Answer>): Promise<Answer[]> {

@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import { mock } from 'vitest-mock-extended';
 
 import { CouponAlreadyUsedException } from '@backend/discounts/application/domain/coupon-already-used-exception';
 import { CouponRedeemed } from '@backend/discounts/application/domain/coupon-redeemed';
 import { CouponRedemptionRejected } from '@backend/discounts/application/domain/coupon-redemption-rejected';
+import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
+import type { DiscountRepository } from '@backend/discounts/application/domain/discount-repository';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
@@ -41,6 +44,19 @@ describe('class DiscountService', () => {
 
         const [kept] = repository.save.mock.lastCall?.at(0)?.toJSON().coupons ?? [];
         expect(kept, 'the coupon of the code typed').to.deep.equal({ token: '7K3QX9M2PD', redeemed: true, counted: false });
+      });
+    });
+
+    describe('one change at a time', () => {
+      it('should keep the coupon redeemed through the repository its change is given', async () => {
+        const { repository, service } = setupSut();
+        const given = mock<DiscountRepository>();
+        given.withCouponToken.mockResolvedValue(await repository.withCouponToken(CouponToken.read('7K3QX9M2PD')));
+        repository.changing.mockImplementation((work) => work(given));
+
+        await service.redeemCoupon('7K3QX9M2PD');
+
+        expect(given.save.mock.lastCall?.at(0)?.toJSON().coupons, 'the coupons kept through the repository given').to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true, counted: false }]);
       });
     });
 

@@ -8,4 +8,5 @@ export interface DiscountRepository {
   withId(id: string): Promise<Discount | undefined>;
   withCouponToken(token: CouponToken): Promise<Discount | undefined>;
   ofStore(store: Store): Promise<Discount[]>;
+  changing<Answer>(work: (repository: DiscountRepository) => Promise<Answer>): Promise<Answer>;
 }

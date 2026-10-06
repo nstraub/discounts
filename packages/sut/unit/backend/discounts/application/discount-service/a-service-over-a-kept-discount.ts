@@ -18,5 +18,6 @@ export const aServiceOverAKeptDiscount = ({ kept = publishedSpicesDiscount, draw
   repository.withId.calledWith(kept.id).mockResolvedValue(discount);
   repository.withCouponToken.mockResolvedValue(discount);
   repository.ofStore.mockResolvedValue([discount]);
+  repository.changing.mockImplementation((work) => work(repository));
   return { events, repository, service: new DiscountService(factory, repository, aSourceDrawing(drawing)) };
 };

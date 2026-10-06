@@ -44,6 +44,10 @@ export class DiscountDrizzleRepository implements DiscountRepository {
     return this.rebuiltWithTheirCoupons(await this.keptDiscounts().where(atTheStore).orderBy(discounts.id));
   }
 
+  async changing<Answer>(work: (repository: DiscountRepository) => Promise<Answer>): Promise<Answer> {
+    return work(this);
+  }
+
   private keptDiscounts() {
     return this.database.select(theColumnsOfADiscount).from(discounts);
   }
