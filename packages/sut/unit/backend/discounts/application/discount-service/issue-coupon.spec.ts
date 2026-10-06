@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { CouponIssued } from '@backend/discounts/application/domain/coupon-issued';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { publishedProduceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
 
@@ -29,6 +29,13 @@ describe('class DiscountService', () => {
       const answered = await service.issueCoupon('spices-id');
 
       expect(answered).to.deep.equal({ token: '7K3QX9M2PD', storeName: spicesDiscount.storeName });
+    });
+    it('should answer with the token and the store of a coupon for another discount', async () => {
+      const { service } = setupSut({ kept: publishedProduceDiscount, drawing: 'R4WZ0BH8NE' });
+
+      const answered = await service.issueCoupon('produce-id');
+
+      expect(answered).to.deep.equal({ token: 'R4WZ0BH8NE', storeName: publishedProduceDiscount.storeName });
     });
 
     describe('state', () => {

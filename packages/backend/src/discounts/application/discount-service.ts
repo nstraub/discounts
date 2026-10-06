@@ -30,9 +30,10 @@ export class DiscountService {
 
   async issueCoupon(id: string): Promise<{ token: string; storeName: string }> {
     const discount = (await this.repository.withId(id))!;
-    discount.issueCoupon(CouponToken.drawnFrom(this.random));
+    const token = CouponToken.drawnFrom(this.random);
+    discount.issueCoupon(token);
     await this.repository.save(discount);
-    return { token: '7K3QX9M2PD', storeName: "Mike's Groceries" };
+    return { token: token.toJSON(), storeName: discount.toJSON().storeName };
   }
 
   async published(): Promise<Discount[]> {
