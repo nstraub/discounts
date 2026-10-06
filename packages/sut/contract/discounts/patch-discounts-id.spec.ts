@@ -69,7 +69,14 @@ describe('PATCH /discounts/:id', () => {
 
       expect(statuses).to.deep.equal([400, 400, 400, 400]);
     });
-    it.todo('should answer 400 for a body that is not valid JSON');
+    it('should answer 400 for a body that is not valid JSON', async () => {
+      const { http } = await setupSut();
+      const published = await publishTheSpicesDiscount(http);
+
+      const response = await patchTheDiscount(http, published.id).set('Content-Type', 'application/json').send('{"rate": "25",');
+
+      expect(response.status).to.equal(400);
+    });
     it.todo('should answer every error with a body matching the error schema');
   });
 
