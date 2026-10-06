@@ -31,7 +31,7 @@ defineProps<{ discounts: DiscountResponse[] }>();
         <span data-testid="published-store-name">{{ discount.storeName.trim() }}</span>
         <span data-testid="published-store-address">{{ discount.storeAddress.trim() }}</span>
       </div>
-      <ChangeRateForm />
+      <ChangeRateForm :discount="discount" />
     </li>
   </ul>
 </template>
