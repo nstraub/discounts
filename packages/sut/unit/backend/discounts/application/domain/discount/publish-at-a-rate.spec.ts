@@ -80,6 +80,14 @@ describe('class Discount', () => {
 
         expect(lastEventOf(events)).to.be.instanceOf(DiscountPublished);
       });
+      it('should accept a rate of 100.0, the highest a rate may be written with one decimal place', async () => {
+        const { events, keep, discountAt } = setupSut();
+        const discount = discountAt('100.0');
+
+        await discount.publish(keep);
+
+        expect(lastEventOf(events)).to.be.instanceOf(DiscountPublished);
+      });
       it('should accept a rate of 0.1, the lowest a rate may be', async () => {
         const { events, keep, discountAt } = setupSut();
         const discount = discountAt('0.1');
