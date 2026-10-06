@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { spicesDiscountWithItsHook } from '@sut/support/example-discounts';
+import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
 
@@ -15,7 +15,13 @@ describe('POST /discounts with a hook', () => {
       expect(rows.map((row) => row.hook), 'the hook kept').to.deep.equal([spicesDiscountWithItsHook.hook]);
       expect(response.body, 'the discount published').to.deep.equal({ id: response.body.id, ...spicesDiscountWithItsHook });
     });
-    it.todo('should answer with no hook when the request gives none');
+    it('should answer with no hook when the request gives none', async () => {
+      const { http } = await setupSut();
+
+      const response = await http.post('/discounts').send(spicesDiscount);
+
+      expect(response.body).to.not.have.property('hook');
+    });
   });
 
   describe('empty', () => {
