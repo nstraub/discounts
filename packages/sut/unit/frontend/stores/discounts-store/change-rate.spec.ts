@@ -30,11 +30,15 @@ describe('Store discounts', () => {
     });
     it('should hold the discounts as listed once the change succeeds', async () => {
       const { restApi, discounts } = setupSut();
-      restApi.get.mockResolvedValue([{ ...publishedSpicesDiscount, rate: '30' }, publishedProduceDiscount]);
+      const listedOnceChanged = [{ ...publishedSpicesDiscount, rate: '30' }, publishedProduceDiscount];
+      restApi.get.mockResolvedValue([publishedSpicesDiscount, publishedProduceDiscount]);
+      restApi.patch.mockImplementation(async () => {
+        restApi.get.mockResolvedValue(listedOnceChanged);
+      });
 
       await discounts.changeRate('spices-id', { rate: '30' });
 
-      expect(discounts.published).to.deep.equal([{ ...publishedSpicesDiscount, rate: '30' }, publishedProduceDiscount]);
+      expect(discounts.published).to.deep.equal(listedOnceChanged);
     });
 
     describe('dependency failure', () => {
