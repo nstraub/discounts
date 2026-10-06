@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { FetchRestApi } from '@app/types/rest-api';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { FetchRestApi, UnprocessableContentException } from '@app/types/rest-api';
+import { spicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { setupSut as setupTheApp } from '../../support/app';
 
@@ -10,6 +10,11 @@ const setupSut = async () => {
   await app.listen(0);
   return { client, restApi: new FetchRestApi(await app.getUrl()) };
 };
+
+const refusalOf = (answer: Promise<unknown>): Promise<unknown> => answer.then(
+  () => 'resolved',
+  (refusal: unknown) => refusal,
+);
 
 const outcomeOf = (answer: Promise<unknown>): Promise<string> =>
   answer.then(
@@ -47,6 +52,15 @@ describe('class FetchRestApi', () => {
       const outcome = await outcomeOf(restApi.post('/nowhere', spicesDiscount));
 
       expect(outcome).to.equal('POST /nowhere answered 404');
+    });
+    it('should reject an answer of 422 with an exception of its own', async () => {
+      const { restApi } = await setupSut();
+      const published = await restApi.post<{ id: string }>('/discounts', spicesDiscount);
+      const { token } = await restApi.post<{ token: string }>(`/discounts/${published.id}/coupons`, {});
+
+      const refusal = await refusalOf(restApi.post('/redemptions', { code: token, ...theStoreOf(stephaniesProduceDiscount) }));
+
+      expect(refusal).to.be.instanceOf(UnprocessableContentException);
     });
   });
 

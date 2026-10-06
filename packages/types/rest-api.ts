@@ -7,6 +7,8 @@ export interface RestApi {
 
 class RestApiException extends Error {}
 
+export class UnprocessableContentException extends RestApiException {}
+
 export class FetchRestApi implements RestApi {
   constructor(private readonly baseUrl: string) {}
 
@@ -44,7 +46,7 @@ export class FetchRestApi implements RestApi {
 
   private refuseANotOkAnswer(request: string, response: Response): void {
     if (!response.ok) {
-      throw new RestApiException(`${request} answered ${response.status}`);
+      throw new UnprocessableContentException(`${request} answered ${response.status}`);
     }
   }
 }
