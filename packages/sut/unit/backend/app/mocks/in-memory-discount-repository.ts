@@ -1,3 +1,4 @@
+import type { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import type { Discount } from '@backend/discounts/application/domain/discount';
 import type { DiscountRepository } from '@backend/discounts/application/domain/discount-repository';
 
@@ -14,5 +15,9 @@ export class InMemoryDiscountRepository implements DiscountRepository {
 
   async withId(id: string): Promise<Discount | undefined> {
     return this.kept.get(id);
+  }
+
+  async withCouponToken(token: CouponToken): Promise<Discount | undefined> {
+    return [...this.kept.values()].find((discount) => discount.toJSON().coupons.some((coupon) => coupon.token === token.toJSON()));
   }
 }

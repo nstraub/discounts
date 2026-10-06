@@ -43,6 +43,10 @@ export class DiscountDrizzleRepository implements DiscountRepository {
     return rows.map((row) => this.rebuilt(row, issued)).at(0);
   }
 
+  async withCouponToken(): Promise<Discount | undefined> {
+    return undefined;
+  }
+
   private rebuilt(row: typeof discounts.$inferSelect, issued: string[]): Discount {
     return this.factory.reconstitute({ ...withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) }), coupons: issued.map((token) => ({ token, redeemed: false })) });
   }

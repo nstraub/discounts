@@ -5,6 +5,7 @@ import type { DiscountFactory } from './domain/discount-factory.js';
 import type { DiscountRepository } from './domain/discount-repository.js';
 import type { IssuedCoupon } from './domain/issued-coupon.js';
 import type { RandomSource } from './domain/random-source.js';
+import type { RedeemedCoupon } from './domain/redeemed-coupon.js';
 
 export class DiscountService {
   constructor(
@@ -34,6 +35,14 @@ export class DiscountService {
     const coupon = discount.issueCoupon(CouponToken.drawnFrom(this.random));
     await this.repository.save(discount);
     return coupon;
+  }
+
+  async redeemCoupon(code: string): Promise<RedeemedCoupon> {
+    const token = CouponToken.keptAs(code);
+    const discount = (await this.repository.withCouponToken(token))!;
+    const redeemed = discount.redeemCoupon(token);
+    await this.repository.save(discount);
+    return redeemed;
   }
 
   async published(): Promise<Discount[]> {
