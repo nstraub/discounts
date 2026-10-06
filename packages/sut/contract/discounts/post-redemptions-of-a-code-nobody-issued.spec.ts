@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
+import { spicesDiscount } from '@sut/support/example-discounts';
+
 import { setupSut } from '../support/app';
+import { theDiscountsKept, theRowKeptFor } from '../support/discounts-table';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
-import { redeemAtTheStoreOf } from '../support/redemptions';
+import { redeemAtTheStoreOf, setupSutWithAnotherCouponOfTheSameDiscount } from '../support/redemptions';
 
 const aCodeNobodyIssued = 'ZZZZZZZZZZ';
 
@@ -16,7 +19,15 @@ describe('POST /redemptions', () => {
       expect(response.status).to.equal(404);
       expect(bodiesNotMatchingTheErrorSchema([response])).to.deep.equal([]);
     });
-    it.todo('should keep every discount and coupon as it was when the code was never issued');
+    it('should keep every discount and coupon as it was when the code was never issued', async () => {
+      const { client, http, published, code, other } = await setupSutWithAnotherCouponOfTheSameDiscount();
+
+      await redeemAtTheStoreOf(http, aCodeNobodyIssued);
+
+      const kept = await client.query('SELECT token, redeemed, counted FROM app.coupons');
+      expect(kept.rows, 'each coupon kept').to.have.deep.members([{ token: code, redeemed: false, counted: false }, { token: other, redeemed: false, counted: false }]);
+      expect(await theDiscountsKept(client), 'the discount kept').to.deep.equal([theRowKeptFor(published, spicesDiscount)]);
+    });
     it.todo('should publish nothing on the application event emitter for a code nobody issued');
   });
 
