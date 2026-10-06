@@ -1,3 +1,4 @@
+import { CouponIssued } from './coupon-issued.js';
 import type { CouponToken } from './coupon-token.js';
 import type { DiscountDetails } from './discount-details.js';
 import { DiscountPublished } from './discount-published.js';
@@ -23,6 +24,7 @@ export class Discount {
 
   issueCoupon(token: CouponToken): void {
     this.coupons = [token];
+    this.events.publish(new CouponIssued('test-uuid', '7K3QX9M2PD'));
   }
 
   toJSON(): { id: string; coupons: string[] } & ReturnType<DiscountDetails['toJSON']> {

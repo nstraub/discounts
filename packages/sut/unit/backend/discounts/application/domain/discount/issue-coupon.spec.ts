@@ -2,6 +2,7 @@ import { mock } from 'vitest-mock-extended';
 import { describe, expect, it } from 'vitest';
 
 import { tokenDrawnAs } from '@backend/app/mocks/coupon-tokens';
+import { CouponIssued } from '@backend/discounts/application/domain/coupon-issued';
 import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
@@ -22,7 +23,15 @@ describe('class Discount', () => {
 
         expect(discount.toJSON().coupons).to.deep.equal(['7K3QX9M2PD']);
       });
-      it.todo('should raise CouponIssued carrying its id and the coupon\'s token');
+      it('should raise CouponIssued carrying its id and the coupon\'s token', () => {
+        const { events, discount } = setupSut();
+
+        discount.issueCoupon(tokenDrawnAs('7K3QX9M2PD'));
+
+        const [raised] = events.publish.mock.lastCall ?? [];
+        expect(raised).to.be.instanceOf(CouponIssued);
+        expect(raised).to.deep.include({ id: 'test-uuid', token: '7K3QX9M2PD' });
+      });
     });
 
     describe('state', () => {
