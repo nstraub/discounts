@@ -46,4 +46,7 @@ describe('class DiscountFactory', () => {
       expect(rebuilt.toJSON().coupons.map(({ redeemed }) => redeemed), 'each coupon redeemed').to.deep.equal([true, false]);
     });
   });
+  describe('rebuilding a kept discount with its sales counted', () => {
+    it.todo('should rebuild each kept redeemed coupon counted or not yet counted, as it was kept');
+  });
 });

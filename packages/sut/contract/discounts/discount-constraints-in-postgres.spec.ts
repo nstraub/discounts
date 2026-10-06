@@ -99,4 +99,7 @@ describe('the discounts table refusing what Discount refuses', () => {
       });
     });
   });
+  describe('a count of a discount\'s sales', () => {
+    it.todo('should trace every constraint on counting a discount\'s sales to a rule of Discount, keeping no time and no one with it');
+  });
 });

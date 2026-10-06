@@ -169,4 +169,8 @@ describe('a discount kept in PostgreSQL', () => {
       it.todo('should read back as written the rates published before the rate rules');
     });
   });
+  describe('with its sales counted', () => {
+    it.todo('should save a discount with a counted and an uncounted redeemed coupon and load it back equal, in a separate transaction');
+    it.todo('should keep a counted coupon counted when another coupon is redeemed and the discount is saved again');
+  });
 });
