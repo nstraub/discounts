@@ -10,7 +10,10 @@ defineProps<{ stores: Pick<DiscountResponse, 'storeName' | 'storeAddress'>[] }>(
   <form>
     <label class="flex flex-col gap-1">
       {{ discountTexts.yourStore }}
-      <select class="rounded border border-gray-400 px-2 py-1" />
+      <select
+        required
+        class="rounded border border-gray-400 px-2 py-1"
+      />
     </label>
   </form>
 </template>
