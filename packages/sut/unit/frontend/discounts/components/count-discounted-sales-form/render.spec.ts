@@ -15,7 +15,7 @@ describe('Component CountDiscountedSalesForm', () => {
     it('should ask for the store under its caption', () => {
       setupSut();
 
-      expect(queryAllByRole(document.body, 'combobox', { name: discountTexts.store }), 'store pickers under the caption').to.have.length(1);
+      expect(theStorePickers(), 'store pickers under the caption').to.have.length(1);
     });
     it('should require a store to be picked before the sales are counted', () => {
       setupSut();
