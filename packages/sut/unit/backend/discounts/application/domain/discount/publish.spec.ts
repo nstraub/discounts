@@ -109,7 +109,14 @@ describe('class Discount', () => {
     });
 
     describe('boundary', () => {
-      it.todo('should accept a rate of 20, a whole number above 0 and at most 100');
+      it('should accept a rate of 20, a whole number above 0 and at most 100', () => {
+        const { events, discountWith } = setupSut();
+        const discount = discountWith({ ...spicesDiscount, rate: '20' });
+
+        discount.publish();
+
+        expect(lastEventOf(events)).to.be.instanceOf(DiscountPublished);
+      });
       it.todo('should accept a rate of 12.5, with one decimal place');
       it.todo('should accept a rate of 100, the highest a rate may be');
       it.todo('should accept a rate of 0.1, the lowest a rate may be');
