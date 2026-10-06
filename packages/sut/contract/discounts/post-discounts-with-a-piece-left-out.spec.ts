@@ -62,7 +62,14 @@ describe('POST /discounts with a piece left out', () => {
 
       expect(bodiesNotMatchingTheErrorSchema(answers)).to.deep.equal([]);
     });
-    it.todo('should publish nothing when a piece is missing, listing no discount afterwards');
+    it('should publish nothing when a piece is missing, listing no discount afterwards', async () => {
+      const { http } = await setupSut();
+
+      await http.post('/discounts').send({ ...spicesDiscount, item: '' });
+
+      const listed = await http.get('/discounts');
+      expect(listed.body).to.deep.equal([]);
+    });
     it.todo('should publish DiscountPublicationRejected on the application event emitter for a piece made only of blank space');
   });
 });
