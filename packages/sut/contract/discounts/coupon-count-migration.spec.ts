@@ -53,5 +53,13 @@ describe('the migration that lets a discount\'s sales be counted', () => {
     const readBack = await discountRepositoryOn(client, databaseUrl).repository.withId('constraint-id');
     expect(readBack?.count().toJSON().discountedSales, 'the coupon redeemed before, counted').to.equal(1);
   });
-  it.todo('should keep and load back, as the deployed version does, a discount with a redeemed coupon on the migrated schema');
+  it('should keep and load back, as the deployed version does, a discount with a redeemed coupon on the migrated schema', async () => {
+    const { client, databaseUrl, migrateForward } = await setupSut();
+    await migrateForward();
+
+    const kept = await keepADiscountWithACouponRedeemed(client, databaseUrl);
+
+    const [loaded] = await discountRepositoryOn(client, databaseUrl).loadOnItsOwnConnection();
+    expect(loaded?.toJSON(), 'the discount loaded back with its redeemed coupon').to.deep.equal(kept.toJSON());
+  });
 });
