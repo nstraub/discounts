@@ -80,4 +80,9 @@ describe('class Discount', () => {
       expect(discount.toJSON().hook).to.equal(spicesDiscountWithItsHook.hook);
     });
   });
+  describe('lowering its rate', () => {
+    describe('boundary', () => {
+      it.todo('should accept a new rate of 0.1 %, the lowest a rate may be');
+    });
+  });
 });
