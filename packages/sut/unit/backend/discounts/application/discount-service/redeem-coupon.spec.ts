@@ -5,7 +5,7 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
 
-const setupSut = ({ coupons = [{ token: '7K3QX9M2PD', redeemed: false }] } = {}) => aServiceOverAKeptDiscount({ coupons });
+const setupSut = ({ coupons = [{ token: '7K3QX9M2PD', redeemed: false, counted: false }] } = {}) => aServiceOverAKeptDiscount({ coupons });
 
 describe('class DiscountService', () => {
   describe('redeeming a coupon', () => {
@@ -14,7 +14,7 @@ describe('class DiscountService', () => {
 
       await service.redeemCoupon('7K3QX9M2PD');
 
-      expect(repository.save.mock.lastCall?.at(0)?.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true }]);
+      expect(repository.save.mock.lastCall?.at(0)?.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true, counted: false }]);
     });
     it('should announce CouponRedeemed for the coupon redeemed', async () => {
       const { events, service } = setupSut();
@@ -38,7 +38,7 @@ describe('class DiscountService', () => {
         await service.redeemCoupon('7k3qx 9m2pd');
 
         const [kept] = repository.save.mock.lastCall?.at(0)?.toJSON().coupons ?? [];
-        expect(kept, 'the coupon of the code typed').to.deep.equal({ token: '7K3QX9M2PD', redeemed: true });
+        expect(kept, 'the coupon of the code typed').to.deep.equal({ token: '7K3QX9M2PD', redeemed: true, counted: false });
       });
     });
 

@@ -17,7 +17,7 @@ export class DiscountFactory {
     return new Discount(
       id,
       new DiscountDetails(details),
-      coupons.map(({ token, redeemed }) => new Coupon(CouponToken.keptAs(token), redeemed, this.events)),
+      coupons.map(({ token, redeemed, counted }) => new Coupon(CouponToken.keptAs(token), redeemed, counted, this.events)),
       this.events,
     );
   }

@@ -7,7 +7,7 @@ import { coupons } from './schema.js';
 
 type KeptCoupon = ReturnType<Coupon['toJSON']>;
 
-const theColumnsOfACoupon = { token: coupons.token, redeemed: coupons.redeemed };
+const theColumnsOfACoupon = { token: coupons.token, redeemed: coupons.redeemed, counted: coupons.counted };
 
 export const couponsIssuedBy = (database: Database, discountId: string): Promise<KeptCoupon[]> =>
   database.select(theColumnsOfACoupon).from(coupons).where(eq(coupons.discountId, discountId)).orderBy(coupons.id);
@@ -15,7 +15,7 @@ export const couponsIssuedBy = (database: Database, discountId: string): Promise
 export const couponsIssuedByEachDiscount = async (database: Database): Promise<Map<string, KeptCoupon[]>> => {
   const rows = await database.select({ ...theColumnsOfACoupon, discountId: coupons.discountId }).from(coupons).orderBy(coupons.id);
   const byDiscount = Map.groupBy(rows, (row) => row.discountId);
-  return new Map(byDiscount.entries().map(([discountId, issued]) => [discountId, issued.map(({ token, redeemed }) => ({ token, redeemed }))]));
+  return new Map(byDiscount.entries().map(([discountId, issued]) => [discountId, issued.map(({ token, redeemed, counted }) => ({ token, redeemed, counted }))]));
 };
 
 export const idsOfTheDiscountsThatIssued = async (database: Database, token: string): Promise<string[]> => {

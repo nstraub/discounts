@@ -14,7 +14,7 @@ describe('class DiscountService', () => {
 
       await service.issueCoupon('spices-id');
 
-      expect(repository.save.mock.lastCall?.at(0)?.toJSON()).to.deep.include({ id: 'spices-id', coupons: [{ token: '7K3QX9M2PD', redeemed: false }] });
+      expect(repository.save.mock.lastCall?.at(0)?.toJSON()).to.deep.include({ id: 'spices-id', coupons: [{ token: '7K3QX9M2PD', redeemed: false, counted: false }] });
     });
     it('should announce CouponIssued for the coupon the discount named issues', async () => {
       const { events, service } = setupSut();

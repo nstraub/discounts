@@ -29,7 +29,7 @@ describe('class DiscountFactory', () => {
   describe('rebuilding a kept discount with its coupons', () => {
     it('should rebuild a kept discount with the coupons it has issued', () => {
       const factory = new DiscountFactory(mock<DomainEventPublisher>());
-      const kept = { id: 'kept-spices-id', ...spicesDiscount, coupons: [{ token: '7K3QX9M2PD', redeemed: false }, { token: 'R4WZ0BH8NE', redeemed: false }] };
+      const kept = { id: 'kept-spices-id', ...spicesDiscount, coupons: [{ token: '7K3QX9M2PD', redeemed: false, counted: false }, { token: 'R4WZ0BH8NE', redeemed: false, counted: false }] };
 
       const rebuilt = factory.reconstitute(kept);
 
@@ -39,7 +39,7 @@ describe('class DiscountFactory', () => {
   describe('rebuilding a kept discount with a redeemed coupon', () => {
     it('should rebuild each kept coupon redeemed or unused, as it was kept', () => {
       const factory = new DiscountFactory(mock<DomainEventPublisher>());
-      const coupons = [{ token: '7K3QX9M2PD', redeemed: true }, { token: 'R4WZ0BH8NE', redeemed: false }];
+      const coupons = [{ token: '7K3QX9M2PD', redeemed: true, counted: false }, { token: 'R4WZ0BH8NE', redeemed: false, counted: false }];
 
       const rebuilt = factory.reconstitute({ id: 'kept-spices-id', ...spicesDiscount, coupons });
 
@@ -47,6 +47,13 @@ describe('class DiscountFactory', () => {
     });
   });
   describe('rebuilding a kept discount with its sales counted', () => {
-    it.todo('should rebuild each kept redeemed coupon counted or not yet counted, as it was kept');
+    it('should rebuild each kept redeemed coupon counted or not yet counted, as it was kept', () => {
+      const factory = new DiscountFactory(mock<DomainEventPublisher>());
+      const coupons = [{ token: '7K3QX9M2PD', redeemed: true, counted: true }, { token: 'R4WZ0BH8NE', redeemed: true, counted: false }];
+
+      const rebuilt = factory.reconstitute({ id: 'kept-spices-id', ...spicesDiscount, coupons });
+
+      expect(rebuilt.toJSON().coupons.map(({ counted }) => counted), 'each coupon counted').to.deep.equal([true, false]);
+    });
   });
 });

@@ -5,7 +5,7 @@ import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/
 
 import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
 
-const setupSut = ({ kept = publishedSpicesDiscount, coupons = [{ token: '7K3QX9M2PD', redeemed: false }] } = {}) =>
+const setupSut = ({ kept = publishedSpicesDiscount, coupons = [{ token: '7K3QX9M2PD', redeemed: false, counted: false }] } = {}) =>
   aSpicesDiscountWithItsEvents().factory.reconstitute({ ...kept, coupons });
 
 describe('class Discount', () => {
@@ -15,7 +15,7 @@ describe('class Discount', () => {
 
       discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
 
-      expect(discount.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true }]);
+      expect(discount.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true, counted: false }]);
     });
 
     it('should answer with the item of the discount the coupon redeemed is for', () => {
@@ -35,11 +35,11 @@ describe('class Discount', () => {
 
     describe('combination', () => {
       it('should leave its other coupons unused when one is redeemed', () => {
-        const discount = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: false }, { token: 'R4WZ0BH8NE', redeemed: false }] });
+        const discount = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: false, counted: false }, { token: 'R4WZ0BH8NE', redeemed: false, counted: false }] });
 
         discount.redeemCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
 
-        expect(discount.toJSON().coupons.at(0)).to.deep.equal({ token: '7K3QX9M2PD', redeemed: false });
+        expect(discount.toJSON().coupons.at(0)).to.deep.equal({ token: '7K3QX9M2PD', redeemed: false, counted: false });
       });
     });
   });

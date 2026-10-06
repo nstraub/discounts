@@ -7,9 +7,9 @@ import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/
 import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
 
 const threeRedeemedCoupons = [
-  { token: '7K3QX9M2PD', redeemed: true },
-  { token: 'R4WZ0BH8NE', redeemed: true },
-  { token: 'C9D2F6H8JK', redeemed: true },
+  { token: '7K3QX9M2PD', redeemed: true, counted: false },
+  { token: 'R4WZ0BH8NE', redeemed: true, counted: false },
+  { token: 'C9D2F6H8JK', redeemed: true, counted: false },
 ];
 
 const setupSut = ({ kept = publishedSpicesDiscount, coupons = threeRedeemedCoupons } = {}) => {
@@ -48,7 +48,7 @@ describe('class Discount', () => {
 
     describe('state', () => {
       it('should leave out of a count the coupons redeemed before its last count', () => {
-        const coupons = [...threeRedeemedCoupons.slice(0, 2), { token: 'C9D2F6H8JK', redeemed: false }];
+        const coupons = [...threeRedeemedCoupons.slice(0, 2), { token: 'C9D2F6H8JK', redeemed: false, counted: false }];
         const { discount } = setupSut({ coupons });
         discount.count();
         discount.redeemCoupon(CouponToken.keptAs('C9D2F6H8JK'));
@@ -58,7 +58,7 @@ describe('class Discount', () => {
         expect(counted.toJSON().discountedSales, 'the sales since the last count').to.equal(1);
       });
       it('should count a coupon issued before its last count and redeemed after it', () => {
-        const { discount } = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: false }] });
+        const { discount } = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: false, counted: false }] });
         discount.count();
         discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
 
@@ -67,7 +67,7 @@ describe('class Discount', () => {
         expect(counted.toJSON().discountedSales, 'the sales since the last count').to.equal(1);
       });
       it('should not count a coupon issued and not yet redeemed', () => {
-        const { discount } = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: true }, { token: 'R4WZ0BH8NE', redeemed: false }] });
+        const { discount } = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: true, counted: false }, { token: 'R4WZ0BH8NE', redeemed: false, counted: false }] });
 
         const counted = discount.count();
 

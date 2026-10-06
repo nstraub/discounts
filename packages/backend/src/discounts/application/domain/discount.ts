@@ -28,7 +28,7 @@ export class Discount {
   }
 
   issueCoupon(token: CouponToken): IssuedCoupon {
-    this.coupons = [...this.coupons, new Coupon(token, false, this.events)];
+    this.coupons = [...this.coupons, new Coupon(token, false, false, this.events)];
     this.events.publish(new CouponIssued(this.id, token.toJSON()));
     return new IssuedCoupon(token, this.details.toJSON().storeName);
   }

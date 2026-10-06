@@ -9,7 +9,7 @@ import { couponForTheProduceDiscount, publishedProduceDiscount } from '@sut/supp
 
 const setupSut = ({ token = '7K3QX9M2PD' } = {}) => {
   const events = mock<DomainEventPublisher>();
-  return { events, coupon: new Coupon(CouponToken.keptAs(token), false, events) };
+  return { events, coupon: new Coupon(CouponToken.keptAs(token), false, false, events) };
 };
 
 describe('class Coupon', () => {

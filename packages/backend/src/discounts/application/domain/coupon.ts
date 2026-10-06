@@ -3,11 +3,10 @@ import type { CouponToken } from './coupon-token.js';
 import type { DomainEventPublisher } from './domain-event-publisher.js';
 
 export class Coupon {
-  private counted = false;
-
   constructor(
     private readonly token: CouponToken,
     private redeemed: boolean,
+    private counted: boolean,
     private readonly events: DomainEventPublisher,
   ) {}
 
@@ -32,7 +31,7 @@ export class Coupon {
     return this.token.toJSON() === token.toJSON();
   }
 
-  toJSON(): { token: string; redeemed: boolean } {
-    return { token: this.token.toJSON(), redeemed: this.redeemed };
+  toJSON(): { token: string; redeemed: boolean; counted: boolean } {
+    return { token: this.token.toJSON(), redeemed: this.redeemed, counted: this.counted };
   }
 }

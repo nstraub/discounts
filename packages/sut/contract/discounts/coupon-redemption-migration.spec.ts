@@ -51,7 +51,7 @@ describe('the migration that lets a coupon be redeemed', () => {
     await migrateForward();
 
     const foundAgain = await discountRepositoryOn(client, databaseUrl).repository.withId(keptBefore.toJSON().id);
-    expect(foundAgain?.toJSON().coupons, 'forward again, the use lost').to.deep.equal([{ token: '7K3QX9M2PD', redeemed: false }]);
+    expect(foundAgain?.toJSON().coupons, 'forward again, the use lost').to.deep.equal([{ token: '7K3QX9M2PD', redeemed: false, counted: false }]);
     expect(await theRedeemedCouponLoadedBackAsKept(client, databaseUrl), 'forward again, a redeemed coupon loaded back as kept').to.equal(true);
   });
   it('should read back unused, through the repository, a coupon issued before the migration', async () => {
