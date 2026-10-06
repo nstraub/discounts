@@ -29,6 +29,10 @@ export const insertACoupon = (client: pg.Client, coupon: { token?: string; disco
 
 export const theDiscountsKept = async (client: pg.Client) => (await client.query('SELECT id, item, rate, store_name, store_address FROM app.discounts')).rows;
 
+export const theCouponsKept = async (client: pg.Client) => (await client.query('SELECT token, redeemed, counted FROM app.coupons')).rows;
+
+export const keptUnused = (token: string) => ({ token, redeemed: false, counted: false });
+
 export const theRowKeptFor = (published: { id: string }, discount: typeof spicesDiscount) => ({
   id: published.id,
   item: discount.item,
