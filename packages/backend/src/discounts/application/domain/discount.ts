@@ -5,12 +5,16 @@ import type { DomainEventPublisher } from './domain-event-publisher.js';
 export class Discount {
   constructor(
     private readonly id: string,
-    private readonly details: DiscountDetails,
+    private details: DiscountDetails,
     private readonly events: DomainEventPublisher,
   ) {}
 
   publish(): void {
     this.events.publish(new DiscountPublished(this.toJSON()));
+  }
+
+  changeRate(rate: string): void {
+    this.details = this.details.withRate(rate);
   }
 
   toJSON(): { id: string } & ReturnType<DiscountDetails['toJSON']> {

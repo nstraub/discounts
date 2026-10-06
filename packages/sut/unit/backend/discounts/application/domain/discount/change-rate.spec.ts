@@ -1,9 +1,26 @@
-import { describe, it } from 'vitest';
+import { mock } from 'vitest-mock-extended';
+import { describe, expect, it } from 'vitest';
+
+import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
+import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
+import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
+import { spicesDiscount } from '@sut/support/example-discounts';
+
+const setupSut = () => {
+  const events = mock<DomainEventPublisher>();
+  return { events, discount: new DiscountFactory(events).create(new DiscountDetails(spicesDiscount)) };
+};
 
 describe('class Discount', () => {
   describe('changing its rate', () => {
     describe('the discount changed', () => {
-      it.todo('should hold the new rate once its rate is changed');
+      it('should hold the new rate once its rate is changed', () => {
+        const { discount } = setupSut();
+
+        discount.changeRate('25');
+
+        expect(discount.toJSON().rate).to.equal('25');
+      });
       it.todo('should raise DiscountRateChanged carrying its id and its new rate');
       it.todo('should keep its item, store name and store address when its rate changes');
     });
