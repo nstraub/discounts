@@ -29,6 +29,7 @@ const redeem = async (): Promise<void> => {
   <form @submit.prevent="redeem">
     <StorePicker
       v-model="picked"
+      :caption="discountTexts.yourStore"
       :stores="stores"
     />
     <CaptionedInput

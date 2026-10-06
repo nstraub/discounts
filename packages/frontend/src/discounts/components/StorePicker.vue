@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import type { DiscountResponse } from '@app/types/discounts';
 
-import { discountTexts } from '../texts';
-
 type Store = Pick<DiscountResponse, 'storeName' | 'storeAddress'>;
 
-defineProps<{ stores: Store[] }>();
+defineProps<{ caption: string; stores: Store[] }>();
 
 const picked = defineModel<Store>();
 
@@ -14,7 +12,7 @@ const theNameAndAddressOf = (store: Store) => `${store.storeName}, ${store.store
 
 <template>
   <label class="flex flex-col gap-1">
-    {{ discountTexts.yourStore }}
+    {{ caption }}
     <select
       v-model="picked"
       required
