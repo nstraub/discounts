@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { UnprocessableContentException } from '@app/types/rest-api';
+import { discountTexts } from '@frontend/discounts/texts';
 import { produceDiscount, spicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { setupSut } from './till-store-of-an-app';
@@ -37,7 +38,7 @@ describe('Store till', () => {
 
       await till.redeemCoupon({ code: '7K3QX9M2PD', storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
 
-      expect(till.redemption).to.deep.equal({ item: 'Peruvian spices' });
+      expect(till.told, 'what the till tells').to.equal(`${discountTexts.theDiscountAppliesTo} Peruvian spices`);
     });
     it('should hold another item when the redemption answers with another', async () => {
       const { restApi, till } = setupSut();
@@ -45,7 +46,7 @@ describe('Store till', () => {
 
       await till.redeemCoupon({ code: 'R4WZ0BH8NE', storeName: produceDiscount.storeName, storeAddress: produceDiscount.storeAddress });
 
-      expect(till.redemption).to.deep.equal({ item: 'Fresh produce' });
+      expect(till.told, 'what the till tells').to.equal(`${discountTexts.theDiscountAppliesTo} Fresh produce`);
     });
 
     describe('dependency failure', () => {
@@ -58,7 +59,7 @@ describe('Store till', () => {
 
       await till.redeemCoupon(aCodeAtTheSpicesStore);
 
-      expect(till.couponAlreadyUsed, 'whether the coupon is held as already used').to.equal(true);
+      expect(till.told, 'what the till tells').to.equal(discountTexts.couponAlreadyUsed);
     });
     it('should no longer hold a coupon as already used once the next coupon is redeemed', async () => {
       const { restApi, till } = setupSut();
@@ -68,14 +69,14 @@ describe('Store till', () => {
 
       await till.redeemCoupon({ code: 'R4WZ0BH8NE', ...atTheSpicesStore });
 
-      expect(till.couponAlreadyUsed, 'whether a coupon is held as already used').to.equal(false);
+      expect(till.told, 'what the till tells').not.to.equal(discountTexts.couponAlreadyUsed);
     });
     it('should not hold a coupon already used as not for the store picked', async () => {
       const { till } = setupSutRefusing(new Error('POST /redemptions answered 409'));
 
       await till.redeemCoupon(aCodeAtTheSpicesStore);
 
-      expect(till.couponNotForThisStore, 'whether the coupon is held as not for the store picked').to.equal(false);
+      expect(till.told, 'what the till tells').not.to.equal(discountTexts.couponNotForYourStore);
     });
   });
   describe('redeeming a coupon at another store', () => {
@@ -84,14 +85,14 @@ describe('Store till', () => {
 
       await till.redeemCoupon({ code: '7K3QX9M2PD', storeName: stephaniesProduceDiscount.storeName, storeAddress: stephaniesProduceDiscount.storeAddress });
 
-      expect(till.couponNotForThisStore, 'whether the coupon is held as not for the store picked').to.equal(true);
+      expect(till.told, 'what the till tells').to.equal(discountTexts.couponNotForYourStore);
     });
     it('should not hold a coupon not for the store picked as already used', async () => {
       const { till } = setupSutRefusing(new UnprocessableContentException('POST /redemptions answered 422'));
 
       await till.redeemCoupon(aCodeAtTheSpicesStore);
 
-      expect(till.couponAlreadyUsed, 'whether the coupon is held as already used').to.equal(false);
+      expect(till.told, 'what the till tells').not.to.equal(discountTexts.couponAlreadyUsed);
     });
     it('should no longer hold a coupon as not for the store picked once the next coupon is redeemed', async () => {
       const { restApi, till } = setupSut();
@@ -100,7 +101,7 @@ describe('Store till', () => {
 
       await till.redeemCoupon({ ...aCodeAtTheSpicesStore, code: 'R4WZ0BH8NE' });
 
-      expect(till.couponNotForThisStore, 'whether a coupon is held as not for the store picked').to.equal(false);
+      expect(till.told, 'what the till tells').not.to.equal(discountTexts.couponNotForYourStore);
     });
   });
 });
