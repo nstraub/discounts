@@ -1,5 +1,5 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
-import { describe, expect, it, onTestFinished } from 'vitest';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import ChangeRateForm from '@frontend/discounts/components/ChangeRateForm.vue';
 import { useDiscountsStore } from '@frontend/stores/discounts-store';
@@ -28,7 +28,13 @@ describe('Component ChangeRateForm', () => {
 
       expect(discounts.changeRate).to.have.been.calledWith('spices-id', { rate: '30' });
     });
-    it.todo('should change it to the rate exactly as Mike wrote it');
+    it('should change it to the rate exactly as Mike wrote it', async () => {
+      const { form, discounts } = setupSut();
+
+      await changeThroughTheForm(form, '12,5');
+
+      expect(vi.mocked(discounts.changeRate).mock.lastCall?.at(1)?.rate).to.equal('12,5');
+    });
 
     describe('empty', () => {
       it.todo('should change to a blank rate as left out, never as a rate of zero');
