@@ -7,6 +7,14 @@ import type { DiscountRepository } from '../application/domain/discount-reposito
 import type { Database } from './database.module.js';
 import { discounts } from './schema.js';
 
+const theColumnsOfADiscount = {
+  id: discounts.id,
+  item: discounts.item,
+  rate: discounts.rate,
+  storeName: discounts.storeName,
+  storeAddress: discounts.storeAddress,
+};
+
 export class DiscountDrizzleRepository implements DiscountRepository {
   constructor(
     private readonly database: Database,
@@ -19,12 +27,12 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   }
 
   async all(): Promise<Discount[]> {
-    const rows = await this.database.select().from(discounts);
+    const rows = await this.database.select(theColumnsOfADiscount).from(discounts);
     return rows.map((row) => this.factory.reconstitute({ ...row, rate: String(row.rate) }));
   }
 
   async withId(id: string): Promise<Discount | undefined> {
-    const rows = await this.database.select().from(discounts).where(eq(discounts.id, id));
+    const rows = await this.database.select(theColumnsOfADiscount).from(discounts).where(eq(discounts.id, id));
     return rows.map((row) => this.factory.reconstitute({ ...row, rate: String(row.rate) })).at(0);
   }
 }
