@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { oneRaceAfterAnother } from '../support/at-the-same-moment';
-import { issueACouponFor, redeemAtTheStoreOf, setupSutWithACouponForEachRace } from '../support/redemptions';
+import { oneRaceAfterAnother, timesTheRaceIsRun } from '../support/at-the-same-moment';
+import { issueACouponFor, redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithACouponForEachRace } from '../support/redemptions';
 
 describe('changes to one discount at the same moment', () => {
   describe('A4 concurrency', () => {
@@ -19,7 +19,18 @@ describe('changes to one discount at the same moment', () => {
         codes.map(() => ({ redemptionKept: true, issuedKept: true })),
       );
     });
-    it.todo('should keep both of two coupons issued for one discount at the same moment');
+    it('should keep both of two coupons issued for one discount at the same moment', async () => {
+      const { http, published } = await setupSutWithACouponFor();
+      const races = Array.from({ length: timesTheRaceIsRun }, (_, race) => race);
+
+      const keptOfEachPair = await oneRaceAfterAnother(races, async () => {
+        const pair = await Promise.all([issueACouponFor(http, published), issueACouponFor(http, published)]);
+        const used = await Promise.all(pair.map((issued) => redeemAtTheStoreOf(http, issued)));
+        return used.map((response) => response.status);
+      });
+
+      expect(keptOfEachPair, 'the statuses using each coupon of a pair issued at once').to.deep.equal(races.map(() => [201, 201]));
+    });
     it('should keep a coupon\'s redemption and a change of its discount\'s rate made at the same moment', async () => {
       const { http, published, codes } = await setupSutWithACouponForEachRace();
 
