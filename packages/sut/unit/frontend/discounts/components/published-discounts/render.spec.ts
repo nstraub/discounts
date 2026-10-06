@@ -175,4 +175,7 @@ describe('Component PublishedDiscounts', () => {
   describe('showing a rate written another way', () => {
     it.todo('should show a rate without a needless .0');
   });
+  describe('several discounts of one store', () => {
+    it.todo('should show each discount of one store on an entry of its own, each naming the store');
+  });
 });

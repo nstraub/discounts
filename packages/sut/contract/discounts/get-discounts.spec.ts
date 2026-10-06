@@ -105,4 +105,7 @@ describe('GET /discounts', () => {
       expect(response.text).to.not.contain(coupon.body.token);
     });
   });
+  describe('discounts kept before their rules', () => {
+    it.todo('should list every other discount when one kept before the rules would be refused by them');
+  });
 });
