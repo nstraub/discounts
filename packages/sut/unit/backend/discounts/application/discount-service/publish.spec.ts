@@ -5,6 +5,7 @@ import { InMemoryDiscountRepository } from '@backend/app/mocks/in-memory-discoun
 import { aSourceDrawing } from '@backend/app/mocks/random-sources';
 import { DiscountService } from '@backend/discounts/application/discount-service';
 import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
+import { DiscountPublicationRejected } from '@backend/discounts/application/domain/discount-publication-rejected';
 import { DiscountPublished } from '@backend/discounts/application/domain/discount-published';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
@@ -63,6 +64,12 @@ describe('class DiscountService', () => {
 
       expect(await repository.all()).to.deep.equal([]);
     });
-    it.todo('should announce DiscountPublicationRejected for the rate refused');
+    it('should announce DiscountPublicationRejected for the rate refused', async () => {
+      const { events, service } = setupSut();
+
+      await expect(service.publish(spicesDetails.withRate('150'))).rejects.to.be.instanceOf(RateNotValidException);
+
+      expect(events.publish).to.have.been.calledWith(new DiscountPublicationRejected('150', 'not valid'));
+    });
   });
 });
