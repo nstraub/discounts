@@ -9,6 +9,8 @@ import type { PlaywrightWorld } from './playwright-world';
 
 type ExampleDiscount = { item: string; storeName: string; storeAddress: string };
 
+const aCodeNobodyIssued = 'ZZZZZZZZZZ';
+
 export class TillPage {
   constructor(private readonly page: Page) {}
 
@@ -20,6 +22,10 @@ export class TillPage {
     await pickTheStoreOf(this.page, discountTexts.yourStore, discount, 'the till');
     await this.page.getByRole('textbox', { name: discountTexts.couponCode }).fill(code);
     await this.page.getByRole('button', { name: discountTexts.redeem }).click();
+  }
+
+  async redeemACodeNobodyIssuedAt(discount: ExampleDiscount): Promise<void> {
+    await this.redeemAt(discount, aCodeNobodyIssued);
   }
 
   async verifyTellsTheDiscountAppliesTo(discount: ExampleDiscount): Promise<void> {
@@ -35,6 +41,11 @@ export class TillPage {
   async verifyTellsTheCouponIsNotForItsStore(): Promise<void> {
     const told = this.page.getByRole('status').filter({ hasText: discountTexts.couponNotForYourStore });
     await told.waitFor().catch(() => assert.fail('the till does not say the coupon is not for its store'));
+  }
+
+  async verifyTellsTheCouponIsNotValid(): Promise<void> {
+    const told = this.page.getByRole('status').filter({ hasText: discountTexts.couponNotValid });
+    await told.waitFor().catch(() => assert.fail('the till does not say the coupon is not valid'));
   }
 }
 
