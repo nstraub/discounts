@@ -126,7 +126,14 @@ describe('class Discount', () => {
 
         expect(lastEventOf(events)).to.be.instanceOf(DiscountPublished);
       });
-      it.todo('should accept a rate of 0.1, the lowest a rate may be');
+      it('should accept a rate of 0.1, the lowest a rate may be', () => {
+        const { events, discountWith } = setupSut();
+        const discount = discountWith({ ...spicesDiscount, rate: '0.1' });
+
+        discount.publish();
+
+        expect(lastEventOf(events)).to.be.instanceOf(DiscountPublished);
+      });
       it('should refuse a rate of 0, its rejection naming the rate as not valid', () => {
         const { events, discountWith } = setupSut();
         const discount = discountWith({ ...spicesDiscount, rate: '0' });
