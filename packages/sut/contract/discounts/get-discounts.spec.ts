@@ -94,4 +94,7 @@ describe('GET /discounts', () => {
       expect(response.body.at(0)).to.not.have.property('hook');
     });
   });
+  describe('A3 handle guessing (no accounts)', () => {
+    it.todo('should list no coupon token with any discount once coupons have been issued');
+  });
 });

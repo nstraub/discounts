@@ -56,4 +56,9 @@ describe('the discounts table refusing what Discount refuses', () => {
       expect(outcome).to.equal('accepted');
     });
   });
+  describe('its coupons', () => {
+    it.todo('should refuse two coupons with one token: 23505, unique mirrors "a coupon is identified by its token alone"');
+    it.todo('should refuse a coupon without a token: 23502, NOT NULL mirrors "a coupon has a token"');
+    it.todo('should refuse a coupon of no kept discount: 23503, the foreign key mirrors "a coupon belongs to its discount"');
+  });
 });

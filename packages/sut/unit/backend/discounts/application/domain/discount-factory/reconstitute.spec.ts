@@ -26,4 +26,7 @@ describe('class DiscountFactory', () => {
       expect(rebuilt.toJSON().hook).to.equal(spicesDiscountWithItsHook.hook);
     });
   });
+  describe('rebuilding a kept discount with its coupons', () => {
+    it.todo('should rebuild a kept discount with the coupons it has issued');
+  });
 });

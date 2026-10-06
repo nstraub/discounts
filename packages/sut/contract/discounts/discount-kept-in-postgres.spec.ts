@@ -83,4 +83,8 @@ describe('a discount kept in PostgreSQL', () => {
       expect(loaded?.toJSON().hook).to.equal(hook);
     });
   });
+  describe('with its coupons', () => {
+    it.todo('should save a discount with its coupons and load it back equal, in a separate transaction');
+    it.todo('should keep a discount\'s earlier coupons when another is issued and it is saved again');
+  });
 });

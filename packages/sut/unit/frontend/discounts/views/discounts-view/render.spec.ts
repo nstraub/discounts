@@ -42,4 +42,7 @@ describe('View DiscountsView', () => {
       expect(view.findComponent(PublishDiscountForm).exists()).to.equal(true);
     });
   });
+  describe('the coupon Sue gets', () => {
+    it.todo('should show the coupon Sue has got once she decides to try a discount');
+  });
 });

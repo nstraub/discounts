@@ -161,4 +161,7 @@ describe('Component PublishedDiscounts', () => {
   describe('showing where each store is', () => {
     it.todo('should show each entry with its own store address when two stores share a name');
   });
+  describe('getting a coupon', () => {
+    it.todo('should offer to get a coupon on each entry');
+  });
 });
