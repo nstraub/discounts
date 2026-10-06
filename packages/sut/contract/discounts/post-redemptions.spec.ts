@@ -49,11 +49,11 @@ describe('POST /redemptions', () => {
     it('should publish CouponRedeemed on the application event emitter for the coupon redeemed', async () => {
       const { app, http, published, code } = await setupSutWithACouponFor();
       const redeemed: unknown[] = [];
-      app.get(EventEmitter2).on('coupon.redeemed', (event: { id: string; token: string }) => redeemed.push({ id: event.id, token: event.token }));
+      app.get(EventEmitter2).on('coupon.redeemed', (event: { discountId: string; token: string }) => redeemed.push({ discountId: event.discountId, token: event.token }));
 
       await redeemAtTheStoreOf(http, code);
 
-      expect(redeemed).to.deep.equal([{ id: published.id, token: code }]);
+      expect(redeemed).to.deep.equal([{ discountId: published.id, token: code }]);
     });
     it('should keep the coupon redeemed and its discount\'s other coupons unused', async () => {
       const { client, http, published, code } = await setupSutWithACouponFor();

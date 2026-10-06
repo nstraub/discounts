@@ -29,15 +29,15 @@ describe('class Coupon', () => {
 
         const [raised] = events.publish.mock.lastCall ?? [];
         expect(raised).to.be.instanceOf(CouponRedeemed);
-        expect(raised).to.deep.include({ id: 'spices-id', token: '7K3QX9M2PD' });
+        expect(raised).to.deep.include({ discountId: 'spices-id', token: '7K3QX9M2PD' });
       });
       it('should raise CouponRedeemed carrying the id of another discount and the token of a coupon it issued', () => {
         const { events, coupon } = setupSut({ token: couponForTheProduceDiscount.token });
 
         coupon.redeem(publishedProduceDiscount.id);
 
-        const { id, token } = events.publish.mock.lastCall?.at(0) as CouponRedeemed;
-        expect({ id, token }).to.deep.equal({ id: publishedProduceDiscount.id, token: couponForTheProduceDiscount.token });
+        const { discountId, token } = events.publish.mock.lastCall?.at(0) as CouponRedeemed;
+        expect({ discountId, token }).to.deep.equal({ discountId: publishedProduceDiscount.id, token: couponForTheProduceDiscount.token });
       });
     });
 
