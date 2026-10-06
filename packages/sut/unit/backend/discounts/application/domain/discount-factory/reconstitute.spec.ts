@@ -17,6 +17,13 @@ describe('class DiscountFactory', () => {
     });
   });
   describe('rebuilding a kept discount with a hook', () => {
-    it.todo('should rebuild a kept discount with its hook');
+    it('should rebuild a kept discount with its hook', () => {
+      const factory = new DiscountFactory(mock<DomainEventPublisher>());
+      const kept = { id: 'kept-spices-id', ...spicesDiscount, hook: 'Our spices now come from a new supplier' };
+
+      const rebuilt = factory.reconstitute(kept);
+
+      expect(rebuilt.toJSON().hook).to.equal('Our spices now come from a new supplier');
+    });
   });
 });
