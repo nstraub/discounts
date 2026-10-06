@@ -134,3 +134,24 @@ Feature: Stephanie takes the coupon at the till
     When it is used at Mike's store while it is tried at Stephanie's store
     Then Mike is told the discount applies
     And Stephanie is told it is not for her store
+
+  @wip
+  Scenario: A coupon nobody issued
+    Given Stephanie is taking a coupon at the till
+    When the coupon was never issued
+    Then Stephanie is told it is not valid
+
+  @todo
+  Scenario: A code one character away from Sue's is not valid
+    Given Sue has a coupon for Stephanie's discount
+    When Stephanie takes a code one character away from Sue's
+    Then Stephanie is told it is not valid
+    And Sue's coupon is still unused
+
+  # What Stephanie is told when she redeems with no code typed is not settled. The proposal beside the
+  # question: she is told to type the coupon's code, and nothing is redeemed.
+  @todo
+  Scenario: Stephanie redeems with no code typed
+    Given Stephanie is taking a coupon at the till
+    When she redeems with no code typed
+    Then she is told to type the coupon's code
