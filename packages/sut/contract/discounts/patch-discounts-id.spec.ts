@@ -4,9 +4,8 @@ import { describe, expect, it } from 'vitest';
 import { requestRejection } from '@app/types/discounts';
 
 import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
+import { statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
-
-const bodiesThatAreNotObjects = ['[]', '"25"', '25', 'null'];
 
 const patchTheDiscount = (http: Http, id: string) => http.patch(`/discounts/${id}`);
 
@@ -59,11 +58,7 @@ describe('PATCH /discounts/:id', () => {
       const { http } = await setupSut();
       const published = await publishTheSpicesDiscount(http);
 
-      const statuses = [];
-      for (const body of bodiesThatAreNotObjects) {
-        const response = await patchWrittenAsJson(http, published.id, body);
-        statuses.push(response.status);
-      }
+      const statuses = await statusesAnsweringBodiesThatAreNotObjects((body) => patchWrittenAsJson(http, published.id, body));
 
       expect(statuses).to.deep.equal([400, 400, 400, 400]);
     });

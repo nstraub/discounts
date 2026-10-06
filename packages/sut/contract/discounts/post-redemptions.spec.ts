@@ -5,6 +5,7 @@ import { redemptionResponse, requestRejection } from '@app/types/discounts';
 import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
+import { statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
 
 type ExampleDiscount = typeof spicesDiscount;
 
@@ -14,8 +15,6 @@ const setupSutWithACouponFor = async (discount: ExampleDiscount = spicesDiscount
   const code: string = (await sut.http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
   return { ...sut, published, code };
 };
-
-const bodiesThatAreNotObjects = ['[]', '"7K3QX9M2PD"', '25', 'null'];
 
 const redeemWrittenAsJson = (http: Http, body: string) => http.post('/redemptions').set('Content-Type', 'application/json').send(body);
 
@@ -93,12 +92,9 @@ describe('POST /redemptions', () => {
     it('should answer 400 for a JSON body that is an array, a string, a number or null', async () => {
       const { http } = await setupSut();
 
-      const statuses = [];
-      for (const body of bodiesThatAreNotObjects) {
-        statuses.push((await redeemWrittenAsJson(http, body)).status);
-      }
+      const statuses = await statusesAnsweringBodiesThatAreNotObjects((body) => redeemWrittenAsJson(http, body));
 
-      expect(statuses).to.deep.equal([400, 400, 400, 400]);
+      expect(statuses, 'the statuses answering an array, a string, a number and null').to.deep.equal([400, 400, 400, 400]);
     });
     it('should answer 400 for a body that is not valid JSON', async () => {
       const { http } = await setupSut();

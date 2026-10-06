@@ -5,13 +5,12 @@ import { discountResponse, requestRejection } from '@app/types/discounts';
 import { longTextInAnyCharacters, produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
+import { answersInTurnToBodiesThatAreNotObjects, statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
 
 type Http = Awaited<ReturnType<typeof setupSut>>['http'];
 
 const aDiscountAboveTheTransportLimit = { ...spicesDiscount, item: 'x'.repeat(200_000) };
-
-const bodiesThatAreNotObjects = ['[]', '"Peruvian spices"', '20', 'null'];
 
 const postWrittenAsJson = (http: Http, body: string) => http.post('/discounts').set('Content-Type', 'application/json').send(body);
 
@@ -71,24 +70,16 @@ describe('POST /discounts', () => {
     it('should answer 400 for a JSON body that is an array, a string, a number or null', async () => {
       const { http } = await setupSut();
 
-      const statuses = [];
-      for (const body of bodiesThatAreNotObjects) {
-        const response = await postWrittenAsJson(http, body);
-        statuses.push(response.status);
-      }
+      const statuses = await statusesAnsweringBodiesThatAreNotObjects((body) => postWrittenAsJson(http, body));
 
       expect(statuses).to.deep.equal([400, 400, 400, 400]);
     });
     it('should name no field for a JSON body that is an array, a string, a number or null', async () => {
       const { http } = await setupSut();
 
-      const fieldsNamed = [];
-      for (const body of bodiesThatAreNotObjects) {
-        const response = await postWrittenAsJson(http, body);
-        fieldsNamed.push(...(requestRejection.parse(response.body).fields ?? []));
-      }
+      const answers = await answersInTurnToBodiesThatAreNotObjects((body) => postWrittenAsJson(http, body));
 
-      expect(fieldsNamed).to.deep.equal([]);
+      expect(answers.flatMap((answer) => requestRejection.parse(answer.body).fields ?? [])).to.deep.equal([]);
     });
     it('should answer 400 for a body that is not valid JSON', async () => {
       const { http } = await setupSut();
