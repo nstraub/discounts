@@ -1,3 +1,4 @@
+import { Coupon } from './coupon.js';
 import { CouponIssued } from './coupon-issued.js';
 import type { CouponToken } from './coupon-token.js';
 import type { DiscountDetails } from './discount-details.js';
@@ -10,7 +11,7 @@ export class Discount {
   constructor(
     private readonly id: string,
     private details: DiscountDetails,
-    private coupons: CouponToken[],
+    private coupons: Coupon[],
     private readonly events: DomainEventPublisher,
   ) {}
 
@@ -24,12 +25,12 @@ export class Discount {
   }
 
   issueCoupon(token: CouponToken): IssuedCoupon {
-    this.coupons = [...this.coupons, token];
+    this.coupons = [...this.coupons, new Coupon(token, false, this.events)];
     this.events.publish(new CouponIssued(this.id, token.toJSON()));
     return new IssuedCoupon(token, this.details.toJSON().storeName);
   }
 
   toJSON(): { id: string; coupons: string[] } & ReturnType<DiscountDetails['toJSON']> {
-    return { id: this.id, ...this.details.toJSON(), coupons: this.coupons.map((coupon) => coupon.toJSON()) };
+    return { id: this.id, ...this.details.toJSON(), coupons: this.coupons.map((coupon) => coupon.toJSON().token) };
   }
 }
