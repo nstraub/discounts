@@ -29,8 +29,7 @@ export class Discount {
   }
 
   issueCoupon(token: CouponToken): IssuedCoupon {
-    this.coupons.issue(token);
-    this.events.couponIssued(this.id, token.toJSON());
+    this.coupons.issue(token, this.id);
     return new IssuedCoupon(token, this.details.toJSON().storeName);
   }
 
@@ -44,9 +43,7 @@ export class Discount {
   }
 
   count(): CountedSales {
-    const discountedSales = this.coupons.countSinceTheLastCount();
-    this.events.salesCounted(this.id, discountedSales);
-    return new CountedSales(this.id, this.details, discountedSales);
+    return new CountedSales(this.id, this.details, this.coupons.countSinceTheLastCount(this.id));
   }
 
   toJSON(): { id: string; coupons: ReturnType<Coupons['toJSON']> } & ReturnType<DiscountDetails['toJSON']> {
