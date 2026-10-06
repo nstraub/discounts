@@ -28,7 +28,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
       rateNotValid.value = true;
       if (refusal instanceof BadRequestException) {
         missing.value = refusal.missing;
-        rateNotValid.value = !refusal.missing.includes('rate');
+        rateNotValid.value = refusal.missing.length === 0;
       }
     }
   };
