@@ -1,8 +1,20 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { stephaniesProduceDiscount } from '@sut/support/example-discounts';
+
+import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
+import { redeemAtTheStoreOf, setupSutWithACouponFor } from '../support/redemptions';
 
 describe('POST /redemptions at a store the coupon is not for', () => {
   describe('a coupon for another store', () => {
-    it.todo('should answer 422 with a body matching the error schema when the coupon is not for the store given');
+    it('should answer 422 with a body matching the error schema when the coupon is not for the store given', async () => {
+      const { http, code } = await setupSutWithACouponFor();
+
+      const response = await redeemAtTheStoreOf(http, code, stephaniesProduceDiscount);
+
+      expect(response.status).to.equal(422);
+      expect(bodiesNotMatchingTheErrorSchema([response])).to.deep.equal([]);
+    });
     it.todo('should keep the coupon unused and its discount as it was when the coupon is not for the store given');
     it.todo('should publish CouponRedemptionRejected on the application event emitter for the coupon refused at another store');
     it.todo('should refuse a coupon at a store with the same name as its own at another address');

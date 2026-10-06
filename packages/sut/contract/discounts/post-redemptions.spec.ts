@@ -2,7 +2,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { redemptionRequest, redemptionResponse, requestRejection } from '@app/types/discounts';
-import { longTextInAnyCharacters, produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
+import { longTextInAnyCharacters, produceDiscount, spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
 import { oneRaceAfterAnother } from '../support/at-the-same-moment';
@@ -118,6 +118,7 @@ describe('POST /redemptions', () => {
         ...(await answersInTurnToBodiesThatAreNotObjects((body) => redeemWrittenAsJson(http, body))),
         await redeemWrittenAsJson(http, '{"code": "7K3QX9M2PD",'),
         await redeemAtTheStoreOf(http, code),
+        await redeemAtTheStoreOf(http, code, stephaniesProduceDiscount),
       ];
 
       expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
