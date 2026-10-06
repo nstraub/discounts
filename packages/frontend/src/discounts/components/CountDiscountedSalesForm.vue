@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+
 import type { DiscountResponse } from '@app/types/discounts';
 
 import { useDiscountsStore } from '../../stores/discounts-store';
@@ -11,15 +13,19 @@ type Store = Pick<DiscountResponse, 'storeName' | 'storeAddress'>;
 defineProps<{ stores: Store[] }>();
 
 const discounts = useDiscountsStore();
+const picked = ref<Store>();
+
+const theStoreTheRequiredPickerHolds = (): Store => picked.value!;
 
 const count = async (): Promise<void> => {
-  await discounts.countDiscountedSales({ storeName: "Mike's Groceries", storeAddress: '12 Market Street' });
+  await discounts.countDiscountedSales(theStoreTheRequiredPickerHolds());
 };
 </script>
 
 <template>
   <form @submit.prevent="count">
     <StorePicker
+      v-model="picked"
       :caption="discountTexts.store"
       :stores="stores"
     />

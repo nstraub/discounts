@@ -26,6 +26,13 @@ describe('Component CountDiscountedSalesForm', () => {
 
       expect(discounts.countDiscountedSales).to.have.been.calledWith({ storeName: "Mike's Groceries", storeAddress: '12 Market Street' });
     });
+    it('should count the discounted sales of another store when Rodrigo picks another', async () => {
+      const { form, discounts } = setupSut();
+
+      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+
+      expect(discounts.countDiscountedSales).to.have.been.calledWith({ storeName: "Stephanie's Market", storeAddress: '8 Orchard Lane' });
+    });
     it.todo('should name the item of each discount counted');
     it.todo('should show the rate of each discount counted');
     it.todo('should show the number of discounted sales counted for each discount under its caption');
