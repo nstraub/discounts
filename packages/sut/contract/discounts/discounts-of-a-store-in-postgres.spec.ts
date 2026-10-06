@@ -16,7 +16,15 @@ describe('the discounts of a store found in PostgreSQL', () => {
 
     expect(found.map((discount) => discount.toJSON())).to.deep.equal([spices.toJSON()]);
   });
-  it.todo('should leave out a discount of a store with the same name at another address');
+  it('should leave out a discount of a store with the same name at another address', async () => {
+    const { keep, repository } = await setupSut();
+    const spices = await keep(spicesDiscount);
+    await keep({ ...produceDiscount, storeName: spicesDiscount.storeName });
+
+    const found = await repository.ofStore(theSpicesStore);
+
+    expect(found.map((discount) => discount.toJSON())).to.deep.equal([spices.toJSON()]);
+  });
   it.todo('should load each discount found with every one of its coupons');
   it.todo('should find nothing for a name and address no kept discount has');
 

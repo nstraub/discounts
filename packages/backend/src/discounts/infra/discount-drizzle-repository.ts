@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import type { CouponToken } from '../application/domain/coupon-token.js';
 import type { Discount } from '../application/domain/discount.js';
@@ -39,8 +39,8 @@ export class DiscountDrizzleRepository implements DiscountRepository {
     return owner === undefined ? undefined : this.withId(owner);
   }
 
-  async ofStore({ storeName }: Parameters<DiscountRepository['ofStore']>[0]): Promise<Discount[]> {
-    const rows = await this.keptDiscounts().where(eq(discounts.storeName, storeName));
+  async ofStore({ storeName, storeAddress }: Parameters<DiscountRepository['ofStore']>[0]): Promise<Discount[]> {
+    const rows = await this.keptDiscounts().where(and(eq(discounts.storeName, storeName), eq(discounts.storeAddress, storeAddress)));
     return rows.map((row) => this.rebuilt(row, []));
   }
 
