@@ -101,6 +101,12 @@ describe('class DiscountService', () => {
 
       expect(repository.save.mock.calls, 'the discounts saved').to.deep.equal([]);
     });
-    it.todo('should announce CouponRedemptionRejected for the coupon refused at another store');
+    it('should announce CouponRedemptionRejected for the coupon refused at another store', async () => {
+      const { events, service } = setupSut();
+
+      await expect(service.redeemCoupon('7K3QX9M2PD', atStephaniesStore)).rejects.to.be.instanceOf(CouponNotForThisStoreException);
+
+      expect(events.publish).to.have.been.calledWith(new CouponRedemptionRejected('spices-id', '7K3QX9M2PD', 'not for this store'));
+    });
   });
 });
