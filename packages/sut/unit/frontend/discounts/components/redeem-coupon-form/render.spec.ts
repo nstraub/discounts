@@ -5,7 +5,7 @@ import RedeemCouponForm from '@frontend/discounts/components/RedeemCouponForm.vu
 import { discountTexts } from '@frontend/discounts/texts';
 import { produceDiscount, spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
-import { aFormOfferingTheStores } from '../a-form-offering-the-stores';
+import { aFormOfferingTheStores, theStorePickersUnder, theStoresOfferedUnder } from '../a-form-offering-the-stores';
 
 const theStoreOf = ({ storeName, storeAddress }: typeof produceDiscount) => ({ storeName, storeAddress });
 
@@ -13,7 +13,7 @@ const theCornerGrocery = theStoreOf(produceDiscount);
 
 const setupSut = ({ stores = [theCornerGrocery] } = {}) => aFormOfferingTheStores(RedeemCouponForm, stores);
 
-const theStorePickers = () => queryAllByRole<HTMLSelectElement>(document.body, 'combobox', { name: discountTexts.yourStore });
+const theStorePickers = () => theStorePickersUnder(discountTexts.yourStore);
 
 describe('Component RedeemCouponForm', () => {
   describe('what the till asks for', () => {
@@ -30,14 +30,14 @@ describe('Component RedeemCouponForm', () => {
     it('should offer each store it is given as its name and address', () => {
       setupSut({ stores: [theCornerGrocery] });
 
-      const offered = theStorePickers().flatMap((picker) => queryAllByRole(picker, 'option', { name: 'Corner Grocery, 3 Hill Road' }));
+      const offered = theStoresOfferedUnder(discountTexts.yourStore, 'Corner Grocery, 3 Hill Road');
       expect(offered, 'the Corner Grocery offered by its name and address').to.have.length(1);
     });
     it('should offer other stores, each by its name and address, when given others', () => {
       setupSut({ stores: [theStoreOf(stephaniesProduceDiscount), theStoreOf(spicesDiscount)] });
 
       const offered = ["Stephanie's Market, 8 Orchard Lane", "Mike's Groceries, 12 Market Street"].map(
-        (name) => theStorePickers().flatMap((picker) => queryAllByRole(picker, 'option', { name })).length,
+        (name) => theStoresOfferedUnder(discountTexts.yourStore, name).length,
       );
       expect(offered, 'times each store is offered').to.deep.equal([1, 1]);
     });

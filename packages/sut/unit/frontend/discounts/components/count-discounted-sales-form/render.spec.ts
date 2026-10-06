@@ -1,14 +1,13 @@
-import { queryAllByRole } from '@testing-library/dom';
 import { describe, expect, it } from 'vitest';
 
 import CountDiscountedSalesForm from '@frontend/discounts/components/CountDiscountedSalesForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
 
-import { aFormOfferingTheStores } from '../a-form-offering-the-stores';
+import { aFormOfferingTheStores, theStorePickersUnder } from '../a-form-offering-the-stores';
 
 const setupSut = () => aFormOfferingTheStores(CountDiscountedSalesForm, []);
 
-const theStorePickers = () => queryAllByRole<HTMLSelectElement>(document.body, 'combobox', { name: discountTexts.store });
+const theStorePickers = () => theStorePickersUnder(discountTexts.store);
 
 describe('Component CountDiscountedSalesForm', () => {
   describe('what the count asks for', () => {
