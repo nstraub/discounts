@@ -35,6 +35,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const redeemCoupon = async (request: RedemptionRequest): Promise<void> => {
     try {
       redemption.value = await restApi.post<RedemptionResponse>('/redemptions', request);
+      couponAlreadyUsed.value = false;
     } catch {
       couponAlreadyUsed.value = true;
     }

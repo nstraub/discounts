@@ -52,5 +52,15 @@ describe('Store discounts', () => {
 
       expect(discounts.couponAlreadyUsed, 'whether the coupon is held as already used').to.equal(true);
     });
+    it('should no longer hold a coupon as already used once the next coupon is redeemed', async () => {
+      const { restApi, discounts } = setupSut();
+      const atTheSpicesStore = { storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress };
+      restApi.post.mockRejectedValueOnce(new Error('POST /redemptions answered 409')).mockResolvedValueOnce({ item: spicesDiscount.item });
+      await discounts.redeemCoupon({ code: '7K3QX9M2PD', ...atTheSpicesStore });
+
+      await discounts.redeemCoupon({ code: 'R4WZ0BH8NE', ...atTheSpicesStore });
+
+      expect(discounts.couponAlreadyUsed, 'whether a coupon is held as already used').to.equal(false);
+    });
   });
 });
