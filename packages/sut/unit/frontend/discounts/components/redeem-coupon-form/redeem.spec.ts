@@ -84,7 +84,16 @@ describe('Component RedeemCouponForm', () => {
     });
   });
   describe('a coupon already used', () => {
-    it.todo('should tell Stephanie the coupon has already been used');
+    it('should tell Stephanie the coupon has already been used', async () => {
+      const sut = setupSut();
+      vi.mocked(sut.discounts.redeemCoupon).mockImplementation(async () => {
+        sut.discounts.couponAlreadyUsed = true;
+      });
+
+      await redeemThroughTheForm(sut.form, "Mike's Groceries, 12 Market Street", '7k3qx 9m2pd');
+
+      expect(whatTheTillTells(), 'what the till tells').to.contain(discountTexts.couponAlreadyUsed);
+    });
     it.todo('should not say the discount applies when the coupon has already been used');
   });
 });

@@ -74,7 +74,6 @@ Feature: Stephanie takes the coupon at the till
     When someone tries codes at the till far faster than anyone takes coupons
     Then they are slowed down
 
-  @wip
   Scenario: A coupon counts only once
     Given Sue has used her coupon at Stephanie's store
     When Sue tries to use it again
