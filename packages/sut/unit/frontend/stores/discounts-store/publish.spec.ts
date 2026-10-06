@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { spicesDiscountWithItsHook } from '@sut/support/example-discounts';
+import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from './discounts-store-of-an-app';
 
@@ -8,7 +8,6 @@ describe('Store discounts', () => {
   describe('publishing a discount', () => {
     it('should hand the item, rate, store name and store address over to be published', async () => {
       const { restApi, discounts } = setupSut();
-      const spicesDiscount = { item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
       await discounts.publish(spicesDiscount);
 
@@ -38,13 +37,12 @@ describe('Store discounts', () => {
       const { restApi, discounts } = setupSut();
       restApi.post.mockRejectedValue(new Error('POST /discounts answered 400'));
 
-      await discounts.publish({ item: 'Peruvian spices', rate: '150', storeName: "Mike's Groceries", storeAddress: '12 Market Street' });
+      await discounts.publish({ ...spicesDiscount, rate: '150' });
 
       expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(true);
     });
     it('should no longer hold the rate as not valid once the next discount is published', async () => {
       const { restApi, discounts } = setupSut();
-      const spicesDiscount = { item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
       restApi.post.mockRejectedValueOnce(new Error('POST /discounts answered 400')).mockResolvedValueOnce(undefined);
       await discounts.publish({ ...spicesDiscount, rate: '150' });
 
