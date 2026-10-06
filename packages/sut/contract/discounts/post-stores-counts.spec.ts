@@ -2,13 +2,13 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { countRequest, countResponse } from '@app/types/discounts';
-import { longTextInAnyCharacters, spicesDiscount, theStoreOf } from '@sut/support/example-discounts';
+import { longTextInAnyCharacters, spicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
 import { answersInTurnToBodiesThatAreNotObjects, statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
 import { countTheStoreOf } from '../support/counts';
 import { bodiesNotMatchingTheErrorSchema, theFieldsNamedBy } from '../support/error-schema';
-import { redeemAtTheStoreOf } from '../support/redemptions';
+import { redeemAtTheStoreOf, setupSutWithACouponFor } from '../support/redemptions';
 
 type ExampleDiscount = typeof spicesDiscount;
 
@@ -170,6 +170,14 @@ describe('POST /stores/counts', () => {
     });
   });
   describe('a coupon refused at another store\'s till', () => {
-    it.todo('should count a coupon refused at another store\'s till with neither store');
+    it('should count a coupon refused at another store\'s till with neither store', async () => {
+      const { http, code } = await setupSutWithACouponFor();
+      await http.post('/discounts').send(stephaniesProduceDiscount);
+      await redeemAtTheStoreOf(http, code, stephaniesProduceDiscount);
+
+      const counts = [await countTheStoreOf(http), await countTheStoreOf(http, stephaniesProduceDiscount)];
+
+      expect(counts.map((count) => count.body[0].discountedSales), 'the discounted sales of each store').to.deep.equal([0, 0]);
+    });
   });
 });
