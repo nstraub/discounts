@@ -12,7 +12,7 @@ definitions.
 Files read: `.plans/mike-new-neighbourhood-epic.md`, the feature of story 1 and the outlines appended to it for
 "Mike publishes a discount at any rate up to 100%" and "Mike's earlier discounts stay published", the outline
 and spec drafts of the former, the `describe` and `it` names and the length of the specs this outline adds to,
-the arrange of the `GET /discounts` line that lists a rate written as 12,5, and the recorded rulings on the rate.
+the arrange of the `GET /discounts` line that lists a rate written as 12,5, and the settled points on the rate.
 No implementation body was read.
 
 ## Outlined

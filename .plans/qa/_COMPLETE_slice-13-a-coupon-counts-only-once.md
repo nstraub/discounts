@@ -17,7 +17,7 @@ counts. How that is achieved is left open; whatever it is, no one is shown a ref
 since they looked, and a change of rate stays last-write-wins.
 
 Files read: `.plans/stephanie-comeback-epic.md`, the outlines and scenarios of "Stephanie redeems a
-coupon" and "Rodrigo counts the discounted sales since his last count", and the recorded rulings on single use,
+coupon" and "Rodrigo counts the discounted sales since his last count", and the settled points on single use,
 the count and concurrent changes. No implementation body was read.
 
 ## Outlined
