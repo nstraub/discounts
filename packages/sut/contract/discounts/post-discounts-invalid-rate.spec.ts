@@ -28,7 +28,14 @@ describe('POST /discounts with a rate that is not valid', () => {
 
       expect(bodiesNotMatchingTheErrorSchema([response])).to.deep.equal([]);
     });
-    it.todo('should publish nothing when the rate is not valid, listing no discount afterwards');
+    it('should publish nothing when the rate is not valid, listing no discount afterwards', async () => {
+      const { http } = await setupSut();
+
+      await http.post('/discounts').send({ ...spicesDiscount, rate: '150' });
+
+      const listed = await http.get('/discounts');
+      expect(listed.body).to.deep.equal([]);
+    });
     it.todo('should publish DiscountPublicationRejected on the application event emitter for the rate refused');
     it.todo('should publish no DiscountPublicationRejected when the request schema refuses the body before any rule decides');
   });
