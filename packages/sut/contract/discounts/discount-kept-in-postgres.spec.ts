@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/discount-repository';
 
@@ -56,7 +56,14 @@ describe('a discount kept in PostgreSQL', () => {
     ]);
   });
   describe('with a hook', () => {
-    it.todo('should save a discount with a hook and load it back equal, in a separate transaction');
+    it('should save a discount with a hook and load it back equal, in a separate transaction', async () => {
+      const { keep, loadOnItsOwnConnection } = await setupSut();
+      const discount = await keep(spicesDiscountWithItsHook);
+
+      const [loaded] = await loadOnItsOwnConnection();
+
+      expect(loaded?.toJSON()).to.deep.equal(discount.toJSON());
+    });
     it.todo('should keep a hook with quotes, semicolons and SQL keywords verbatim');
     it.todo('should keep a hook with accents, apostrophes and emoji verbatim');
   });
