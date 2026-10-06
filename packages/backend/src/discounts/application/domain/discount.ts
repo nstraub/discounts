@@ -1,11 +1,11 @@
-import type { CountedSales } from './counted-sales.js';
+import { CountedSales } from './counted-sales.js';
 import { CouponNotForThisStoreException } from './coupon-not-for-this-store-exception.js';
 import type { CouponToken } from './coupon-token.js';
 import type { Coupons } from './coupons.js';
 import type { DiscountDetails } from './discount-details.js';
 import type { DiscountEvents } from './discount-events.js';
 import { DiscountRate } from './discount-rate.js';
-import type { IssuedCoupon } from './issued-coupon.js';
+import { IssuedCoupon } from './issued-coupon.js';
 import { RedeemedCoupon } from './redeemed-coupon.js';
 import type { Store } from './store.js';
 
@@ -30,9 +30,9 @@ export class Discount {
   }
 
   issueCoupon(token: CouponToken): IssuedCoupon {
-    const issued = this.coupons.issue(token, this.details);
+    this.coupons.issue(token);
     this.events.couponIssued(this.id, token.toJSON());
-    return issued;
+    return new IssuedCoupon(token, this.details.toJSON().storeName);
   }
 
   redeemCoupon(token: CouponToken, store: Store): RedeemedCoupon {
@@ -45,9 +45,9 @@ export class Discount {
   }
 
   count(): CountedSales {
-    const counted = this.coupons.countSinceTheLastCount(this.id, this.details);
-    this.events.salesCounted(this.id, counted.toJSON().discountedSales);
-    return counted;
+    const discountedSales = this.coupons.countSinceTheLastCount();
+    this.events.salesCounted(this.id, discountedSales);
+    return new CountedSales(this.id, this.details, discountedSales);
   }
 
   toJSON(): { id: string; coupons: ReturnType<Coupons['toJSON']> } & ReturnType<DiscountDetails['toJSON']> {
