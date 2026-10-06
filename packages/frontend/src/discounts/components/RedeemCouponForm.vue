@@ -41,8 +41,11 @@ const redeem = async (): Promise<void> => {
     >
       {{ discountTexts.redeem }}
     </button>
-    <p role="status">
-      {{ discountTexts.theDiscountAppliesTo }} {{ discounts.redemption?.item }}
+    <p
+      v-if="discounts.redemption"
+      role="status"
+    >
+      {{ discountTexts.theDiscountAppliesTo }} {{ discounts.redemption.item }}
     </p>
   </form>
 </template>

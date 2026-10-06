@@ -76,7 +76,11 @@ describe('Component RedeemCouponForm', () => {
     });
 
     describe('state', () => {
-      it.todo('should say nothing applies before a coupon is redeemed');
+      it('should say nothing applies before a coupon is redeemed', () => {
+        setupSut();
+
+        expect(whatTheTillTells(), 'what the till tells').to.equal('');
+      });
       it.todo('should tell Stephanie to say which store she is at when none is picked, redeeming nothing');
     });
 
