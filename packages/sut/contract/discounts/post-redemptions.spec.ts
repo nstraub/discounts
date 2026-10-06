@@ -15,6 +15,10 @@ const setupSutWithACouponFor = async (discount: ExampleDiscount = spicesDiscount
   return { ...sut, published, code };
 };
 
+const bodiesThatAreNotObjects = ['[]', '"7K3QX9M2PD"', '25', 'null'];
+
+const redeemWrittenAsJson = (http: Http, body: string) => http.post('/redemptions').set('Content-Type', 'application/json').send(body);
+
 const redeemAtTheStoreOf = (http: Http, code: string, discount: ExampleDiscount = spicesDiscount) =>
   http.post('/redemptions').send({ code, storeName: discount.storeName, storeAddress: discount.storeAddress });
 
@@ -86,7 +90,16 @@ describe('POST /redemptions', () => {
       expect([missing.status, notText.status]).to.deep.equal([400, 400]);
       expect([requestRejection.parse(missing.body).fields, requestRejection.parse(notText.body).fields]).to.deep.equal([['code'], ['code']]);
     });
-    it.todo('should answer 400 for a JSON body that is an array, a string, a number or null');
+    it('should answer 400 for a JSON body that is an array, a string, a number or null', async () => {
+      const { http } = await setupSut();
+
+      const statuses = [];
+      for (const body of bodiesThatAreNotObjects) {
+        statuses.push((await redeemWrittenAsJson(http, body)).status);
+      }
+
+      expect(statuses).to.deep.equal([400, 400, 400, 400]);
+    });
     it.todo('should answer 400 for a body that is not valid JSON');
     it.todo('should answer every error with a body matching the error schema');
   });
