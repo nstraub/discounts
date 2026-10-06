@@ -16,7 +16,7 @@ export class CouponToken {
   }
 
   static read(typed: string): CouponToken {
-    return new CouponToken(typed);
+    return new CouponToken(typed.toUpperCase());
   }
 
   toJSON(): string {
