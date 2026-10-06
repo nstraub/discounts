@@ -109,7 +109,13 @@ describe('POST /stores/counts', () => {
 
       expect(statuses, 'the statuses answering an array, a string, a number and null').to.deep.equal([400, 400, 400, 400]);
     });
-    it.todo('should answer 400 for a body that is not valid JSON');
+    it('should answer 400 for a body that is not valid JSON', async () => {
+      const { http } = await setupSut();
+
+      const response = await countWrittenAsJson(http, '{"storeName": "Spice Bazaar",');
+
+      expect(response.status).to.equal(400);
+    });
     it.todo('should answer every error with a body matching the error schema');
   });
 
