@@ -135,7 +135,6 @@ Feature: Stephanie takes the coupon at the till
     Then Mike is told the discount applies
     And Stephanie is told it is not for her store
 
-  @wip
   Scenario: A coupon nobody issued
     Given Stephanie is taking a coupon at the till
     When the coupon was never issued

@@ -39,7 +39,7 @@ export class NoStoreSaid implements TillAnswer {
 }
 
 export class CouponNotValid implements TillAnswer {
-  told(): string {
-    return '';
+  told(texts: DiscountTexts): string {
+    return texts.couponNotValid;
   }
 }

@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import RedeemCouponForm from '@frontend/discounts/components/RedeemCouponForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
-import { CouponAlreadyUsed, CouponNotForThisStore, DiscountApplies, NoStoreSaid, type TillAnswer } from '@frontend/discounts/till-answers';
+import { CouponAlreadyUsed, CouponNotForThisStore, CouponNotValid, DiscountApplies, NoStoreSaid, type TillAnswer } from '@frontend/discounts/till-answers';
 import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
 import { aFormOfferingTheStoresOf } from '../a-form-offering-the-stores';
@@ -137,7 +137,13 @@ describe('Component RedeemCouponForm', () => {
     });
   });
   describe('a code nobody issued', () => {
-    it.todo('should tell Stephanie the coupon is not valid');
+    it('should tell Stephanie the coupon is not valid', async () => {
+      const { form } = setupSutAnswering(new CouponNotValid());
+
+      await redeemThroughTheForm(form, "Mike's Groceries, 12 Market Street", 'ZZZZZZZZZZ');
+
+      expect(whatTheTillTells(), 'what the till tells').to.contain(discountTexts.couponNotValid);
+    });
     it.todo('should not say the discount applies when the coupon is not valid');
   });
   describe('no code typed', () => {
