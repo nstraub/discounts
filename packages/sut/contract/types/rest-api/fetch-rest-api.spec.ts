@@ -108,6 +108,10 @@ describe('class FetchRestApi', () => {
       expect(refusal).to.deep.include({ fields: ['item'] });
     });
   });
+  describe('posting to something not found', () => {
+    it.todo('should reject an answer of 404 with an exception of its own');
+    it.todo('should not reject an answer other than 404 as not found');
+  });
 
   describe('getting', () => {
     it('should reject when the answer is not ok', async () => {

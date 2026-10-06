@@ -136,4 +136,11 @@ describe('Component RedeemCouponForm', () => {
       expect(whatTheTillTells(), 'what the till tells after an earlier coupon applied').not.to.contain(discountTexts.theDiscountAppliesTo);
     });
   });
+  describe('a code nobody issued', () => {
+    it.todo('should tell Stephanie the coupon is not valid');
+    it.todo('should not say the discount applies when the coupon is not valid');
+  });
+  describe('no code typed', () => {
+    it.todo('should tell Stephanie to type the coupon\'s code when she redeems with none typed, redeeming nothing');
+  });
 });

@@ -55,4 +55,15 @@ describe('class CouponToken', () => {
       });
     });
   });
+  describe('reading a code that cannot be a token', () => {
+    describe('boundary', () => {
+      it.todo('should read no token from a code of nine characters');
+      it.todo('should read no token from a code of eleven characters');
+    });
+
+    describe('type', () => {
+      it.todo('should read no token from a code with a letter U, which no token has');
+      it.todo('should read no token from a code with a symbol, an accented letter or an emoji');
+    });
+  });
 });

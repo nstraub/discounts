@@ -109,4 +109,9 @@ describe('class DiscountService', () => {
       expect(events.publish).to.have.been.calledWith(new CouponRedemptionRejected('spices-id', '7K3QX9M2PD', 'not for this store'));
     });
   });
+  describe('redeeming a code nobody issued', () => {
+    it.todo('should report that no coupon has the code when none was issued with it');
+    it.todo('should report a code that cannot be a coupon\'s as one nobody issued');
+    it.todo('should keep nothing and announce nothing when no coupon has the code');
+  });
 });

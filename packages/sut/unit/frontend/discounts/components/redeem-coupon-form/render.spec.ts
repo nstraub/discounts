@@ -55,4 +55,7 @@ describe('Component RedeemCouponForm', () => {
       expect(queryAllByRole(document.body, 'button', { name: discountTexts.redeem }), 'redeem buttons').to.have.length(1);
     });
   });
+  describe('what the till requires', () => {
+    it.todo('should require the coupon\'s code to be typed before the coupon is redeemed');
+  });
 });

@@ -104,6 +104,11 @@ describe('Store till', () => {
       expect(till.answer, 'the answer the till holds').not.to.be.instanceOf(CouponNotForThisStore);
     });
   });
+  describe('redeeming a code nobody issued', () => {
+    it.todo('should hold that the coupon is not valid');
+    it.todo('should not hold a coupon nobody issued as already used');
+    it.todo('should no longer hold a coupon as not valid once the next coupon is redeemed');
+  });
   describe('redeeming with no store said', () => {
     it('should hold that Stephanie is to say which store she is at', () => {
       const { till } = setupSut();
