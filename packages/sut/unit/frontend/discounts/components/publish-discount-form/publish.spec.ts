@@ -1,4 +1,4 @@
-import { getByRole } from '@testing-library/dom';
+import { getByRole, queryAllByRole } from '@testing-library/dom';
 import { DOMWrapper, mount, type VueWrapper } from '@vue/test-utils';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
@@ -28,6 +28,8 @@ const publishThroughTheForm = async (form: VueWrapper, discount: typeof spicesDi
 const typeTheHook = async (hook: string): Promise<void> => {
   await new DOMWrapper(getByRole(document.body, 'textbox', { name: discountTexts.hook })).setValue(hook);
 };
+
+const whatTheFormTells = () => queryAllByRole(document.body, 'status').map((told) => told.textContent).join(' ');
 
 describe('Component PublishDiscountForm', () => {
   describe('publishing a discount', () => {
@@ -139,6 +141,12 @@ describe('Component PublishDiscountForm', () => {
   });
   describe('publishing a discount at a rate that is not valid', () => {
     it.todo('should tell Mike the rate is not valid when the publish is refused for it');
-    it.todo('should not tell Mike the rate is not valid before a publish is refused for it');
+    it('should not tell Mike the rate is not valid before a publish is refused for it', async () => {
+      const { form } = setupSut();
+
+      await publishThroughTheForm(form, spicesDiscount);
+
+      expect(whatTheFormTells(), 'what the form tells').not.to.contain(discountTexts.rateNotValid);
+    });
   });
 });
