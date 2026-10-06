@@ -12,7 +12,7 @@ export class ParsedBy<Request> implements PipeTransform<unknown, Request> {
       const rejection: RequestRejection = {
         statusCode: HttpStatus.BAD_REQUEST,
         message: 'Missing or mistyped fields',
-        fields: parsed.error.issues.map((issue) => issue.path.join('.')),
+        fields: parsed.error.issues.filter((issue) => issue.path.length > 0).map((issue) => issue.path.join('.')),
       };
       throw new BadRequestException(rejection);
     }

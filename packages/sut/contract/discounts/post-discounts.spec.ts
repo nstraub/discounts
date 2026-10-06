@@ -77,6 +77,18 @@ describe('POST /discounts', () => {
 
       expect(statuses).to.deep.equal([400, 400, 400, 400]);
     });
+    it('should name no field for a JSON body that is an array, a string, a number or null', async () => {
+      const { http } = await setupSut();
+      const bodiesThatAreNotObjects = ['[]', '"Peruvian spices"', '20', 'null'];
+
+      const fieldsNamed = [];
+      for (const body of bodiesThatAreNotObjects) {
+        const response = await postWrittenAsJson(http, body);
+        fieldsNamed.push(...(requestRejection.parse(response.body).fields ?? []));
+      }
+
+      expect(fieldsNamed).to.deep.equal([]);
+    });
     it('should answer 400 for a body that is not valid JSON', async () => {
       const { http } = await setupSut();
 
