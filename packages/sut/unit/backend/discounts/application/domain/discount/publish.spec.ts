@@ -158,7 +158,14 @@ describe('class Discount', () => {
 
         expect(lastRejectionOf(events)).to.include({ rate: '100.1', reason: 'not valid' });
       });
-      it.todo('should refuse a rate of 150, its rejection naming the rate as not valid');
+      it('should refuse a rate of 150, its rejection naming the rate as not valid', () => {
+        const { events, discountWith } = setupSut();
+        const discount = discountWith({ ...spicesDiscount, rate: '150' });
+
+        discount.publish();
+
+        expect(lastRejectionOf(events)).to.include({ rate: '150', reason: 'not valid' });
+      });
       it.todo('should refuse a rate of 12.25, with two decimal places, its rejection naming the rate as not valid');
     });
 
