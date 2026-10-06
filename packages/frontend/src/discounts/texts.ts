@@ -14,6 +14,7 @@ export const discountTexts = {
   couponCode: 'Coupon code',
   redeem: 'Redeem',
   theDiscountAppliesTo: 'The discount applies to',
+  couponAlreadyUsed: 'This coupon has already been used.',
   store: 'Store',
   countDiscountedSales: 'Count discounted sales',
   discountedSales: 'Discounted sales',
