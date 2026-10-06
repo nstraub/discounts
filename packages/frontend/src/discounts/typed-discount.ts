@@ -4,11 +4,18 @@ export const nothingTyped = () => ({ item: '', rate: '', storeName: '', storeAdd
 
 const isBlank = (typed: string): boolean => typed.trim() === '';
 
-export const discountToPublish = ({ rate, ...others }: ReturnType<typeof nothingTyped>): Partial<PublishDiscountRequest> => {
-  if (isBlank(rate)) {
-    return others;
+const withTheHookGiven = (discount: Partial<PublishDiscountRequest>, hook: string): Partial<PublishDiscountRequest> => {
+  if (hook === '') {
+    return discount;
   }
-  return { ...others, rate };
+  return { ...discount, hook };
+};
+
+export const discountToPublish = ({ rate, ...others }: ReturnType<typeof nothingTyped>, hook: string): Partial<PublishDiscountRequest> => {
+  if (isBlank(rate)) {
+    return withTheHookGiven(others, hook);
+  }
+  return withTheHookGiven({ ...others, rate }, hook);
 };
 
 export const changeToMake = (newRate: string): Partial<ChangeRateRequest> => {

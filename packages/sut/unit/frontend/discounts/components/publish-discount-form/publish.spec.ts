@@ -1,8 +1,11 @@
-import { mount, type VueWrapper } from '@vue/test-utils';
+import { getByRole } from '@testing-library/dom';
+import { DOMWrapper, mount, type VueWrapper } from '@vue/test-utils';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import PublishDiscountForm from '@frontend/discounts/components/PublishDiscountForm.vue';
+import { discountTexts } from '@frontend/discounts/texts';
 import { useDiscountsStore } from '@frontend/stores/discounts-store';
+import { spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
 const setupSut = () => {
@@ -101,7 +104,14 @@ describe('Component PublishDiscountForm', () => {
     });
   });
   describe('publishing a discount with a hook', () => {
-    it.todo('should publish the hook as Stephanie gave it');
+    it('should publish the hook as Stephanie gave it', async () => {
+      const { form, discounts } = setupSut();
+      await new DOMWrapper(getByRole(document.body, 'textbox', { name: discountTexts.hook })).setValue(spicesDiscountWithItsHook.hook);
+
+      await publishThroughTheForm(form, spicesDiscount);
+
+      expect(discounts.publish).to.have.been.calledWith(spicesDiscountWithItsHook);
+    });
     it.todo('should publish no hook when the hook is left empty');
     it.todo('should clear the hook once the discount is published');
 
