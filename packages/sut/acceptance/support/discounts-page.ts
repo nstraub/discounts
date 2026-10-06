@@ -17,6 +17,12 @@ export class DiscountsPage {
     await this.page.getByTestId('discount-store-name').fill(discount.storeName);
     await this.page.getByTestId('discount-store-address').fill(discount.storeAddress);
     await this.page.getByTestId('publish-discount').click();
+    await this.untilTheDiscountIsKeptAndTheFormCleared();
+  }
+
+  private async untilTheDiscountIsKeptAndTheFormCleared(): Promise<void> {
+    const item = await this.page.getByTestId('discount-item').elementHandle();
+    await this.page.waitForFunction((input) => (input as HTMLInputElement | null)?.value === '', item);
   }
 
   async verifyShows(discount: ExampleDiscount): Promise<void> {
