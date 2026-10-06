@@ -5,6 +5,7 @@ import { couponResponse } from '@app/types/discounts';
 import { anIdNoDiscountHas, longTextInAnyCharacters, spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
+import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
 
 const getACouponFor = (http: Http, id: string) => http.post(`/discounts/${id}/coupons`).send({});
 
@@ -83,6 +84,12 @@ describe('POST /discounts/:id/coupons', () => {
 
       expect(response.status).to.equal(404);
       expect(issued, 'the coupons issued').to.deep.equal([]);
+    });
+    it('should answer every error with a body matching the error schema', async () => {
+      const { http } = await setupSut();
+      const errors = [await getACouponFor(http, anIdNoDiscountHas)];
+
+      expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
     });
   });
 
