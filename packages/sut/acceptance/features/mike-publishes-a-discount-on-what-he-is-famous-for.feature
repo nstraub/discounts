@@ -136,3 +136,46 @@ Feature: Mike publishes a discount on what he is famous for
     Given Sue has a coupon for Mike's discount
     When Mike publishes a discount on another item
     Then Sue's coupon still applies at Mike's store
+
+  @wip
+  Scenario Outline: Mike gives an invalid rate
+    Given Mike tries to publish a discount
+    When he gives a rate of <rate>
+    Then he is told the rate is not valid
+    And the discount is not published
+
+    Examples:
+      | rate   |
+      | 150%   |
+      | 100.5% |
+      | 12.25% |
+      | 0%     |
+      | -10%   |
+
+  @todo
+  Scenario: Mike gives the lowest rate a discount may have
+    When Mike publishes a discount of 0.1% on an item
+    Then people can see it immediately
+
+  @todo
+  Scenario: Mike gives a rate just above 100%
+    Given Mike tries to publish a discount
+    When he gives a rate of 100.1%
+    Then he is told the rate is not valid
+    And the discount is not published
+
+  @todo
+  Scenario: Mike gives a rate that is not a number
+    Given Mike tries to publish a discount
+    When he gives a rate that is not a number
+    Then he is told the rate is not valid
+    And the discount is not published
+
+  # Whether a rate that is not valid and a piece left out are reported together is not settled. The
+  # proposal beside the question: every problem is reported at once.
+  @todo
+  Scenario: Mike leaves out the item and gives an invalid rate
+    Given Mike tries to publish a discount
+    When he leaves out the item it applies to and gives a rate of 150%
+    Then he is told the item it applies to is missing and the rate is not valid
+    And the discount is not published
