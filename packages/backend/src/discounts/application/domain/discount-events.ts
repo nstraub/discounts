@@ -1,4 +1,5 @@
 import { CouponIssued } from './coupon-issued.js';
+import { CouponRedemptionRejected } from './coupon-redemption-rejected.js';
 import type { Discount } from './discount.js';
 import { DiscountedSalesCounted } from './discounted-sales-counted.js';
 import { DiscountPublicationRejected } from './discount-publication-rejected.js';
@@ -27,5 +28,9 @@ export class DiscountEvents {
 
   salesCounted(discountId: string, discountedSales: number): void {
     this.events.publish(new DiscountedSalesCounted(discountId, discountedSales));
+  }
+
+  redemptionRejected(discountId: string, token: string, reason: string): void {
+    this.events.publish(new CouponRedemptionRejected(discountId, token, reason));
   }
 }
