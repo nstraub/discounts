@@ -9,7 +9,7 @@ const aRefusalListingAsMissing = (pieces: string[]) => new BadRequestException('
 
 const aRefusalOfTheRate = aRefusalListingAsMissing([]);
 
-const setupSutRefusing = (refusal: BadRequestException) => {
+const setupSutRefusing = (refusal: Error) => {
   const sut = setupSut();
   sut.restApi.post.mockRejectedValue(refusal);
   return sut;
@@ -93,5 +93,13 @@ describe('Store discounts', () => {
       expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(false);
     });
     it.todo('should no longer hold any piece as missing once the next discount is published');
+  });
+  describe('publishing a discount refused for another reason', () => {
+    it('should pass on a refusal that is not a bad request', async () => {
+      const failure = new Error('POST /discounts answered 500');
+      const { discounts } = setupSutRefusing(failure);
+
+      await expect(discounts.publish(spicesDiscount)).rejects.to.equal(failure);
+    });
   });
 });

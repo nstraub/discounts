@@ -25,6 +25,9 @@ export const useDiscountsStore = defineStore('discounts', () => {
       await restApi.post('/discounts', discount);
       rateNotValid.value = false;
     } catch (refusal) {
+      if (!(refusal instanceof BadRequestException)) {
+        throw refusal;
+      }
       rateNotValid.value = true;
       if (refusal instanceof BadRequestException) {
         missing.value = refusal.missing;
