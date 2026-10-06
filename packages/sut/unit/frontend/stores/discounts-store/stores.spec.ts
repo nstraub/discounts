@@ -35,7 +35,9 @@ describe('Store discounts', () => {
     });
 
     describe('empty', () => {
-      it.todo('should list no store when no discount is published');
+      it('should list no store when no discount is published', async () => {
+        expect(await theStoresOnceLoaded([])).to.deep.equal([]);
+      });
     });
   });
 });
