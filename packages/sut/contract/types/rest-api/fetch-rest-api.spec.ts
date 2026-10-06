@@ -121,7 +121,14 @@ describe('class FetchRestApi', () => {
 
       expect(refusal).to.be.instanceOf(NotFoundException);
     });
-    it.todo('should not reject an answer other than 404 as not found');
+    it('should not reject an answer other than 404 as not found', async () => {
+      const { restApi, token } = await setupSutWithACoupon();
+      await restApi.post('/redemptions', { code: token, ...theStoreOf(spicesDiscount) });
+
+      const refusal = await refusalOf(restApi.post('/redemptions', { code: token, ...theStoreOf(spicesDiscount) }));
+
+      expect(refusal).to.not.be.instanceOf(NotFoundException);
+    });
   });
 
   describe('getting', () => {

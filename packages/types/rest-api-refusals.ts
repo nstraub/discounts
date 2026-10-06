@@ -2,6 +2,8 @@ import { requestRejection } from '@app/types/request-rejection';
 
 const badRequest = 400;
 
+const notFound = 404;
+
 const unprocessableContent = 422;
 
 class RestApiException extends Error {}
@@ -29,7 +31,10 @@ export const refuseANotOkAnswer = async (request: string, response: Response): P
   if (response.status === unprocessableContent) {
     throw new UnprocessableContentException(answered);
   }
-  if (!response.ok) {
+  if (response.status === notFound) {
     throw new NotFoundException(answered);
+  }
+  if (!response.ok) {
+    throw new RestApiException(answered);
   }
 };
