@@ -57,7 +57,17 @@ describe('POST /redemptions at a store the coupon is not for', () => {
       const kept = await client.query('SELECT redeemed FROM app.coupons');
       expect(kept.rows, 'the coupon kept').to.deep.equal([{ redeemed: false }]);
     });
-    it.todo('should answer 400 naming the store\'s name and address when each is empty or only blank space, the coupon staying unused');
+    it('should answer 400 naming the store\'s name and address when each is empty or only blank space, the coupon staying unused', async () => {
+      const { client, http, code } = await setupSutWithACouponFor();
+
+      const empty = await http.post('/redemptions').send({ code, storeName: '', storeAddress: '' });
+      const blank = await http.post('/redemptions').send({ code, storeName: '   ', storeAddress: ' \t ' });
+
+      expect([empty.status, blank.status]).to.deep.equal([400, 400]);
+      expect(theFieldsNamedBy(empty, blank)).to.deep.equal([['storeName', 'storeAddress'], ['storeName', 'storeAddress']]);
+      const kept = await client.query('SELECT redeemed FROM app.coupons');
+      expect(kept.rows, 'the coupon kept').to.deep.equal([{ redeemed: false }]);
+    });
   });
 
   describe('A1 input boundary', () => {

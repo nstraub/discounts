@@ -28,7 +28,9 @@ export const store = z.object({ storeName: z.string(), storeAddress: z.string() 
 
 export type Store = z.infer<typeof store>;
 
-export const redemptionRequest = z.object({ code: z.string() }).extend(store.shape);
+const saidText = z.string().refine((text) => text.trim() !== '');
+
+export const redemptionRequest = z.object({ code: z.string(), storeName: saidText, storeAddress: saidText });
 
 export type RedemptionRequest = z.infer<typeof redemptionRequest>;
 
