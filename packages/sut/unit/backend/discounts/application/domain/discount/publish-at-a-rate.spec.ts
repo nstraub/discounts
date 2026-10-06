@@ -8,7 +8,15 @@ import { lastEventOf, lastRejectionOf, setupSut } from './publishing-a-discount'
 describe('class Discount', () => {
   describe('publishing a discount at a rate written another way', () => {
     describe('type', () => {
-      it.todo('should accept a rate written with a decimal comma as the rate it names');
+      it('should accept a rate written with a decimal comma as the rate it names', () => {
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('12,5');
+
+        discount.publish();
+
+        expect(lastEventOf(events)).to.be.instanceOf(DiscountPublished);
+        expect(lastEventOf(events).discount.rate).to.equal('12,5');
+      });
       it.todo('should accept a rate written with or without a percent sign as the rate it names');
       it.todo('should accept a rate written with spaces around it as the rate it names');
       it.todo('should accept a rate written with a trailing zero as the rate it names');
