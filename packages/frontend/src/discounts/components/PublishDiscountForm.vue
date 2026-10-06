@@ -14,6 +14,7 @@ const hook = ref('');
 const publish = async (): Promise<void> => {
   await discounts.publish(discountToPublish(discount.value, hook.value));
   discount.value = nothingTyped();
+  hook.value = '';
 };
 </script>
 
