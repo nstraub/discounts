@@ -62,7 +62,13 @@ describe('Component CountDiscountedSalesForm', () => {
 
       expect(whatTheCountShowsFor(form, 'counted-item'), 'the items counted').to.deep.equal(['Peruvian spices', 'Organic produce']);
     });
-    it.todo('should show the rate of each discount counted');
+    it('should show the rate of each discount counted', async () => {
+      const { form } = setupSutCountingTo([stephaniesProduceCounted]);
+
+      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+
+      expect(whatTheCountShowsFor(form, 'counted-rate'), 'the rates counted').to.deep.equal(['15%']);
+    });
     it.todo('should show the number of discounted sales counted for each discount under its caption');
 
     describe('state', () => {
