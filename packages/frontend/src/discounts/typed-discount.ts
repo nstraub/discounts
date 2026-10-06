@@ -12,10 +12,8 @@ const withTheHookGiven = (discount: Partial<PublishDiscountRequest>, hook: strin
 };
 
 export const discountToPublish = ({ rate, hook, ...others }: ReturnType<typeof nothingTyped>): Partial<PublishDiscountRequest> => {
-  if (isBlank(rate)) {
-    return withTheHookGiven(others, hook);
-  }
-  return withTheHookGiven({ ...others, rate }, hook);
+  const discount = isBlank(rate) ? others : { ...others, rate };
+  return withTheHookGiven(discount, hook);
 };
 
 export const changeToMake = (newRate: string): Partial<ChangeRateRequest> => {
