@@ -1,6 +1,7 @@
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from './app';
+import { timesTheRaceIsRun } from './at-the-same-moment';
 
 type ExampleDiscount = typeof spicesDiscount;
 
@@ -23,5 +24,10 @@ export const setupSutWithAnotherCouponOfTheSameDiscount = async () => {
 export const redeemAtTheStoreOf = (http: Http, code: string, discount: ExampleDiscount = spicesDiscount) =>
   http.post('/redemptions').send({ code, storeName: discount.storeName, storeAddress: discount.storeAddress });
 
-export const couponsIssuedFor = (http: Http, published: { id: string }, howMany: number): Promise<string[]> =>
+const couponsIssuedFor = (http: Http, published: { id: string }, howMany: number): Promise<string[]> =>
   Promise.all(Array.from({ length: howMany }, () => issueACouponFor(http, published)));
+
+export const setupSutWithACouponForEachRace = async () => {
+  const sut = await setupSutWithACouponFor();
+  return { ...sut, codes: await couponsIssuedFor(sut.http, sut.published, timesTheRaceIsRun) };
+};
