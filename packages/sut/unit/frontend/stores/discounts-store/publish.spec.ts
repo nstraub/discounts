@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { spicesDiscountWithItsHook } from '@sut/support/example-discounts';
+
 import { setupSut } from './discounts-store-of-an-app';
 
 describe('Store discounts', () => {
@@ -23,6 +25,12 @@ describe('Store discounts', () => {
     it.todo('should hold the discount just published without loading the page again');
   });
   describe('publishing a discount with a hook', () => {
-    it.todo('should hand the hook over to be published with the rest');
+    it('should hand the hook over to be published with the rest', async () => {
+      const { restApi, discounts } = setupSut();
+
+      await discounts.publish(spicesDiscountWithItsHook);
+
+      expect(restApi.post).to.have.been.calledWith('/discounts', spicesDiscountWithItsHook);
+    });
   });
 });
