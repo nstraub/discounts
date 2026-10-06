@@ -3,6 +3,7 @@ import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { countRequest, type CountRequest } from '@app/types/discounts';
 
 import { DiscountService } from '../application/discount-service.js';
+import { Store } from '../application/domain/store.js';
 
 import { ParsedBy } from './parsed-by.js';
 
@@ -12,7 +13,7 @@ export class StoreCountsController {
 
   @Post()
   async count(@Body(new ParsedBy(countRequest)) request: CountRequest) {
-    const counted = await this.discounts.count(request);
+    const counted = await this.discounts.count(new Store(request));
     return counted.map((sales) => sales.toJSON());
   }
 }

@@ -1,6 +1,7 @@
 import type { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import type { Discount } from '@backend/discounts/application/domain/discount';
 import type { DiscountRepository } from '@backend/discounts/application/domain/discount-repository';
+import type { Store } from '@backend/discounts/application/domain/store';
 
 export class InMemoryDiscountRepository implements DiscountRepository {
   private readonly kept = new Map<string, Discount>();
@@ -21,7 +22,8 @@ export class InMemoryDiscountRepository implements DiscountRepository {
     return [...this.kept.values()].find((discount) => discount.toJSON().coupons.some((coupon) => coupon.token === token.toJSON()));
   }
 
-  async ofStore({ storeName, storeAddress }: Parameters<DiscountRepository['ofStore']>[0]): Promise<Discount[]> {
+  async ofStore(store: Store): Promise<Discount[]> {
+    const { storeName, storeAddress } = store.toJSON();
     return [...this.kept.values()].filter((discount) => discount.toJSON().storeName === storeName && discount.toJSON().storeAddress === storeAddress);
   }
 }

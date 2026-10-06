@@ -8,6 +8,7 @@ import type { DiscountRepository } from './domain/discount-repository.js';
 import type { IssuedCoupon } from './domain/issued-coupon.js';
 import type { RandomSource } from './domain/random-source.js';
 import type { RedeemedCoupon } from './domain/redeemed-coupon.js';
+import type { Store } from './domain/store.js';
 
 export class DiscountService {
   private readonly changes: DiscountChanges;
@@ -44,7 +45,7 @@ export class DiscountService {
     return this.changes.toTheOneThatIssued(token, (found) => found.redeemCoupon(token));
   }
 
-  async count(store: Parameters<DiscountRepository['ofStore']>[0]): Promise<CountedSales[]> {
+  async count(store: Store): Promise<CountedSales[]> {
     return this.changes.toEachOfTheStore(store, (found) => found.count());
   }
 

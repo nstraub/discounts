@@ -4,6 +4,7 @@ import type { CouponToken } from '../application/domain/coupon-token.js';
 import type { Discount } from '../application/domain/discount.js';
 import type { DiscountFactory } from '../application/domain/discount-factory.js';
 import type { DiscountRepository } from '../application/domain/discount-repository.js';
+import type { Store } from '../application/domain/store.js';
 
 import { couponsIssuedBy, couponsIssuedByEachDiscount, idsOfTheDiscountsThatIssued, keepTheCouponsIssued } from './coupon-rows.js';
 import type { Database } from './database.module.js';
@@ -39,7 +40,8 @@ export class DiscountDrizzleRepository implements DiscountRepository {
     return owner === undefined ? undefined : this.withId(owner);
   }
 
-  async ofStore({ storeName, storeAddress }: Parameters<DiscountRepository['ofStore']>[0]): Promise<Discount[]> {
+  async ofStore(store: Store): Promise<Discount[]> {
+    const { storeName, storeAddress } = store.toJSON();
     const rows = await this.keptDiscounts().where(and(eq(discounts.storeName, storeName), eq(discounts.storeAddress, storeAddress)));
     const issued = await couponsIssuedByEachDiscount(this.database);
     return rows.map((row) => this.rebuilt(row, issued.get(row.id) ?? []));

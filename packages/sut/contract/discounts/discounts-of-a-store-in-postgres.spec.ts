@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
+import { Store } from '@backend/discounts/application/domain/store';
 import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/discount-repository';
 
-const theSpicesStore = { storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress };
+const theSpicesStore = new Store({ storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
 
 const theSpicesStoresDiscountsFoundBeside = async (another: typeof spicesDiscount) => {
   const { keep, repository } = await setupSut();
@@ -37,7 +38,7 @@ describe('the discounts of a store found in PostgreSQL', () => {
     const { keep, repository } = await setupSut();
     await keep(spicesDiscount);
 
-    const found = await repository.ofStore({ storeName: produceDiscount.storeName, storeAddress: produceDiscount.storeAddress });
+    const found = await repository.ofStore(new Store({ storeName: produceDiscount.storeName, storeAddress: produceDiscount.storeAddress }));
 
     expect(found).to.deep.equal([]);
   });
@@ -48,7 +49,7 @@ describe('the discounts of a store found in PostgreSQL', () => {
       const spices = await keepWithCouponsIssued(spicesDiscount, ['7K3QX9M2PD']);
       const injected = "x' OR '1'='1'; DELETE FROM app.coupons; --";
 
-      const found = await repository.ofStore({ storeName: injected, storeAddress: injected });
+      const found = await repository.ofStore(new Store({ storeName: injected, storeAddress: injected }));
 
       expect(found, 'the discounts found').to.deep.equal([]);
       expect((await loadOnItsOwnConnection()).map((kept) => kept.toJSON()), 'every discount kept').to.deep.equal([spices.toJSON()]);
