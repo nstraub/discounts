@@ -8,6 +8,12 @@ import { migrateBackward, setupSut } from '../support/migrations';
 
 const theMigration = '0003_rate_as_written';
 
+const setupSutMigratedForward = async () => {
+  const sut = await setupSut();
+  await sut.migrateForward();
+  return sut;
+};
+
 const aRateWrittenWithAComma = { ...spicesDiscount, rate: '12,5' };
 
 describe('the migration that keeps the rate as written', () => {
@@ -24,8 +30,7 @@ describe('the migration that keeps the rate as written', () => {
     expect(loaded?.toJSON()).to.deep.include(aRateWrittenWithAComma);
   });
   it('should run backward to the rate kept as a number, a rate that is a number kept, and forward again, back as text', async () => {
-    const { client, databaseUrl, migrateForward } = await setupSut();
-    await migrateForward();
+    const { client, databaseUrl, migrateForward } = await setupSutMigratedForward();
     const { keep, loadOnItsOwnConnection } = discountRepositoryOn(client, databaseUrl);
     await keep(spicesDiscount);
 
@@ -40,8 +45,7 @@ describe('the migration that keeps the rate as written', () => {
     expect(loaded?.toJSON(), 'the discount, forward again').to.deep.include(spicesDiscount);
   });
   it('should refuse to run backward while a rate is not a number: lossy, a rate such as 12,5 cannot go back', async () => {
-    const { client, databaseUrl, migrateForward } = await setupSut();
-    await migrateForward();
+    const { client, databaseUrl } = await setupSutMigratedForward();
     await discountRepositoryOn(client, databaseUrl).keep(aRateWrittenWithAComma);
 
     const refusal = await migrateBackward(client, theMigration).then(
@@ -52,8 +56,7 @@ describe('the migration that keeps the rate as written', () => {
     expect(refusal, 'invalid text representation of a number').to.equal('22P02');
   });
   it('should read back as text, through the repository, the rate of a discount kept before the migration', async () => {
-    const { client, databaseUrl, migrateForward } = await setupSut();
-    await migrateForward();
+    const { client, databaseUrl, migrateForward } = await setupSutMigratedForward();
     await migrateBackward(client, theMigration);
     await client.query("INSERT INTO app.discounts (id, item, rate, store_name, store_address) VALUES ('kept-before', 'Saffron', 12.5, 'Corner Grocery', '3 Hill Road')");
 
@@ -63,8 +66,7 @@ describe('the migration that keeps the rate as written', () => {
     expect(loaded?.toJSON()).to.deep.equal({ id: 'kept-before', item: 'Saffron', rate: '12.5', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' });
   });
   it('should keep and load back a rate that is a number on the schema before the migration, as on the one after it', async () => {
-    const { client, databaseUrl, migrateForward } = await setupSut();
-    await migrateForward();
+    const { client, databaseUrl } = await setupSutMigratedForward();
     await migrateBackward(client, theMigration);
     const { keep, loadOnItsOwnConnection } = discountRepositoryOn(client, databaseUrl);
     await keep(spicesDiscount);
