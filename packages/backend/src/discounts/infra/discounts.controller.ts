@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Inject, NotFoundException, Param, Patch, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Param, Patch, Post, Res } from '@nestjs/common';
 
 import {
   changeRateRequest,
@@ -9,25 +9,15 @@ import {
   type PublishDiscountRequest,
   publishedDiscountsResponse,
 } from '@app/types/discounts';
-import type { RequestRejection } from '@app/types/request-rejection';
 
 import { DiscountService } from '../application/discount-service.js';
 import { DiscountDetails } from '../application/domain/discount-details.js';
-import { NoSuchDiscountException } from '../application/domain/no-such-discount-exception.js';
 
+import { answerAMissingDiscount } from './missing-discount.js';
 import { ParsedBy } from './parsed-by.js';
 import { answerARefusedPublish } from './refused-publish.js';
 
 type Located = { location(url: string): unknown };
-
-const noSuchDiscount: RequestRejection = { statusCode: HttpStatus.NOT_FOUND, message: 'There is no such discount' };
-
-const answerAMissingDiscount = (refusal: unknown): never => {
-  if (refusal instanceof NoSuchDiscountException) {
-    throw new NotFoundException(noSuchDiscount);
-  }
-  throw refusal;
-};
 
 @Controller('discounts')
 export class DiscountsController {
