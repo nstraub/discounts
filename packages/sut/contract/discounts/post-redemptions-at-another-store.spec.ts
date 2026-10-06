@@ -71,6 +71,12 @@ describe('POST /redemptions at a store the coupon is not for', () => {
   });
 
   describe('A1 input boundary', () => {
-    it.todo('should refuse a coupon at a store whose name is 10 000 characters long as not for that store, never a 500');
+    it('should refuse a coupon at a store whose name is 10 000 characters long as not for that store, never a 500', async () => {
+      const { http, code } = await setupSutWithACouponFor();
+
+      const response = await redeemAtTheStoreOf(http, code, { ...spicesDiscount, storeName: 'M'.repeat(10_000) });
+
+      expect(response.status).to.equal(422);
+    });
   });
 });
