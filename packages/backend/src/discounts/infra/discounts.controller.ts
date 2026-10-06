@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Param, Patch, Post, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpCode, HttpStatus, Inject, Param, Patch, Post, Res } from '@nestjs/common';
 
 import {
   changeRateRequest,
@@ -8,6 +8,7 @@ import {
   publishDiscountRequest,
   type PublishDiscountRequest,
   publishedDiscountsResponse,
+  type RequestRejection,
 } from '@app/types/discounts';
 
 import { DiscountService } from '../application/discount-service.js';
@@ -17,13 +18,17 @@ import { ParsedBy } from './parsed-by.js';
 
 type Located = { location(url: string): unknown };
 
+const rateNotValid: RequestRejection = { statusCode: HttpStatus.BAD_REQUEST, message: 'The rate is not valid', fields: ['rate'] };
+
 @Controller('discounts')
 export class DiscountsController {
   constructor(@Inject(DiscountService) private readonly discounts: DiscountService) {}
 
   @Post()
   async publish(@Body(new ParsedBy(publishDiscountRequest)) request: PublishDiscountRequest, @Res({ passthrough: true }) response: Located) {
-    const discount = await this.discounts.publish(new DiscountDetails(request));
+    const discount = await this.discounts.publish(new DiscountDetails(request)).catch(() => {
+      throw new BadRequestException(rateNotValid);
+    });
     const published = discountResponse.parse(discount.toJSON());
     response.location(`/discounts/${published.id}`);
     return published;
