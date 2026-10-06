@@ -20,6 +20,11 @@ const savedAgainAfter = async (sut: Awaited<ReturnType<typeof setupSut>>, change
   return loaded;
 };
 
+const theFirstCouponLoadedBackAfter = async (sut: Awaited<ReturnType<typeof setupSut>>, change: (found: Discount) => void) =>
+  (await savedAgainAfter(sut, change))?.toJSON().coupons.at(0);
+
+const redeemTheSecondCoupon = (found: Discount) => found.redeemCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
+
 describe('a discount kept in PostgreSQL', () => {
   describe('with its coupons', () => {
     it('should save a discount with its coupons and load it back equal, in a separate transaction', async () => {
@@ -67,9 +72,9 @@ describe('a discount kept in PostgreSQL', () => {
       discount.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
       await sut.repository.save(discount);
 
-      const loaded = await savedAgainAfter(sut, (found) => found.redeemCoupon(CouponToken.keptAs('R4WZ0BH8NE')));
+      const loaded = await theFirstCouponLoadedBackAfter(sut, redeemTheSecondCoupon);
 
-      expect(loaded?.toJSON().coupons.at(0), 'the other coupon loaded back').to.deep.equal({ token: '7K3QX9M2PD', redeemed: false, counted: false });
+      expect(loaded, 'the other coupon loaded back').to.deep.equal({ token: '7K3QX9M2PD', redeemed: false, counted: false });
     });
     it('should keep a redeemed coupon redeemed when another coupon is issued and the discount is saved again', async () => {
       const sut = await setupSut();
@@ -77,9 +82,9 @@ describe('a discount kept in PostgreSQL', () => {
       discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
       await sut.repository.save(discount);
 
-      const loaded = await savedAgainAfter(sut, (found) => found.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE')));
+      const loaded = await theFirstCouponLoadedBackAfter(sut, (found) => found.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE')));
 
-      expect(loaded?.toJSON().coupons.at(0), 'the coupon redeemed before').to.deep.equal({ token: '7K3QX9M2PD', redeemed: true, counted: false });
+      expect(loaded, 'the coupon redeemed before').to.deep.equal({ token: '7K3QX9M2PD', redeemed: true, counted: false });
     });
   });
   describe('with its sales counted', () => {
