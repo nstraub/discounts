@@ -1,6 +1,5 @@
 Feature: Mike raises a discount that is not working
 
-  @wip
   Scenario: Mike raises a discount
     Given Mike has published a discount on an item
     When he raises its rate
