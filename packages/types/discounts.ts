@@ -5,6 +5,7 @@ export const publishDiscountRequest = z.object({
   rate: z.string(),
   storeName: z.string(),
   storeAddress: z.string(),
+  hook: z.string().optional(),
 });
 
 export type PublishDiscountRequest = z.infer<typeof publishDiscountRequest>;
