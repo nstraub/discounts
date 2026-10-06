@@ -103,6 +103,17 @@ describe('a discount kept in PostgreSQL', () => {
       expect(loaded?.toJSON().coupons.map(({ counted }) => counted), 'each coupon loaded back, counted').to.deep.equal([true, false]);
       expect(loaded?.toJSON(), 'the discount loaded back').to.deep.equal(discount.toJSON());
     });
-    it.todo('should keep a counted coupon counted when another coupon is redeemed and the discount is saved again');
+    it('should keep a counted coupon counted when another coupon is redeemed and the discount is saved again', async () => {
+      const sut = await setupSut();
+      const discount = await keepWithACouponIssued(sut);
+      discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+      discount.count();
+      discount.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
+      await sut.repository.save(discount);
+
+      const loaded = await theFirstCouponLoadedBackAfter(sut, redeemTheSecondCoupon);
+
+      expect(loaded, 'the coupon counted before').to.deep.equal({ token: '7K3QX9M2PD', redeemed: true, counted: true });
+    });
   });
 });
