@@ -158,4 +158,7 @@ describe('Component PublishedDiscounts', () => {
     });
     it.todo('should show a web address in a hook as plain text, never as a link');
   });
+  describe('showing where each store is', () => {
+    it.todo('should show each entry with its own store address when two stores share a name');
+  });
 });
