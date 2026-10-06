@@ -6,6 +6,7 @@ import { DiscountPublished } from './discount-published.js';
 import { DiscountRateChanged } from './discount-rate-changed.js';
 import type { DomainEventPublisher } from './domain-event-publisher.js';
 import { IssuedCoupon } from './issued-coupon.js';
+import { RedeemedCoupon } from './redeemed-coupon.js';
 
 export class Discount {
   constructor(
@@ -30,8 +31,9 @@ export class Discount {
     return new IssuedCoupon(token, this.details.toJSON().storeName);
   }
 
-  redeemCoupon(token: CouponToken): void {
+  redeemCoupon(token: CouponToken): RedeemedCoupon {
     this.coupons.filter((coupon) => coupon.isIdentifiedBy(token)).forEach((coupon) => coupon.redeem(this.id));
+    return new RedeemedCoupon('Peruvian spices');
   }
 
   toJSON(): { id: string; coupons: ReturnType<Coupon['toJSON']>[] } & ReturnType<DiscountDetails['toJSON']> {

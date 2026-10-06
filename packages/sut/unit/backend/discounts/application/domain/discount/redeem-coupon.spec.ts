@@ -16,6 +16,15 @@ describe('class Discount', () => {
       expect(discount.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true }]);
     });
 
+    it('should answer with the item of the discount the coupon redeemed is for', () => {
+      const { factory } = aSpicesDiscountWithItsEvents();
+      const discount = factory.reconstitute({ ...publishedSpicesDiscount, coupons: [{ token: '7K3QX9M2PD', redeemed: false }] });
+
+      const redeemed = discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+
+      expect(redeemed.toJSON()).to.deep.equal({ item: publishedSpicesDiscount.item });
+    });
+
     describe('combination', () => {
       it('should leave its other coupons unused when one is redeemed', () => {
         const { factory } = aSpicesDiscountWithItsEvents();
