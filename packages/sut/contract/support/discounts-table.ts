@@ -27,6 +27,16 @@ export const insertACoupon = (client: pg.Client, coupon: { token?: string; disco
   );
 };
 
+export const theDiscountsKept = async (client: pg.Client) => (await client.query('SELECT id, item, rate, store_name, store_address FROM app.discounts')).rows;
+
+export const theRowKeptFor = (published: { id: string }, discount: typeof spicesDiscount) => ({
+  id: published.id,
+  item: discount.item,
+  rate: discount.rate,
+  store_name: discount.storeName,
+  store_address: discount.storeAddress,
+});
+
 export const constraintsAndColumnsOfTheDiscountsTable = async (client: pg.Client) => {
   const constraints = await client.query("SELECT contype AS kind FROM pg_constraint WHERE conrelid = 'app.discounts'::regclass");
   const columns = await client.query(

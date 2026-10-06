@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import type { CouponRedemptionRejected } from '@backend/discounts/application/domain/coupon-redemption-rejected';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
+import { theDiscountsKept, theRowKeptFor } from '../support/discounts-table';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
 import { redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithAnotherCouponOfTheSameDiscount } from '../support/redemptions';
 
@@ -25,11 +26,8 @@ describe('POST /redemptions', () => {
       await redeemAtTheStoreOf(http, code);
 
       const kept = await client.query('SELECT token, redeemed, counted FROM app.coupons');
-      const discountKept = await client.query('SELECT id, item, rate, store_name, store_address FROM app.discounts');
       expect(kept.rows, 'each coupon kept').to.have.deep.members([{ token: code, redeemed: true, counted: false }, { token: other, redeemed: false, counted: false }]);
-      expect(discountKept.rows, 'the discount kept').to.deep.equal([
-        { id: published.id, item: spicesDiscount.item, rate: spicesDiscount.rate, store_name: spicesDiscount.storeName, store_address: spicesDiscount.storeAddress },
-      ]);
+      expect(await theDiscountsKept(client), 'the discount kept').to.deep.equal([theRowKeptFor(published, spicesDiscount)]);
     });
     it('should publish CouponRedemptionRejected on the application event emitter for the coupon already used', async () => {
       const { app, http, published, code } = await setupSutWithACouponFor();
