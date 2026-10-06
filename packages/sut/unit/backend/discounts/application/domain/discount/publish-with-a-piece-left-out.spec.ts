@@ -52,7 +52,17 @@ describe('class Discount', () => {
 
         expect(lastRejectionOf(events)).to.deep.include({ reason: 'missing', pieces: ['storeAddress'] });
       });
-      it.todo('should refuse a rate that is empty text or only blank space, its rejection naming the rate as missing, not as not valid');
+      it('should refuse a rate that is empty text or only blank space, its rejection naming the rate as missing, not as not valid', async () => {
+        const ratesLeftOut = ['', '   '];
+        const rejections: unknown[] = [];
+
+        for (const rate of ratesLeftOut) {
+          const events = await refusedWith({ ...spicesDiscount, rate });
+          rejections.push(lastRejectionOf(events));
+        }
+
+        expect(rejections).to.deep.equal(ratesLeftOut.map((rate) => new DiscountPublicationRejected(rate, 'missing', ['rate'])));
+      });
     });
 
     describe('combination', () => {

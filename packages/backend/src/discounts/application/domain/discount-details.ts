@@ -19,7 +19,7 @@ export class DiscountDetails {
 
   private piecesLeftOut(): string[] {
     const { item, rate, storeName, storeAddress } = this.details;
-    return Object.entries({ item, rate, storeName, storeAddress }).filter(([, text]) => text === '').map(([piece]) => piece);
+    return Object.entries({ item, rate, storeName, storeAddress }).filter(([, text]) => text.trim() === '').map(([piece]) => piece);
   }
 
   store(): Store {
