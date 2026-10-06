@@ -5,7 +5,7 @@ import { DiscountDetails } from '@backend/discounts/application/domain/discount-
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import { DiscountRateChanged } from '@backend/discounts/application/domain/discount-rate-changed';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
-import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 const setupSut = () => {
   const events = mock<DomainEventPublisher>();
@@ -73,11 +73,11 @@ describe('class Discount', () => {
   describe('changing the rate of a discount with a hook', () => {
     it('should keep its hook when its rate changes', () => {
       const { factory } = setupSut();
-      const discount = factory.reconstitute({ id: 'spices-id', ...spicesDiscount, hook: 'Our spices now come from a new supplier' });
+      const discount = factory.reconstitute({ id: 'spices-id', ...spicesDiscountWithItsHook });
 
       discount.changeRate('25');
 
-      expect(discount.toJSON().hook).to.equal('Our spices now come from a new supplier');
+      expect(discount.toJSON().hook).to.equal(spicesDiscountWithItsHook.hook);
     });
   });
 });

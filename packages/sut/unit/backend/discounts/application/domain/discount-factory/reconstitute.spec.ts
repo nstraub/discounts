@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 describe('class DiscountFactory', () => {
   describe('rebuilding a kept discount', () => {
@@ -19,11 +19,11 @@ describe('class DiscountFactory', () => {
   describe('rebuilding a kept discount with a hook', () => {
     it('should rebuild a kept discount with its hook', () => {
       const factory = new DiscountFactory(mock<DomainEventPublisher>());
-      const kept = { id: 'kept-spices-id', ...spicesDiscount, hook: 'Our spices now come from a new supplier' };
+      const kept = { id: 'kept-spices-id', ...spicesDiscountWithItsHook };
 
       const rebuilt = factory.reconstitute(kept);
 
-      expect(rebuilt.toJSON().hook).to.equal('Our spices now come from a new supplier');
+      expect(rebuilt.toJSON().hook).to.equal(spicesDiscountWithItsHook.hook);
     });
   });
 });

@@ -1,21 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
-
-const withItsHook = { ...spicesDiscount, hook: 'Our spices now come from a new supplier' };
 
 describe('POST /discounts with a hook', () => {
   describe('success', () => {
     it('should publish the hook the request gives and answer with it', async () => {
       const { client, http } = await setupSut();
 
-      const response = await http.post('/discounts').send(withItsHook);
+      const response = await http.post('/discounts').send(spicesDiscountWithItsHook);
 
       const { rows } = await client.query('SELECT hook FROM app.discounts');
-      expect(rows.map((row) => row.hook), 'the hook kept').to.deep.equal([withItsHook.hook]);
-      expect(response.body, 'the discount published').to.deep.equal({ id: response.body.id, ...withItsHook });
+      expect(rows.map((row) => row.hook), 'the hook kept').to.deep.equal([spicesDiscountWithItsHook.hook]);
+      expect(response.body, 'the discount published').to.deep.equal({ id: response.body.id, ...spicesDiscountWithItsHook });
     });
     it.todo('should answer with no hook when the request gives none');
   });

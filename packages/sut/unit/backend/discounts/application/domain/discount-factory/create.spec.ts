@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 vi.unmock('uuid');
 
@@ -46,9 +46,9 @@ describe('class DiscountFactory', () => {
     it('should hold the hook it was created with', () => {
       const { discountWith } = setupSut();
 
-      const discount = discountWith({ ...spicesDiscount, hook: 'Our spices now come from a new supplier' });
+      const discount = discountWith(spicesDiscountWithItsHook);
 
-      expect(discount.toJSON().hook).to.equal('Our spices now come from a new supplier');
+      expect(discount.toJSON().hook).to.equal(spicesDiscountWithItsHook.hook);
     });
     it('should hold no hook when created without one', () => {
       const { discountWith } = setupSut();

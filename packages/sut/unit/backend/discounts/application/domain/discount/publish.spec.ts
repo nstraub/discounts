@@ -5,7 +5,7 @@ import { DiscountDetails } from '@backend/discounts/application/domain/discount-
 import { DiscountPublished } from '@backend/discounts/application/domain/discount-published';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 const setupSut = () => {
   const events = mock<DomainEventPublisher>();
@@ -48,11 +48,11 @@ describe('class Discount', () => {
     describe('the discount published', () => {
       it('should raise DiscountPublished carrying its hook', () => {
         const { events, discountWith } = setupSut();
-        const discount = discountWith({ ...spicesDiscount, hook: 'Our spices now come from a new supplier' });
+        const discount = discountWith(spicesDiscountWithItsHook);
 
         discount.publish();
 
-        expect(lastEventOf(events).discount.hook).to.equal('Our spices now come from a new supplier');
+        expect(lastEventOf(events).discount.hook).to.equal(spicesDiscountWithItsHook.hook);
       });
       it('should raise DiscountPublished carrying no hook when it has none', () => {
         const { events, discountWith } = setupSut();

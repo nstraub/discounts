@@ -2,7 +2,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { discountResponse, requestRejection } from '@app/types/discounts';
-import { longTextInAnyCharacters, produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
+import { longTextInAnyCharacters, produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
@@ -179,14 +179,13 @@ describe('POST /discounts', () => {
   describe('A6 business-logic abuse', () => {
     it('should keep nothing the request sends beyond the item, rate, store name, store address and hook', async () => {
       const { client, http } = await setupSut();
-      const withItsHook = { ...spicesDiscount, hook: 'Our spices now come from a new supplier' };
 
-      const response = await http.post('/discounts').send({ ...withItsHook, publishedBy: 'Mike', featured: true });
+      const response = await http.post('/discounts').send({ ...spicesDiscountWithItsHook, publishedBy: 'Mike', featured: true });
 
       const { rows } = await client.query('SELECT * FROM app.discounts');
-      const { item, rate, storeName, storeAddress, hook } = withItsHook;
+      const { item, rate, storeName, storeAddress, hook } = spicesDiscountWithItsHook;
       expect(rows).to.deep.equal([{ id: response.body.id, item, rate, store_name: storeName, store_address: storeAddress, hook }]);
-      expect(response.body, 'the discount published').to.deep.equal({ id: response.body.id, ...withItsHook });
+      expect(response.body, 'the discount published').to.deep.equal({ id: response.body.id, ...spicesDiscountWithItsHook });
     });
   });
 });
