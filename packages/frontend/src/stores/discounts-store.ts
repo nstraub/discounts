@@ -30,7 +30,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
         throw refusal;
       }
       missing.value = refusal.missing;
-      rateNotValid.value = refusal.missing.length === 0;
+      rateNotValid.value = refusal.missing.length === 0 && refusal.fields.includes('rate');
     }
   };
   const load = async (): Promise<void> => {

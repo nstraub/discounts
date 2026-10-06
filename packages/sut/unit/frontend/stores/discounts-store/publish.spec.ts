@@ -62,6 +62,13 @@ describe('Store discounts', () => {
 
       expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(false);
     });
+    it('should not hold the rate as not valid when the refusal names other fields and none as missing', async () => {
+      const { discounts } = setupSutRefusing(new BadRequestException('POST /discounts answered 400', [], ['storeName']));
+
+      await discounts.publish(spicesDiscount);
+
+      expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(false);
+    });
   });
   describe('publishing a discount with a piece left out', () => {
     it('should hold which pieces are missing as the refusal lists them', async () => {
