@@ -10,13 +10,15 @@ type Http = Awaited<ReturnType<typeof setupSut>>['http'];
 
 const publishTheSpicesDiscount = async (http: Http): Promise<{ id: string }> => (await http.post('/discounts').send(spicesDiscount)).body;
 
+const patchTheDiscount = (http: Http, id: string) => http.patch(`/discounts/${id}`);
+
 describe('PATCH /discounts/:id', () => {
   describe('success', () => {
     it('should answer 204 with no body when the rate is changed', async () => {
       const { http } = await setupSut();
       const published = await publishTheSpicesDiscount(http);
 
-      const response = await http.patch(`/discounts/${published.id}`).send({ rate: '25' });
+      const response = await patchTheDiscount(http, published.id).send({ rate: '25' });
 
       expect(response.status).to.equal(204);
       expect(response.text).to.equal('');
@@ -25,7 +27,7 @@ describe('PATCH /discounts/:id', () => {
       const { http } = await setupSut();
       const published = await publishTheSpicesDiscount(http);
 
-      await http.patch(`/discounts/${published.id}`).send({ rate: '25' });
+      await patchTheDiscount(http, published.id).send({ rate: '25' });
 
       const listed = await http.get('/discounts');
       expect(listed.body, 'the discounts listed after the change').to.deep.equal([{ ...published, rate: '25' }]);
@@ -36,7 +38,7 @@ describe('PATCH /discounts/:id', () => {
       app.get(EventEmitter2).on('discount.rate-changed', (event: { id: string; rate: string }) => changed.push({ id: event.id, rate: event.rate }));
       const published = await publishTheSpicesDiscount(http);
 
-      await http.patch(`/discounts/${published.id}`).send({ rate: '25' });
+      await patchTheDiscount(http, published.id).send({ rate: '25' });
 
       expect(changed).to.deep.equal([{ id: published.id, rate: '25' }]);
     });
@@ -47,8 +49,8 @@ describe('PATCH /discounts/:id', () => {
       const { http } = await setupSut();
       const published = await publishTheSpicesDiscount(http);
 
-      const missing = await http.patch(`/discounts/${published.id}`).send({});
-      const notText = await http.patch(`/discounts/${published.id}`).send({ rate: 25 });
+      const missing = await patchTheDiscount(http, published.id).send({});
+      const notText = await patchTheDiscount(http, published.id).send({ rate: 25 });
 
       expect([missing.status, notText.status]).to.deep.equal([400, 400]);
       expect([requestRejection.parse(missing.body).fields, requestRejection.parse(notText.body).fields]).to.deep.equal([['rate'], ['rate']]);
