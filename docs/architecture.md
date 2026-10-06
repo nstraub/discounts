@@ -47,7 +47,7 @@ C4Component
     Component(list, "PublishedDiscounts", "Vue component", "The list of published discounts, or one short line saying nothing is published")
     Component(entry, "PublishedDiscount", "Vue component", "One entry: item, rate as written followed by %, store name and address, its hook when it has one, and its controls")
     Component(form, "PublishDiscountForm", "Vue component", "Publishes the typed discount and clears itself once published")
-    Component(fields, "TypedDiscountFields", "Vue component", "Five captioned inputs: item, rate, store name, store address and the optional hook")
+    Component(fields, "TypedDiscountFields", "Vue component", "Five captioned inputs: item, rate, store name, store address and the optional hook; each of the first four shows beside it what the publish answer tells of its piece")
     Component(changeForm, "ChangeRateForm", "Vue component", "One per listed discount: a new rate and a button to change it")
     Component(couponButton, "GetCouponButton", "Vue component", "One per listed discount: asks for a coupon")
     Component(tillView, "TillView", "Vue view (#/till)", "The till page where Stephanie redeems a coupon")
@@ -60,25 +60,28 @@ C4Component
     Component(tillStore, "till store", "Pinia", "redeemCoupon() and noStoreSaid(); holds the one till answer, an object of till-answers.ts that tells its own caption")
     Component(applies, "DiscountApplies", "Vue component", "Says the discount applies to the item redeemed")
     Component(issuedCoupon, "IssuedCoupon", "Vue component", "Shows the coupon just issued: the store to use it at and its code as two groups of five")
-    Component(store, "discounts store", "Pinia", "publish(), load(), changeRate() and getCoupon() and countDiscountedSales(); goes through RestApi, reloads the list after a rate change, holds the coupon just issued and the counted discounts, and derives the distinct stores from the published discounts")
+    Component(store, "discounts store", "Pinia", "publish(), load(), changeRate() and getCoupon() and countDiscountedSales(); goes through RestApi, reloads the list after a rate change, holds the coupon just issued and the counted discounts, holds the one publish answer, and derives the distinct stores from the published discounts")
+    Component(publishAnswers, "publish-answers.ts", "Frontend module", "The publish answer, one object per case (nothing told, rate not valid, pieces missing with their list), each telling the form-level caption and each piece's caption from the page's texts; publish-pieces.ts names the four pieces")
   }
 
   Container_Boundary(backend, "Backend (NestJS)") {
-    Component(controller, "DiscountsController", "NestJS controller", "POST /discounts answers 201 with Location; PATCH /discounts/:id answers 204; POST /discounts/:id/coupons answers the coupon; GET /discounts lists"')
+    Component(controller, "DiscountsController", "NestJS controller", "POST /discounts answers 201 with Location; PATCH /discounts/:id answers 204, or 404 for an id no discount has; POST /discounts/:id/coupons answers the coupon, or 404 for an id no discount has; GET /discounts lists")
     Component(storeCounts, "StoreCountsController", "NestJS controller", "POST /stores/counts answers 201 with each discount counted")
     Component(redemptions, "RedemptionsController", "NestJS controller", "POST /redemptions answers 201 with the item, 422 for a coupon of another store, 409 when it has already been used and 400 when the store is missing or blank")
-    Component(parsedBy, "ParsedBy", "Nest pipe, zod", "Parses the request against the shared schema; a failure is a 400 requestRejection")
+    Component(refusedPublish, "refused-publish.ts", "Infra module", "Answers a refused publish: pieces left out are a 400 with fields and missing, a rate not valid a 400 with fields ['rate']; any other failure is rethrown")
+    Component(missingDiscount, "missing-discount.ts", "Infra module", "Answers NoSuchDiscountException with a 404 requestRejection; any other failure is rethrown")
+    Component(parsedBy, "ParsedBy", "Nest pipe, zod", "Parses the request against the shared schema; a failure is a 400 requestRejection, which lists in missing the fields the request leaves out")
     Component(service, "DiscountService", "Application service", "publish(), changeRate(), issueCoupon(), redeemCoupon(code, store), count(store) and published()")
     Component(changes, "DiscountChanges", "Application collaborator", "The unit of work: runs issuing, redeeming and counting through the repository's changing(work): load, tell, save in one transaction")
     Component(factory, "DiscountFactory", "Domain factory", "create() gives a new identity; reconstitute() rebuilds a kept discount")
-    Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails (item, rate, store name, store address, optional hook); redeemCoupon(token, store) refuses a coupon of another store (Store.equals: name and address exactly) and raises CouponRedemptionRejected; publish(keep) refuses a rate that is not valid, otherwise keeps the discount and raises DiscountPublished, changeRate() raises DiscountRateChanged, issueCoupon() adds a coupon and raises CouponIssued, redeemCoupon(token) redeems it, count() counts the coupons redeemed since the last count and raises DiscountedSalesCounted")
+    Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails (item, rate, store name, store address, optional hook); redeemCoupon(token, store) refuses a coupon of another store (Store.equals: name and address exactly) and raises CouponRedemptionRejected; publish(keep) asks its details whether it can be published: a discount with a piece left out or a rate that is not valid keeps nothing and raises DiscountPublicationRejected, otherwise it keeps the discount and raises DiscountPublished; changeRate() raises DiscountRateChanged; issueCoupon() and count() go through Coupons; redeemCoupon(token) redeems the coupon")
+    Component(details, "DiscountDetails", "Value object", "whenPublishable(): first that item, rate, store name and store address are all present (empty or blank text is not), then the rate; raises PiecesMissingException with the pieces left out")
     Component(rate, "DiscountRate", "Value object", "The rule of a rate on publishing: above 0 and at most 100, at most one decimal")
-    Component(publicationRejected, "DiscountPublicationRejected", "Domain event", "Raised when a discount is refused: the rate and the reason")
+    Component(publicationRejected, "DiscountPublicationRejected", "Domain event", "Raised when a discount is refused: the rate, the reason ('missing' or 'not valid') and the pieces refused")
     Component(event, "DiscountPublished", "Domain event", "Carries the discount as published")
     Component(token, "CouponToken", "Value object", "Ten characters of Crockford base32: drawnFrom(random) for a new one, read(code) for a typed one (case, O, I, L and spacing normalised)")
     Component(issued, "IssuedCoupon", "Domain value", "A coupon token and the name of the store it is for")
-    Component(coupons, "Coupons", "Collection in the aggregate", "The discount's coupons: issues, finds by token and hands over the redemption, counts since the last count; no port, no repository")
-    Component(discountEvents, "DiscountEvents", "Domain collaborator", "Builds the discount's events from what Discount tells it and publishes them through the port; decides nothing")
+    Component(coupons, "Coupons", "Collection in the aggregate", "The discount's coupons: issues one and raises CouponIssued, finds by token and hands over the redemption, counts since the last count and raises DiscountedSalesCounted; publishes through the port; no repository")
     Component(coupon, "Coupon", "Entity in the aggregate", "A token, whether it was redeemed and whether it was counted; owns single use; redeem() raises CouponRedeemed, and a second redeem() raises CouponRedemptionRejected and refuses")
     Component(couponRedeemed, "CouponRedeemed", "Domain event", "Raised when a coupon is redeemed")
     Component(redemptionRejected, "CouponRedemptionRejected", "Domain event", "Raised when a coupon already used is redeemed: the discount id, the token and the reason")
@@ -104,7 +107,6 @@ C4Component
   Rel(service, token, "Draws from the random source")
   Rel(discount, token, "Holds its coupons as")
   Rel(discount, issued, "Answers with")
-  Rel(discount, couponIssued, "Raises")
   Rel(discount, coupon, "Holds its coupons as")
   Rel(coupon, couponRedeemed, "Raises")
   Rel(view, tillView, "Routes to")
@@ -116,8 +118,15 @@ C4Component
   Rel(answer, tillStore, "Reads the answer of")
   Rel(discount, coupons, "Holds its coupons in")
   Rel(coupons, coupon, "Holds")
-  Rel(discount, discountEvents, "Tells what happened to")
-  Rel(discountEvents, publisherPort, "Publishes through")
+  Rel(coupons, couponIssued, "Raises")
+  Rel(coupons, salesCounted, "Raises")
+  Rel(coupons, publisherPort, "Publishes through")
+  Rel(coupon, publisherPort, "Publishes through")
+  Rel(discount, details, "Asks whether it can be published")
+  Rel(controller, refusedPublish, "Answers a refused publish through")
+  Rel(controller, missingDiscount, "Answers a missing discount through")
+  Rel(store, publishAnswers, "Holds the answer of")
+  Rel(fields, publishAnswers, "Asks what the answer tells of each piece")
   Rel(store, redemptions, "POST /redemptions", "JSON over HTTP")
   Rel(redemptions, service, "Calls")
   Rel(view, countView, "Routes to")
@@ -128,7 +137,6 @@ C4Component
   Rel(store, storeCounts, "POST /stores/counts", "JSON over HTTP")
   Rel(storeCounts, service, "Calls")
   Rel(service, changes, "Changes discounts through")
-  Rel(discount, salesCounted, "Raises")
   Rel(coupon, redemptionRejected, "Raises")
   Rel(form, store, "publish()")
   Rel(changeForm, store, "changeRate()")
@@ -168,17 +176,40 @@ sequenceDiagram
   Mike->>Form: fills item, rate, store name, store address; submits
   Form->>Store: publish(discount)
   Store->>Controller: POST /discounts
-  Controller->>Controller: ParsedBy checks the body (400 requestRejection when a field is missing or mistyped)
+  Controller->>Controller: ParsedBy checks the body (400 requestRejection when a field is left out, listed in missing, or mistyped)
   Controller->>Service: publish(details)
   Service->>Discount: DiscountFactory.create(details)
   Service->>Discount: publish(keep)
-  Discount->>Discount: DiscountRate checks the rate (400 fields: rate, nothing kept, DiscountPublicationRejected raised, when it is not valid)
+  Discount->>Discount: DiscountDetails checks the pieces, then DiscountRate the rate (400, nothing kept, DiscountPublicationRejected raised, when a piece is blank or the rate is not valid)
   Discount->>Repository: keep(discount) saves it
   Discount->>Events: publish(DiscountPublished)
   Service-->>Controller: discount
   Controller-->>Store: 201, Location /discounts/{id}, the discount as JSON
   Form->>Form: clears its fields
 ```
+
+### Leaving pieces out
+
+A discount needs an item, a rate, a store name and a store address. A request that leaves a field out of
+the body is refused by `ParsedBy` before any rule runs: `400` with the field in `fields` and in `missing`,
+and no event. A field that is there but of the wrong JSON type is in `fields` only, not in `missing`.
+A piece that is there but empty or blank is refused by `Discount` itself: `DiscountDetails.whenPublishable`
+checks that every piece is present, and only then the rate, so a rate is never judged while a piece is
+missing. The discount keeps nothing, raises `DiscountPublicationRejected` with the reason `missing` and
+the pieces, and throws `PiecesMissingException`; `infra/refused-publish.ts` answers it with the same
+shape, `400`, the message "Missing fields", the pieces in `fields` and in `missing`. A rate not valid
+stays a `400` with `fields: ['rate']` and nothing in `missing`; any other failure is not a refusal and
+answers `500`. The schema is `requestRejection` in `@app/types/request-rejection`, with the optional
+`missing` list.
+
+In the web app, `FetchRestApi` turns a `400` into a `BadRequestException` carrying `missing` and `fields`
+(`@app/types/rest-api-refusals`). The discounts store holds one publish answer, an object of
+`discounts/publish-answers.ts` (nothing told, the rate not valid, pieces missing with their list): the
+answer to a `400` lists the missing pieces first, then the rate; a successful publish resets it. Each
+answer tells the form-level caption and each piece's caption (`publish-pieces.ts` names the four pieces)
+from the page's texts, and `TypedDiscountFields` hands each caption to `CaptionedInput` as `told`, which
+shows it as a status beside its field, outside the field's label. Mike is told, beside each field, which
+pieces are missing; a failure that is not a `400` is rethrown.
 
 ### The rate's rule
 
@@ -194,7 +225,7 @@ be above 0 % and at most 100 %, with at most one decimal." and lists nothing new
 ### Changing a discount's rate
 
 Anyone can change any discount's rate (ADR 0002). The request names the discount by its id and carries
-the new rate as text. A change to a discount nobody published answers 204 and changes nothing.
+the new rate as text. A change to a discount nobody published changes nothing and answers `404` with the one error schema: `DiscountService.changeRate` throws `NoSuchDiscountException` and `infra/missing-discount.ts` answers it.
 
 ```mermaid
 sequenceDiagram
@@ -213,6 +244,7 @@ sequenceDiagram
   Controller->>Controller: ParsedBy checks the body (400 requestRejection when the rate is missing or mistyped)
   Controller->>Service: changeRate(id, rate)
   Service->>Repository: withId(id)
+  Service->>Service: NoSuchDiscountException when no discount has the id (404 requestRejection, nothing changed)
   Service->>Discount: changeRate(rate)
   Discount->>Events: publish(DiscountRateChanged)
   Service->>Repository: save(discount)
@@ -233,12 +265,13 @@ form leaves an empty hook out of the request, and the list shows a hook only whe
 
 Coupons belong to the Discount aggregate: only the discount issues them, and it keeps no coupon
 repository and no coupon port. `Discount.issueCoupon(token)` adds the token to the discount's coupons,
-raises `CouponIssued` and answers with an `IssuedCoupon` (the token and the store's name), which the
+raises `CouponIssued` (through `Coupons`, which owns issuing) and answers with an `IssuedCoupon` (the token and the store's name), which the
 controller maps through the shared `couponResponse` schema. `DiscountService.issueCoupon(id)` draws the
 token with `CouponToken.drawnFrom(random)`; the random source is injected, and in production it is
 `crypto.getRandomValues` (ADR 0004). The repository saves a discount's coupons with it, in the `coupons`
 table (migration `0005`: a token that is unique, and a foreign key to the discount; its down drops the
-table and loses every coupon issued).
+table and loses every coupon issued). A coupon asked for an id no discount has issues nothing and
+answers `404` with the one error schema (`NoSuchDiscountException`, answered by `infra/missing-discount.ts`).
 
 ```mermaid
 sequenceDiagram
@@ -249,15 +282,17 @@ sequenceDiagram
   participant Service as DiscountService
   participant Repository as DiscountRepository
   participant Discount
+  participant Coupons
   participant Events as DomainEventPublisher
 
   Sue->>Button: asks for a coupon beside a discount
   Button->>Store: getCoupon(id)
   Store->>Controller: POST /discounts/{id}/coupons
   Controller->>Service: issueCoupon(id)
-  Service->>Repository: withId(id)
+  Service->>Repository: withId(id) (404 requestRejection, nothing issued, when no discount has the id)
   Service->>Discount: issueCoupon(CouponToken.drawnFrom(random))
-  Discount->>Events: publish(CouponIssued)
+  Discount->>Coupons: issue(token, id)
+  Coupons->>Events: publish(CouponIssued)
   Service->>Repository: save(discount)
   Controller-->>Store: the token and the store's name
   Store-->>Sue: IssuedCoupon shows the store and the code, as two groups of five
@@ -306,8 +341,8 @@ sequenceDiagram
 
 ### Counting the discounted sales
 
-A coupon holds whether it was redeemed and whether it was counted. `Discount.count()` counts the
-coupons redeemed since the last count, marks them counted and raises `DiscountedSalesCounted` for the
+A coupon holds whether it was redeemed and whether it was counted. `Discount.count()` has `Coupons` count the
+coupons redeemed since the last count, mark them counted and raise `DiscountedSalesCounted` for the
 discount; it answers with the discount's id, item, rate and number of sales. `DiscountService.count(store)`
 runs it through `DiscountChanges`, the unit of work every use case shares: it loads a discount through
 the repository port, tells it the change and saves it, one discount per save (ADR 0006). For a count the
@@ -327,6 +362,7 @@ sequenceDiagram
   participant Changes as DiscountChanges
   participant Repository as DiscountRepository
   participant Discount
+  participant Coupons
   participant Events as DomainEventPublisher
 
   Rodrigo->>Form: picks his store; counts its discounted sales
@@ -336,7 +372,8 @@ sequenceDiagram
   Service->>Changes: toEachOfTheStore(store, count)
   Changes->>Repository: ofStore(store)
   Changes->>Discount: count()
-  Discount->>Events: publish(DiscountedSalesCounted)
+  Discount->>Coupons: countSinceTheLastCount(id)
+  Coupons->>Events: publish(DiscountedSalesCounted)
   Changes->>Repository: save(discount)
   Controller-->>Store: 201, the discounts counted
   Store-->>Rodrigo: CountedDiscounts shows each discount's sales
@@ -344,13 +381,16 @@ sequenceDiagram
 
 ### Where the aggregate splits
 
-`Discount` decides: it runs every rule (the rate, the store, what a count restarts) and raises each of its
-events at the point the rule decides. It delegates the coupon bookkeeping to `Coupons`, a collection inside
-the aggregate with no port and no repository, reached only through `Discount` and persisted with it:
-issuing, finding a coupon by token and handing it the redemption, counting what was redeemed since the last
-count, and `toJSON`. `Coupon` raises `CouponRedeemed` and its single-use `CouponRedemptionRejected`.
-`DiscountEvents` builds and publishes the events `Discount` raises, through the event-publisher port; it
-decides nothing (ADR 0008).
+`Discount` decides: it runs every rule (the pieces and the rate, the store, what a count restarts) and
+raises the events of what it owns: `DiscountPublished`, `DiscountPublicationRejected`,
+`DiscountRateChanged` and, for the store rule, `CouponRedemptionRejected`. Each entity raises the events
+of what it owns, through the event-publisher port (ADR 0009). `Coupons`, a collection inside the
+aggregate with no port and no repository, reached only through `Discount` and persisted with it, owns
+issuing, finding a coupon by token and handing it the redemption, counting what was redeemed since the
+last count, and `toJSON`: it raises `CouponIssued` and `DiscountedSalesCounted`, one per discount, each
+carrying the discount's id. `Coupon` raises `CouponRedeemed` and its single-use
+`CouponRedemptionRejected`. There is no class that builds or publishes the events for the others (ADR
+0008's `DiscountEvents` is gone).
 
 ### Single use, and one change at a time
 
@@ -374,8 +414,8 @@ changes to one discount are therefore serialised: a redemption is never lost or 
 coupon is never counted in two counts, and nobody is shown a refusal for a change made since they
 looked. `changeRate` runs outside `changing` and keeps last-write-wins on the rate.
 
-Every error answers with the one `requestRejection` schema in `@app/types/discounts`
-(`statusCode`, `message`, optional `fields`); there is no exception filter.
+Every error answers with the one `requestRejection` schema in `@app/types/request-rejection`
+(`statusCode`, `message`, optional `fields`, optional `missing`); there is no exception filter.
 
 ## Deployment pipeline
 
