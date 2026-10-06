@@ -98,7 +98,14 @@ describe('class Discount', () => {
         expect(lastRejectionOf(events)).to.be.instanceOf(DiscountPublicationRejected);
         expect(lastRejectionOf(events)).to.include({ rate: '150', reason: 'not valid' });
       });
-      it.todo('should not raise DiscountPublished when its rate is refused');
+      it('should not raise DiscountPublished when its rate is refused', () => {
+        const { events, discountWith } = setupSut();
+        const discount = discountWith({ ...spicesDiscount, rate: '150' });
+
+        discount.publish();
+
+        expect(events.publish).to.not.have.been.calledWith(expect.any(DiscountPublished));
+      });
     });
 
     describe('boundary', () => {
