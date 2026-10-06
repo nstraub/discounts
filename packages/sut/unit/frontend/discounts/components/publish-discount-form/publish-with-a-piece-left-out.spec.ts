@@ -41,7 +41,13 @@ describe('Component PublishDiscountForm', () => {
 
       expect(whatTheFieldTells(form, 'discount-rate'), "what the rate's field tells").to.equal(discountTexts.rateMissing);
     });
-    it.todo('should tell Mike the store name is missing beside its field when refused for it');
+    it('should tell Mike the store name is missing beside its field when refused for it', async () => {
+      const { form } = setupSutRefusingAsMissing(['storeName']);
+
+      await askToPublish(form);
+
+      expect(whatTheFieldTells(form, 'discount-store-name'), "what the store name's field tells").to.equal(discountTexts.storeNameMissing);
+    });
     it.todo('should tell Mike the store address is missing beside its field when refused for it');
 
     describe('state', () => {
