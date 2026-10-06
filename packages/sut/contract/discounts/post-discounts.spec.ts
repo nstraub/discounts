@@ -184,7 +184,7 @@ describe('POST /discounts', () => {
 
       const { rows } = await client.query('SELECT * FROM app.discounts');
       const { item, rate, storeName, storeAddress } = spicesDiscount;
-      expect(rows).to.deep.equal([{ id: response.body.id, item, rate, store_name: storeName, store_address: storeAddress }]);
+      expect(rows).to.deep.equal([{ id: response.body.id, item, rate, store_name: storeName, store_address: storeAddress, hook: null }]);
       expect(response.body, 'the discount published').to.deep.equal({ id: response.body.id, ...spicesDiscount });
     });
   });

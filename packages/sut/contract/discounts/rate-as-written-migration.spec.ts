@@ -1,3 +1,4 @@
+import type pg from 'pg';
 import { describe, expect, it } from 'vitest';
 
 import { spicesDiscount } from '@sut/support/example-discounts';
@@ -7,6 +8,15 @@ import { constraintsAndColumnsOfTheDiscountsTable } from '../support/discounts-t
 import { migrateBackward, setupSut } from '../support/migrations';
 
 const theMigration = '0003_rate_as_written';
+
+const theMigrationsAfterIt = ['0004_add_discount_hook'];
+
+const migrateBackwardPastIt = async (client: pg.Client): Promise<void> => {
+  for (const later of theMigrationsAfterIt.toReversed()) {
+    await migrateBackward(client, later);
+  }
+  await migrateBackward(client, theMigration);
+};
 
 const setupSutMigratedForward = async () => {
   const sut = await setupSut();
@@ -34,7 +44,7 @@ describe('the migration that keeps the rate as written', () => {
     const { keep, loadOnItsOwnConnection } = discountRepositoryOn(client, databaseUrl);
     await keep(spicesDiscount);
 
-    await migrateBackward(client, theMigration);
+    await migrateBackwardPastIt(client);
 
     const backward = await client.query('SELECT rate FROM app.discounts');
     expect(backward.rows, 'the rate, backward').to.deep.equal([{ rate: 20 }]);
@@ -57,7 +67,7 @@ describe('the migration that keeps the rate as written', () => {
   });
   it('should read back as text, through the repository, the rate of a discount kept before the migration', async () => {
     const { client, databaseUrl, migrateForward } = await setupSutMigratedForward();
-    await migrateBackward(client, theMigration);
+    await migrateBackwardPastIt(client);
     await client.query("INSERT INTO app.discounts (id, item, rate, store_name, store_address) VALUES ('kept-before', 'Saffron', 12.5, 'Corner Grocery', '3 Hill Road')");
 
     await migrateForward();

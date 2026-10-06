@@ -1,0 +1,1 @@
+ALTER TABLE "app"."discounts" ADD COLUMN "hook" text;

@@ -13,4 +13,5 @@ export const discounts = app.table('discounts', {
   rate: text('rate').notNull(),
   storeName: text('store_name').notNull(),
   storeAddress: text('store_address').notNull(),
+  hook: text('hook'),
 });

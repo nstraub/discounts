@@ -38,12 +38,13 @@ describe('the discounts table refusing what Discount refuses', () => {
     const { constraints, columns } = await constraintsAndColumnsOfTheDiscountsTable(client);
 
     expect(constraints, 'only the primary key, for the identity each discount has').to.deep.equal([{ kind: 'p' }]);
-    expect(columns, 'unbounded text, the rate as written included, each NOT NULL').to.have.deep.members([
+    expect(columns, 'unbounded text, the rate as written included, each required piece NOT NULL').to.have.deep.members([
       { name: 'id', type: 'text', nullable: 'NO' },
       { name: 'item', type: 'text', nullable: 'NO' },
       { name: 'rate', type: 'text', nullable: 'NO' },
       { name: 'store_name', type: 'text', nullable: 'NO' },
       { name: 'store_address', type: 'text', nullable: 'NO' },
+      { name: 'hook', type: 'text', nullable: 'YES' },
     ]);
   });
   describe('the hook', () => {
