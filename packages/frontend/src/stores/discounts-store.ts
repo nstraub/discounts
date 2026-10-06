@@ -5,13 +5,17 @@ import type { ChangeRateRequest, CouponResponse, DiscountResponse, PublishDiscou
 
 import { useRestApi } from '../rest-api-key';
 
+const theStoreOf = ({ storeName, storeAddress }: DiscountResponse) => ({ storeName, storeAddress });
+
+const theDistinctStoresPublishing = (discounts: DiscountResponse[]) => [
+  ...new Map(discounts.map((discount) => [JSON.stringify(theStoreOf(discount)), theStoreOf(discount)])).values(),
+];
+
 export const useDiscountsStore = defineStore('discounts', () => {
   const restApi = useRestApi();
   const published = ref<DiscountResponse[]>([]);
   const coupon = ref<CouponResponse>();
-  const stores = computed(() => [
-    ...new Map(published.value.map(({ storeName, storeAddress }) => [JSON.stringify([storeName, storeAddress]), { storeName, storeAddress }])).values(),
-  ]);
+  const stores = computed(() => theDistinctStoresPublishing(published.value));
   const publish = async (discount: Partial<PublishDiscountRequest>): Promise<void> => {
     await restApi.post('/discounts', discount);
   };
