@@ -92,4 +92,7 @@ describe('a discount kept in PostgreSQL', () => {
       it.todo('should read back as written the rates published before the rate rules');
     });
   });
+  describe('beside another discount', () => {
+    it.todo('should leave an earlier discount and its coupons, redeemed, unused and counted, as they were when another discount is kept');
+  });
 });
