@@ -16,3 +16,4 @@ which ADR supersedes it and what part.
 | [0007](0007-one-change-at-a-time-to-a-discount-with-a-row-lock.md) | A change to a discount runs in one transaction with the discount's row locked | accepted | 2026-10-06 |
 | [0008](0008-coupons-collection-and-discount-events-inside-the-aggregate.md) | Discount delegates coupon bookkeeping to a Coupons collection and event building to DiscountEvents, and keeps deciding | accepted, in part superseded by 0009 | 2026-10-06 |
 | [0009](0009-each-entity-raises-its-own-events.md) | Each entity raises its own events; no class builds or publishes them for others | accepted | 2026-10-06 |
+| [0010](0010-a-code-nobody-issued-is-a-not-found-of-its-own.md) | A code nobody issued is a not-found of its own, not "no such discount" | accepted | 2026-10-06 |
