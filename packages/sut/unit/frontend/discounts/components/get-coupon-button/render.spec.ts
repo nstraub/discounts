@@ -45,5 +45,11 @@ describe('Component GetCouponButton', () => {
 
       expect(queryAllByRole(document.body, 'button', { name: `${discountTexts.getCoupon} ${name}` }), 'buttons named by the caption and the discount').to.have.length(1);
     });
+    it('should name another discount in its label when it gets a coupon for that one', () => {
+      const name = 'Fresh produce 10% Corner Grocery 3 Hill Road';
+      setupSutNamedBy('produce-text', name);
+
+      expect(queryAllByRole(document.body, 'button', { name: `${discountTexts.getCoupon} ${name}` }), 'buttons named by the caption and the discount').to.have.length(1);
+    });
   });
 });

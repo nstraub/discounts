@@ -3,13 +3,16 @@ import type { DiscountResponse } from '@app/types/discounts';
 
 import { discountTexts } from '../texts';
 
-defineProps<{ discount: DiscountResponse; namedBy: string }>();
+const props = defineProps<{ discount: DiscountResponse; namedBy: string }>();
+
+const ownId = `${props.namedBy}-get-coupon`;
 </script>
 
 <template>
   <button
+    :id="ownId"
     type="button"
-    aria-label="Get a coupon Peruvian spices 20% Mike's Groceries 12 Market Street"
+    :aria-labelledby="`${ownId} ${namedBy}`"
     class="rounded border px-3 py-1"
     data-testid="get-coupon"
   >
