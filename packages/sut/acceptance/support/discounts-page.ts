@@ -73,8 +73,9 @@ export class DiscountsPage {
 
   async verifyDoesNotShow(discount: ExampleDiscount): Promise<void> {
     await this.page.waitForLoadState('networkidle');
-    const shown = this.page.getByTestId('published-discount-text').filter({ hasText: discount.item });
-    assert.equal(await shown.count(), 0, `the page shows the discount on ${discount.item}`);
+    const published = this.page.getByTestId('published-discount-text');
+    const shown = published.filter({ hasText: discount.item }).or(published.filter({ hasText: discount.storeName }));
+    assert.equal(await shown.count(), 0, `the page shows the discount on ${discount.item} at ${discount.storeName}`);
   }
 
   private async untilTheDiscountIsKeptAndTheFormCleared(): Promise<void> {
