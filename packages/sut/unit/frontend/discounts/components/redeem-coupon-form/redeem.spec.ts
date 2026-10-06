@@ -4,25 +4,26 @@ import { describe, expect, it, vi } from 'vitest';
 
 import RedeemCouponForm from '@frontend/discounts/components/RedeemCouponForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
+import { CouponAlreadyUsed, CouponNotForThisStore, DiscountApplies, NoStoreSaid, type TillAnswer } from '@frontend/discounts/till-answers';
 import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
 import { aFormOfferingTheStoresOf } from '../a-form-offering-the-stores';
 
 const setupSut = () => aFormOfferingTheStoresOf(RedeemCouponForm, [spicesDiscount, stephaniesProduceDiscount]);
 
-const setupSutTelling = (told: string) => {
+const setupSutAnswering = (answer: TillAnswer) => {
   const sut = setupSut();
   vi.mocked(sut.till.redeemCoupon).mockImplementation(async () => {
-    sut.till.told = told;
+    sut.till.answer = answer;
   });
   return sut;
 };
 
-const setupSutRedeemingTo = (item: string) => setupSutTelling(`${discountTexts.theDiscountAppliesTo} ${item}`);
+const setupSutRedeemingTo = (item: string) => setupSutAnswering(new DiscountApplies(item));
 
-const setupSutTellingAfterAnEarlierCouponApplied = (told: string) => {
-  const sut = setupSutTelling(told);
-  sut.till.told = `${discountTexts.theDiscountAppliesTo} ${spicesDiscount.item}`;
+const setupSutAnsweringAfterAnEarlierCouponApplied = (answer: TillAnswer) => {
+  const sut = setupSutAnswering(answer);
+  sut.till.answer = new DiscountApplies(spicesDiscount.item);
   return sut;
 };
 
@@ -85,7 +86,7 @@ describe('Component RedeemCouponForm', () => {
       it('should tell Stephanie to say which store she is at when none is picked, redeeming nothing', async () => {
         const { form, till } = setupSut();
         vi.mocked(till.noStoreSaid).mockImplementation(() => {
-          till.told = discountTexts.sayWhichStoreYouAreAt;
+          till.answer = new NoStoreSaid();
         });
 
         await redeemThroughTheForm(form, noStorePicked, '7k3qx 9m2pd');
@@ -105,14 +106,14 @@ describe('Component RedeemCouponForm', () => {
   });
   describe('a coupon already used', () => {
     it('should tell Stephanie the coupon has already been used', async () => {
-      const { form } = setupSutTelling(discountTexts.couponAlreadyUsed);
+      const { form } = setupSutAnswering(new CouponAlreadyUsed());
 
       await redeemThroughTheForm(form, "Mike's Groceries, 12 Market Street", '7k3qx 9m2pd');
 
       expect(whatTheTillTells(), 'what the till tells').to.contain(discountTexts.couponAlreadyUsed);
     });
     it('should not say the discount applies when the coupon has already been used', async () => {
-      const { form } = setupSutTellingAfterAnEarlierCouponApplied(discountTexts.couponAlreadyUsed);
+      const { form } = setupSutAnsweringAfterAnEarlierCouponApplied(new CouponAlreadyUsed());
 
       await redeemThroughTheForm(form, "Mike's Groceries, 12 Market Street", '7k3qx 9m2pd');
 
@@ -121,14 +122,14 @@ describe('Component RedeemCouponForm', () => {
   });
   describe('a coupon for another store', () => {
     it('should tell Stephanie the coupon is not for her store', async () => {
-      const { form } = setupSutTelling(discountTexts.couponNotForYourStore);
+      const { form } = setupSutAnswering(new CouponNotForThisStore());
 
       await redeemThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane", '7k3qx 9m2pd');
 
       expect(whatTheTillTells(), 'what the till tells').to.contain(discountTexts.couponNotForYourStore);
     });
     it('should not say the discount applies when the coupon is not for her store', async () => {
-      const { form } = setupSutTellingAfterAnEarlierCouponApplied(discountTexts.couponNotForYourStore);
+      const { form } = setupSutAnsweringAfterAnEarlierCouponApplied(new CouponNotForThisStore());
 
       await redeemThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane", '7k3qx 9m2pd');
 

@@ -1,25 +1,25 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { shallowRef } from 'vue';
 
 import type { RedemptionRequest, RedemptionResponse } from '@app/types/discounts';
 import { UnprocessableContentException } from '@app/types/rest-api';
 
-import { discountTexts } from '../discounts/texts';
+import { CouponAlreadyUsed, CouponNotForThisStore, DiscountApplies, NoStoreSaid, NothingTold, type TillAnswer } from '../discounts/till-answers';
 import { useRestApi } from '../rest-api-key';
 
 export const useTillStore = defineStore('till', () => {
   const restApi = useRestApi();
-  const told = ref('');
+  const answer = shallowRef<TillAnswer>(new NothingTold());
   const redeemCoupon = async (request: RedemptionRequest): Promise<void> => {
     try {
       const { item } = await restApi.post<RedemptionResponse>('/redemptions', request);
-      told.value = `${discountTexts.theDiscountAppliesTo} ${item}`;
+      answer.value = new DiscountApplies(item);
     } catch (refusal) {
-      told.value = refusal instanceof UnprocessableContentException ? discountTexts.couponNotForYourStore : discountTexts.couponAlreadyUsed;
+      answer.value = refusal instanceof UnprocessableContentException ? new CouponNotForThisStore() : new CouponAlreadyUsed();
     }
   };
   const noStoreSaid = (): void => {
-    told.value = discountTexts.sayWhichStoreYouAreAt;
+    answer.value = new NoStoreSaid();
   };
-  return { told, redeemCoupon, noStoreSaid };
+  return { answer, redeemCoupon, noStoreSaid };
 });
