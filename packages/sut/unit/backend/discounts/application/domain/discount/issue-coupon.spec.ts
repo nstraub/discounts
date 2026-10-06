@@ -1,17 +1,11 @@
-import { mock } from 'vitest-mock-extended';
 import { describe, expect, it } from 'vitest';
 
 import { tokenDrawnAs } from '@backend/app/mocks/coupon-tokens';
 import { CouponIssued } from '@backend/discounts/application/domain/coupon-issued';
-import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
-import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
-import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
-import { spicesDiscount } from '@sut/support/example-discounts';
 
-const setupSut = () => {
-  const events = mock<DomainEventPublisher>();
-  return { events, discount: new DiscountFactory(events).create(new DiscountDetails(spicesDiscount)) };
-};
+import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
+
+const setupSut = aSpicesDiscountWithItsEvents;
 
 describe('class Discount', () => {
   describe('issuing a coupon', () => {
