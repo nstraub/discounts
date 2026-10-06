@@ -1,0 +1,13 @@
+# Architecture Decision Records
+
+A decision that chose between alternatives a later reader will ask about gets one record here. Copy
+`template.md` to `NNNN-decision-title.md` and add a row below. A decision with no alternative weighed
+gets none.
+
+Number 0002 is reserved for `0002-anyone-can-act-for-any-store.md`, which the epic files link to; it is
+written with the slice that decides it.
+
+| ADR | Title | Status | Date |
+|-----|-------|--------|------|
+| [0001](0001-domain-events-through-a-port-with-an-eventemitter2-adapter.md) | Domain events are raised in the entity and published through a port whose adapter uses EventEmitter2 | accepted | 2026-10-05 |
+| [0003](0003-one-database-pool-per-process.md) | One database pool per process, closed on shutdown | accepted | 2026-10-05 |

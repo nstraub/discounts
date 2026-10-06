@@ -244,6 +244,7 @@ first slice.
 ## 8. Where to look for context
 
 - `README.md` — setting the repository up and the everyday commands.
+- `docs/adr/README.md` — the architecture decision records and how to add one.
 - `docs/architecture.md` — the containers of the deployed app and the deployment pipeline (C4, Mermaid).
 
 ---
