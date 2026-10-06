@@ -41,6 +41,16 @@ describe('POST /redemptions', () => {
 
       expect(rejected).to.deep.equal([{ discountId: published.id, token: code, reason: 'already used' }]);
     });
-    it.todo('should refuse a used coupon whose code is sent in lower case, in two groups, the second time');
+    it('should refuse a used coupon whose code is sent in lower case, in two groups, the second time', async () => {
+      const { app, http, code } = await setupSutWithACouponFor();
+      await redeemAtTheStoreOf(http, code);
+      const refused: string[] = [];
+      app.get(EventEmitter2).on('coupon.redemption-rejected', ({ token }: CouponRedemptionRejected) => refused.push(token));
+
+      const response = await redeemAtTheStoreOf(http, `${code.slice(0, 5)} ${code.slice(5)}`.toLowerCase());
+
+      expect(response.status).to.equal(409);
+      expect(refused, 'the coupons refused').to.deep.equal([code]);
+    });
   });
 });
