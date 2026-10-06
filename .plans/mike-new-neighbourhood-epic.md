@@ -190,6 +190,32 @@ Before opening, Mike looks for a place where the competition is weak exactly whe
 sell only Chilean spices, and their produce is rarely fresh. That is why he believes discounts on
 spices and produce will work there. It sets the scene for the epic; nothing in it asks for our help.
 
+### 5. Mike sees the discount he has just put out — solve, not yet sliced
+
+When Mike puts a sign up front, it is there in front of him as soon as it is up, the way the people
+walking past will see it. A discount he publishes is the same for him: once it is out, he sees it
+among his discounts without going to look for them again.
+
+Open question for Mike: once your sign is up, do you look at it again, and what for? (His answer
+may change how this story is told; what follows does not depend on it.)
+
+#### Acceptance criteria
+
+Not the same as story 1's "people can see it immediately", which is checked the next time anyone
+looks: this is Mike's own view, right after he publishes.
+
+```gherkin
+  Scenario: Mike sees the discount he has just published
+    When Mike publishes a discount on an item
+    Then he can see it without looking again
+```
+
+Recorded, not yet built: the scenario above is tagged `@todo` in
+`packages/sut/acceptance/features/mike-publishes-a-discount-on-what-he-is-famous-for.feature`, and
+the line `should hold the discount just published without loading the page again` is an `it.todo` in
+`packages/sut/unit/frontend/stores/discounts-store/publish.spec.ts`. Both belong to this story, not to
+story 1, until it is sliced.
+
 ## Not written
 
 1. Staying within his margin — out of scope; all it tells us is in story 2 (a discount can be
