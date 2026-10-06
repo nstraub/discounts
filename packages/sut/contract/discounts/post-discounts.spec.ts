@@ -5,6 +5,7 @@ import { discountResponse, requestRejection } from '@app/types/discounts';
 import { longTextInAnyCharacters, produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
+import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
 
 type Http = Awaited<ReturnType<typeof setupSut>>['http'];
 
@@ -108,9 +109,7 @@ describe('POST /discounts', () => {
         await http.post('/discounts').send(aDiscountAboveTheTransportLimit),
       ];
 
-      const unmatched = errors.map((response) => response.body).filter((body) => !requestRejection.safeParse(body).success);
-
-      expect(unmatched).to.deep.equal([]);
+      expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
     });
   });
 
