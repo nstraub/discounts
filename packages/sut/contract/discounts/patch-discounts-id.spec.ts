@@ -1,3 +1,4 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { spicesDiscount } from '@sut/support/example-discounts';
@@ -24,7 +25,16 @@ describe('PATCH /discounts/:id', () => {
       const listed = await http.get('/discounts');
       expect(listed.body, 'the discounts listed after the change').to.deep.equal([{ ...published.body, rate: '25' }]);
     });
-    it.todo('should publish DiscountRateChanged on the application event emitter for the discount changed');
+    it('should publish DiscountRateChanged on the application event emitter for the discount changed', async () => {
+      const { app, http } = await setupSut();
+      const changed: unknown[] = [];
+      app.get(EventEmitter2).on('discount.rate-changed', (event: { id: string; rate: string }) => changed.push({ id: event.id, rate: event.rate }));
+      const published = await http.post('/discounts').send(spicesDiscount);
+
+      await http.patch(`/discounts/${published.body.id}`).send({ rate: '25' });
+
+      expect(changed).to.deep.equal([{ id: published.body.id, rate: '25' }]);
+    });
   });
 
   describe('malformed request', () => {
