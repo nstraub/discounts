@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Patch, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Param, Patch, Post, Res } from '@nestjs/common';
 
 import { publishDiscountRequest, type PublishDiscountRequest } from '@app/types/discounts';
 
@@ -23,7 +23,9 @@ export class DiscountsController {
 
   @Patch(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async changeRate(): Promise<void> {}
+  async changeRate(@Param('id') id: string, @Body('rate') rate: string): Promise<void> {
+    await this.discounts.changeRate(id, rate);
+  }
 
   @Get()
   async published() {

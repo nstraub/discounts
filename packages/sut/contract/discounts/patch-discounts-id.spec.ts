@@ -15,7 +15,15 @@ describe('PATCH /discounts/:id', () => {
       expect(response.status).to.equal(204);
       expect(response.text).to.equal('');
     });
-    it.todo('should list the discount once, at its new rate, after the change');
+    it('should list the discount once, at its new rate, after the change', async () => {
+      const { http } = await setupSut();
+      const published = await http.post('/discounts').send(spicesDiscount);
+
+      await http.patch(`/discounts/${published.body.id}`).send({ rate: '25' });
+
+      const listed = await http.get('/discounts');
+      expect(listed.body, 'the discounts listed after the change').to.deep.equal([{ ...published.body, rate: '25' }]);
+    });
     it.todo('should publish DiscountRateChanged on the application event emitter for the discount changed');
   });
 
