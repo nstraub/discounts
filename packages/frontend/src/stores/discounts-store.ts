@@ -16,7 +16,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
   };
   const changeRate = async (id: string, change: Partial<ChangeRateRequest>): Promise<void> => {
     await restApi.patch(`/discounts/${id}`, change);
-    published.value = [{ id: 'spices-id', item: 'Peruvian spices', rate: '30', storeName: "Mike's Groceries", storeAddress: '12 Market Street' }];
+    await load();
   };
   return { published, publish, load, changeRate };
 });
