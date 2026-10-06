@@ -60,7 +60,22 @@ describe('Component PublishDiscountForm', () => {
 
         expect(theRequiredFields.map((field) => whatTheFieldTells(form, field)), 'what the fields tell').to.deep.equal(['', '', '', '']);
       });
-      it.todo('should no longer tell Mike a piece is missing once he gives it and the discount is published');
+      it('should no longer tell Mike a piece is missing once he gives it and it is published', async () => {
+        const { form, discounts } = setupSut();
+        vi.mocked(discounts.publish)
+          .mockImplementationOnce(async () => {
+            discounts.missing = ['item'];
+          })
+          .mockImplementationOnce(async () => {
+            discounts.missing = [];
+          });
+        await askToPublish(form);
+
+        await form.get('[data-testid="discount-item"]').setValue('Peruvian spices');
+        await askToPublish(form);
+
+        expect(whatTheFieldTells(form, 'discount-item'), "what the item's field tells").to.equal('');
+      });
     });
 
     describe('combination', () => {
