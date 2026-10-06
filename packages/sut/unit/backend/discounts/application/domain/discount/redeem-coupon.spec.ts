@@ -17,7 +17,7 @@ const setupSutWithItsEvents = ({ kept = publishedSpicesDiscount, coupons = [{ to
   return { events, discount: factory.reconstitute({ ...kept, coupons }) };
 };
 
-const tryingItsCouponAtStephaniesStore = (discount: Discount) => () => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atStephaniesStore);
+const tryingItsCouponAt = (store: Store, discount: Discount) => () => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), store);
 
 const setupSut = (options: Parameters<typeof setupSutWithItsEvents>[0] = {}) => setupSutWithItsEvents(options).discount;
 
@@ -76,20 +76,20 @@ describe('class Discount', () => {
     it('should refuse its coupon at another store, the coupon staying unused', () => {
       const discount = setupSut();
 
-      expect(tryingItsCouponAtStephaniesStore(discount)).to.throw(CouponNotForThisStoreException);
+      expect(tryingItsCouponAt(atStephaniesStore, discount)).to.throw(CouponNotForThisStoreException);
       expect(discount.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: false, counted: false }]);
     });
     it('should raise CouponRedemptionRejected carrying its id, the coupon\'s token and that the coupon is not for that store', () => {
       const { events, discount } = setupSutWithItsEvents();
 
-      expect(tryingItsCouponAtStephaniesStore(discount)).to.throw(CouponNotForThisStoreException);
+      expect(tryingItsCouponAt(atStephaniesStore, discount)).to.throw(CouponNotForThisStoreException);
 
       expect(events.publish).to.have.been.calledWith(new CouponRedemptionRejected(publishedSpicesDiscount.id, '7K3QX9M2PD', 'not for this store'));
     });
     it('should not raise CouponRedeemed when its coupon is refused at another store', () => {
       const { events, discount } = setupSutWithItsEvents();
 
-      expect(tryingItsCouponAtStephaniesStore(discount)).to.throw(CouponNotForThisStoreException);
+      expect(tryingItsCouponAt(atStephaniesStore, discount)).to.throw(CouponNotForThisStoreException);
 
       expect(events.publish).to.not.have.been.calledWith(expect.any(CouponRedeemed));
     });
@@ -99,13 +99,13 @@ describe('class Discount', () => {
         const discount = setupSut();
         const atAnotherAddress = new Store({ storeName: publishedSpicesDiscount.storeName, storeAddress: '9 Quay Street' });
 
-        expect(() => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atAnotherAddress)).to.throw(CouponNotForThisStoreException);
+        expect(tryingItsCouponAt(atAnotherAddress, discount)).to.throw(CouponNotForThisStoreException);
       });
       it('should refuse its coupon at a store with another name at the same address', () => {
         const discount = setupSut();
         const underAnotherName = new Store({ storeName: 'Corner Grocery', storeAddress: publishedSpicesDiscount.storeAddress });
 
-        expect(() => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), underAnotherName)).to.throw(CouponNotForThisStoreException);
+        expect(tryingItsCouponAt(underAnotherName, discount)).to.throw(CouponNotForThisStoreException);
       });
       it.todo('should refuse its coupon at a store whose name differs from its own only in its capitals');
       it.todo('should refuse its coupon at a store whose name has spaces around it that its own has not');
