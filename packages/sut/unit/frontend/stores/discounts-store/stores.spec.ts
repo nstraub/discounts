@@ -41,6 +41,12 @@ describe('Store discounts', () => {
     });
   });
   describe('the stores as the till names them', () => {
-    it.todo('should list each store with its name and address exactly as published, spaces around them included');
+    it('should list each store with its name and address exactly as published, spaces around them included', async () => {
+      const publishedWithSpacesAround = { ...publishedProduceDiscount, storeName: '  Corner Grocery ', storeAddress: ' 3 Hill Road  ' };
+
+      const stores = await theStoresOnceLoaded([publishedWithSpacesAround]);
+
+      expect(stores.flatMap(({ storeName, storeAddress }) => [storeName, storeAddress]), 'the name and address listed').to.deep.equal(['  Corner Grocery ', ' 3 Hill Road  ']);
+    });
   });
 });
