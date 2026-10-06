@@ -142,8 +142,9 @@ is npm's DefinitelyTyped scope and would shadow it), one module per file through
 `"@app/types": "workspace:*"` and imports it as a package, without an extension:
 `import type { RestApi } from '@app/types/rest-api'`. Today it holds `rest-api` (the `RestApi`
 abstraction, with `get`, `put`, `post` and `patch`, and `FetchRestApi`), `rest-api-refusals` (the
-refusals `FetchRestApi` throws: `UnprocessableContentException` for a 422 and `BadRequestException` for a 400,
-which carries the `missing` and `fields` of the body), `request-rejection` (the `requestRejection` error
+refusals `FetchRestApi` throws: `UnprocessableContentException` for a 422, `NotFoundException` for a 404 and `BadRequestException` for a 400,
+which carries the `missing` and `fields` of the body; each refusal of its own names its status in a static
+`status`, and `theRefusalFor(status)` finds it), `request-rejection` (the `requestRejection` error
 schema), `discounts` (the request and response schemas) and `greeting` (the wire type). It is not a path alias: the
 backend runs its compiled output, and Node resolves the package through `node_modules`
 and strips the `.ts` types on the symlink's real path.
@@ -171,7 +172,8 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   `GET /discounts`), `parsed-by.ts` (`ParsedBy`, the zod pipe that parses a request; a
   failure is a 400 `requestRejection`, listing in `missing` the fields the request leaves out, and there
   is no exception filter), `refused-publish.ts` (answers a refused publish: 400 with `missing`, or 400
-  `fields: ['rate']`) and `missing-discount.ts` (answers `NoSuchDiscountException` with a 404),
+  `fields: ['rate']`) and `missing-discount.ts` (answers `NoSuchDiscountException` with a 404), `refused-redemption.ts` (answers a refused
+  redemption: 422, 404 "No coupon has this code", 409), `answered-refusals.ts` (below),
   `discount-drizzle-repository.ts`, `event-emitter-domain-event-publisher.ts` (the adapter over
   EventEmitter2), `discounts.module.ts` (the wiring). The request and response schemas
   (`publishDiscountRequest`, `discountResponse`, `publishedDiscountsResponse`) are in
@@ -193,9 +195,11 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   collection inside the aggregate. Each entity raises the events of what it owns through the event-publisher
   port: `Coupons` raises `CouponIssued` and `DiscountedSalesCounted`, `Coupon` its own, `Discount` the rest;
   there is no class that raises events for the others (ADR 0009). `CouponToken.read(code)`
-  normalises a typed code. `DiscountService.redeemCoupon(code)` loads the discount through
+  normalises a typed code and refuses one not written as a token with `NoCouponHasTheCodeException`. `DiscountService.redeemCoupon(code)` loads the discount through
   `DiscountRepository.withCouponToken`. `infra/redemptions.controller.ts` serves `POST /redemptions`
-  (201 `{ item }`; 422 for another store's coupon; 409 already used; 400 for a missing or blank store). Migration `0006` adds `coupons.redeemed` (lossy down).
+  (201 `{ item }`; 422 for another store's coupon; 404 "No coupon has this code" for a code nobody issued, a
+  refusal family of its own beside "no such discount" (ADR 0010); 409 already used, and only that; 400 for a
+  missing or blank code or store). Migration `0006` adds `coupons.redeemed` (lossy down).
 - **Counting:** `Discount.count()` has `Coupons` count the coupons redeemed since the last count and mark
   them counted (`Coupon` holds `redeemed` and `counted`); `Coupons` raises `DiscountedSalesCounted`.
   `DiscountService.count(store)` goes through `DiscountChanges` (`application/discount-changes.ts`),
@@ -203,6 +207,11 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   per save. `DiscountRepository.ofStore` finds a store's discounts by name and address.
   `infra/store-counts.controller.ts` serves `POST /stores/counts` (201). Migration `0007` adds
   `coupons.counted` (lossy down).
+- **Refusals answered:** `infra/answered-refusals.ts` has `answeredWith(refusal class, its rejection)` and
+  `answerFrom(list)`, which answers with the first that matches and rethrows any other failure (a 500, never
+  a guessed refusal); `refused-publish.ts`, `missing-discount.ts` and `refused-redemption.ts` are lists for it.
+  `DiscountChanges` finds a discount through one builder taking the find and the refusal: `theOneWithId`
+  (exported, `NoSuchDiscountException`) and `theOneThatIssued` (`NoCouponHasTheCodeException`).
 - **Single use and concurrency:** `Coupon.redeem` refuses a coupon already redeemed
   (`CouponRedemptionRejected`; `POST /redemptions` answers 409; 'not for this store' answers 422). `DiscountChanges` runs issuing,
   redeeming and counting through `DiscountRepository.changing(work)`: one transaction, the discount's
@@ -241,9 +250,10 @@ first slice.
   of the statically served app keeps its route: the discounts page is `#/`, the walking skeleton's
   greeting `#/walking-skeleton`.
 - **State:** Pinia stores in `src/stores/`; the till store holds one answer, an object of
-  `discounts/till-answers.ts` that tells its own caption; the discounts store holds one publish answer the
+  `discounts/till-answers.ts` that tells its own caption (`CouponNotValid` for a 404, chosen from the list
+  `answersToRefusals`); the discounts store holds one publish answer the
   same way, an object of `discounts/publish-answers.ts` (nothing told, rate not valid, pieces missing)
-  that tells the form's caption and each piece's, which `CaptionedInput` shows beside its field as `told`.
+  that tells the form's caption and each piece's, which `CaptionedInput` shows beside its field as `told` (it also takes an optional `required`).
 - **HTTP:** every backend call goes through `RestApi` in `packages/types`.
 - **Browser capabilities:** services in `src/*/services/`.
 - **UI copy:** a `texts` module per feature.
@@ -293,7 +303,8 @@ first slice.
   among the shared examples; `contract/support/discounts-table.ts` has `insertACoupon` and
   `migrations.ts` has `migrateBackwardPast`. The stores a spec redeems at are `atTheSpicesStore` and
   `atStephaniesStore` (`sut/support/example-stores.ts`); `theFieldsNamedBy` is in
-  `contract/support/error-schema.ts`; `theDiscountsKept` and `theRowKeptFor` are in `discounts-table.ts`.
+  `contract/support/error-schema.ts`; `theDiscountsKept` and `theRowKeptFor` are in `discounts-table.ts`, which also has `theCouponsKept`,
+  `keptUnused`, `theDiscountsAndCouponsKept` and `keptAsIssued`, to show a refused request changed nothing.
 - **Tags:** `@wip` marks the scenario being built (run it with `yarn test:wip`); `@todo` marks a
   recorded missing case whose steps are written and whose step definitions are not. Both are
   excluded from `yarn test:bdd`.
