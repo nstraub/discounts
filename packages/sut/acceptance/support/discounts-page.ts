@@ -90,3 +90,5 @@ export const openSomeoneElsesDiscountsPage = async (world: PlaywrightWorld): Pro
   await discountsPage.open();
   return discountsPage;
 };
+
+export const suesPage = (world: PlaywrightWorld): DiscountsPage => new DiscountsPage(world.page);

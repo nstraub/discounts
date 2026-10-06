@@ -2,10 +2,8 @@ import { Given, Then, When } from '@cucumber/cucumber';
 
 import { produceDiscount } from '@sut/support/example-discounts';
 
-import { DiscountsPage, openSomeoneElsesDiscountsPage } from '../../support/discounts-page';
+import { openSomeoneElsesDiscountsPage, suesPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
-
-const suesPage = (world: PlaywrightWorld): DiscountsPage => new DiscountsPage(world.page);
 
 Given('Mike has published a discount on produce', async function (this: PlaywrightWorld) {
   const mikesPage = await openSomeoneElsesDiscountsPage(this);
