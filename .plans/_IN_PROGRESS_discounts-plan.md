@@ -29,8 +29,8 @@ showcase ("adding feedback would be too onerous to be worth it").
 | 3 (done) | Mike lowers a discount | Sue finds a store close to home | Sue decides to try Stephanie's produce + Stephanie redeems a coupon *(together)* |
 | 4 (done) | Mike publishes a discount at any rate up to 100% | Sue finds more than one store | Rodrigo counts the discounted sales since his last count |
 | 5 (done) | Mike's earlier discounts stay published | — | A coupon counts only once |
-| 6 | Mike gives an invalid rate | — | A coupon for another store's discount |
-| 7 | Mike leaves out required information | — | A coupon nobody issued |
+| 6 (done) | Mike gives an invalid rate | — | A coupon for another store's discount |
+| 7 (done) | Mike leaves out required information | — | A coupon nobody issued |
 | 8 | Mike leaves out all the required information | — | A new count starts from nothing |
 | 9 | Mike's other discounts keep their rates | — | Each discount is counted on its own |
 | 10 | Mike gives an invalid new rate | — | Stephanie ends her discount |
@@ -75,7 +75,7 @@ architecture is drawn in `docs/architecture.md`.
 | 14 | 6 | Mike gives an invalid rate, done | Mike · 1. Mike makes his new store known with a discount on what he is famous for | Mike |
 | 15 | 6 | A coupon for another store's discount, done | Stephanie · 2. Stephanie takes the coupon at the till | Stephanie |
 | 16 | 7 | Mike leaves out required information, done | Mike · 1. Mike makes his new store known with a discount on what he is famous for | Mike |
-| 17 | 7 | A coupon nobody issued | Stephanie · 2. Stephanie takes the coupon at the till | Stephanie |
+| 17 | 7 | A coupon nobody issued, done | Stephanie · 2. Stephanie takes the coupon at the till | Stephanie |
 | 18 | 8 | Mike leaves out all the required information | Mike · 1. Mike makes his new store known with a discount on what he is famous for | Mike |
 | 19 | 8 | A new count starts from nothing | Rodrigo · 1. Rodrigo counts the store's discounted sales since he last looked | Rodrigo |
 | 20 | 9 | Mike's other discounts keep their rates | Mike · 2. Mike raises a discount that is not working | Mike |
