@@ -60,7 +60,13 @@ describe('Component RedeemCouponForm', () => {
 
       expect(whatTheTillTells(), 'what the till tells').to.contain(discountTexts.theDiscountAppliesTo);
     });
-    it.todo('should name the item the discount is for once the coupon is redeemed');
+    it('should name the item the discount is for once the coupon is redeemed', async () => {
+      const { form } = setupSutRedeemingTo(spicesDiscount.item);
+
+      await redeemThroughTheForm(form, "Mike's Groceries, 12 Market Street", '7k3qx 9m2pd');
+
+      expect(whatTheTillTells(), 'what the till tells').to.contain(`${discountTexts.theDiscountAppliesTo} Peruvian spices`);
+    });
 
     describe('state', () => {
       it.todo('should say nothing applies before a coupon is redeemed');

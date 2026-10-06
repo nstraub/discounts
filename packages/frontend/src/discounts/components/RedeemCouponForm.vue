@@ -42,7 +42,7 @@ const redeem = async (): Promise<void> => {
       {{ discountTexts.redeem }}
     </button>
     <p role="status">
-      {{ discountTexts.theDiscountAppliesTo }}
+      {{ discountTexts.theDiscountAppliesTo }} Peruvian spices
     </p>
   </form>
 </template>
