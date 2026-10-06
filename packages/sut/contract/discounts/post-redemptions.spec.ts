@@ -1,7 +1,7 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
-import { redemptionResponse } from '@app/types/discounts';
+import { redemptionResponse, requestRejection } from '@app/types/discounts';
 import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
@@ -77,7 +77,15 @@ describe('POST /redemptions', () => {
   });
 
   describe('malformed request', () => {
-    it.todo('should answer 400 naming the code when it is missing or not text, never a 500');
+    it('should answer 400 naming the code when it is missing or not text, never a 500', async () => {
+      const { http } = await setupSut();
+
+      const missing = await http.post('/redemptions').send({ storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
+      const notText = await redeemAtTheStoreOf(http, 1234567890 as unknown as string);
+
+      expect([missing.status, notText.status]).to.deep.equal([400, 400]);
+      expect([requestRejection.parse(missing.body).fields, requestRejection.parse(notText.body).fields]).to.deep.equal([['code'], ['code']]);
+    });
     it.todo('should answer 400 for a JSON body that is an array, a string, a number or null');
     it.todo('should answer 400 for a body that is not valid JSON');
     it.todo('should answer every error with a body matching the error schema');
