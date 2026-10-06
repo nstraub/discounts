@@ -24,7 +24,11 @@ export const couponResponse = z.object({ token: z.string(), storeName: z.string(
 
 export type CouponResponse = z.infer<typeof couponResponse>;
 
-export const redemptionRequest = z.object({ code: z.string(), storeName: z.string(), storeAddress: z.string() });
+export const store = z.object({ storeName: z.string(), storeAddress: z.string() });
+
+export type Store = z.infer<typeof store>;
+
+export const redemptionRequest = z.object({ code: z.string() }).extend(store.shape);
 
 export type RedemptionRequest = z.infer<typeof redemptionRequest>;
 
@@ -44,6 +48,6 @@ export const countResponse = z.array(z.object({ id: z.string(), item: z.string()
 
 export type CountResponse = z.infer<typeof countResponse>;
 
-export const countRequest = z.object({ storeName: z.string(), storeAddress: z.string() });
+export const countRequest = store;
 
 export type CountRequest = z.infer<typeof countRequest>;
