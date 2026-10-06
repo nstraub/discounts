@@ -79,7 +79,6 @@ Feature: Mike raises a discount that is not working
     Then they are slowed down
     And people can still see every discount as it was before the flood
 
-  @wip
   Scenario: Mike lowers a discount
     Given Mike has published a discount on an item
     When he lowers its rate
