@@ -25,7 +25,10 @@ describe('class CouponToken', () => {
     });
 
     describe('combination', () => {
-      it.todo('should read a lower-case o, i and l as a zero, a one and a one');
+      it('should read a lower-case o, i and l as a zero, a one and a one', () => {
+        expect(CouponToken.read('r4wzobh8ni').toJSON()).to.equal('R4WZ0BH8N1');
+        expect(CouponToken.read('lk3qx9m2pd').toJSON()).to.equal('1K3QX9M2PD');
+      });
     });
 
     describe('property', () => {
