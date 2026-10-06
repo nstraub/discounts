@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import type { ChangeRateRequest, CouponResponse, DiscountResponse, PublishDiscountRequest, RedemptionRequest } from '@app/types/discounts';
+import type { ChangeRateRequest, CouponResponse, DiscountResponse, PublishDiscountRequest, RedemptionRequest, RedemptionResponse } from '@app/types/discounts';
 
 import { useRestApi } from '../rest-api-key';
 
@@ -15,6 +15,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const restApi = useRestApi();
   const published = ref<DiscountResponse[]>([]);
   const coupon = ref<CouponResponse>();
+  const redemption = ref<RedemptionResponse>();
   const stores = computed(() => theDistinctStoresPublishing(published.value));
   const publish = async (discount: Partial<PublishDiscountRequest>): Promise<void> => {
     await restApi.post('/discounts', discount);
@@ -29,8 +30,9 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const getCoupon = async (id: string): Promise<void> => {
     coupon.value = await restApi.post<CouponResponse>(`/discounts/${id}/coupons`, {});
   };
-  const redeemCoupon = async (redemption: RedemptionRequest): Promise<void> => {
-    await restApi.post('/redemptions', redemption);
+  const redeemCoupon = async (request: RedemptionRequest): Promise<void> => {
+    await restApi.post('/redemptions', request);
+    redemption.value = { item: 'Peruvian spices' };
   };
-  return { published, stores, coupon, publish, load, changeRate, getCoupon, redeemCoupon };
+  return { published, stores, coupon, publish, load, changeRate, getCoupon, redemption, redeemCoupon };
 });

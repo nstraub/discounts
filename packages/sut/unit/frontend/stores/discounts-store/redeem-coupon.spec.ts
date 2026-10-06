@@ -22,7 +22,14 @@ describe('Store discounts', () => {
 
       expect(restApi.post).to.have.been.calledWith('/redemptions', atStephaniesMarket);
     });
-    it.todo('should hold what the redemption answers once the coupon is redeemed');
+    it('should hold what the redemption answers once the coupon is redeemed', async () => {
+      const { restApi, discounts } = setupSut();
+      restApi.post.mockResolvedValue({ item: spicesDiscount.item });
+
+      await discounts.redeemCoupon({ code: '7K3QX9M2PD', storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
+
+      expect(discounts.redemption).to.deep.equal({ item: 'Peruvian spices' });
+    });
 
     describe('dependency failure', () => {
       it.todo('should hold that the coupon could not be checked when it cannot be');

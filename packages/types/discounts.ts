@@ -30,6 +30,8 @@ export type RedemptionRequest = z.infer<typeof redemptionRequest>;
 
 export const redemptionResponse = z.object({ item: z.string() });
 
+export type RedemptionResponse = z.infer<typeof redemptionResponse>;
+
 export const requestRejection = z.object({
   statusCode: z.number(),
   message: z.string(),
