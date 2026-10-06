@@ -5,12 +5,12 @@ import { DiscountService } from '@backend/discounts/application/discount-service
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DiscountRepository } from '@backend/discounts/application/domain/discount-repository';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { publishedSpicesDiscount } from '@sut/support/example-discounts';
 
-export const aServiceOverTheKeptSpicesDiscount = () => {
+export const aServiceOverTheKeptSpicesDiscount = ({ kept = publishedSpicesDiscount, drawing = '7K3QX9M2PD' } = {}) => {
   const events = mock<DomainEventPublisher>();
   const factory = new DiscountFactory(events);
   const repository = mock<DiscountRepository>();
-  repository.withId.calledWith('spices-id').mockResolvedValue(factory.reconstitute({ id: 'spices-id', ...spicesDiscount, coupons: [] }));
-  return { events, repository, service: new DiscountService(factory, repository, aSourceDrawing('7K3QX9M2PD')) };
+  repository.withId.calledWith(kept.id).mockResolvedValue(factory.reconstitute({ ...kept, coupons: [] }));
+  return { events, repository, service: new DiscountService(factory, repository, aSourceDrawing(drawing)) };
 };
