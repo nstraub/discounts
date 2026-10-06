@@ -17,7 +17,18 @@ describe('Store discounts', () => {
 
         expect(discounts.stores).to.deep.equal([{ storeName: 'Corner Grocery', storeAddress: '3 Hill Road' }]);
       });
-      it.todo('should list a store with the same name at another address as another store');
+      it('should list a store with the same name at another address as another store', async () => {
+        const { restApi, discounts } = setupSut();
+        const atAnotherAddress = { ...publishedHerbsDiscountOfTheSameStore, storeAddress: '9 River Street' };
+        restApi.get.mockResolvedValue([publishedProduceDiscount, atAnotherAddress]);
+
+        await discounts.load();
+
+        expect(discounts.stores).to.deep.equal([
+          { storeName: 'Corner Grocery', storeAddress: '3 Hill Road' },
+          { storeName: 'Corner Grocery', storeAddress: '9 River Street' },
+        ]);
+      });
     });
 
     describe('empty', () => {

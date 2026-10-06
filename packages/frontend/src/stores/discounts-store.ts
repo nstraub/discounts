@@ -9,7 +9,9 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const restApi = useRestApi();
   const published = ref<DiscountResponse[]>([]);
   const coupon = ref<CouponResponse>();
-  const stores = computed(() => [{ storeName: 'Corner Grocery', storeAddress: '3 Hill Road' }]);
+  const stores = computed(() => [
+    ...new Map(published.value.map(({ storeName, storeAddress }) => [JSON.stringify([storeName, storeAddress]), { storeName, storeAddress }])).values(),
+  ]);
   const publish = async (discount: Partial<PublishDiscountRequest>): Promise<void> => {
     await restApi.post('/discounts', discount);
   };
