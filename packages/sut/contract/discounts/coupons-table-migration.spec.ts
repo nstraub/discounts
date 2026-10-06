@@ -7,7 +7,7 @@ import { CouponToken } from '@backend/discounts/application/domain/coupon-token'
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { discountRepositoryOn } from '../support/discount-repository';
-import { insertACoupon } from '../support/discounts-table';
+import { aDiscountKeptBefore, aDiscountKeptBeforeAsReadAfterMigratingForward, insertACoupon } from '../support/discounts-table';
 import { migrateBackward, setupSut, tableStatus } from '../support/migrations';
 
 const theMigration = '0005_create_coupons';
@@ -62,6 +62,14 @@ describe('the migration that adds the coupons table', () => {
     const foundAgain = await repository.withId(keptBefore.toJSON().id);
     expect(foundAgain?.toJSON().coupons, 'forward again, the first coupon lost').to.deep.equal([]);
   });
-  it.todo('should read back, through the repository, a discount kept before the migration, with no coupon');
+  it('should read back, through the repository, a discount kept before the migration, with no coupon', async () => {
+    const sut = await setupSut();
+    await sut.migrateForward();
+    await migrateBackward(sut.client, theMigration);
+
+    const readBack = await aDiscountKeptBeforeAsReadAfterMigratingForward(sut);
+
+    expect(readBack).to.deep.equal({ ...aDiscountKeptBefore, coupons: [] });
+  });
   it.todo('should keep and load back, as the deployed version does, a discount on the migrated schema');
 });
