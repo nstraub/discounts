@@ -1,6 +1,7 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
+import { couponResponse } from '@app/types/discounts';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
@@ -21,7 +22,14 @@ describe('POST /discounts/:id/coupons', () => {
       expect(response.body.token).to.match(tenCrockfordCharacters);
       expect(response.body.storeName).to.equal(spicesDiscount.storeName);
     });
-    it.todo('should answer with a body matching the coupon response schema');
+    it('should answer with a body matching the coupon response schema', async () => {
+      const { http } = await setupSut();
+      const published = await publishTheSpicesDiscount(http);
+
+      const response = await getACouponFor(http, published.id);
+
+      expect(couponResponse.safeParse(response.body).error).to.equal(undefined);
+    });
     it('should publish CouponIssued on the application event emitter for the coupon issued', async () => {
       const { app, http } = await setupSut();
       const published = await publishTheSpicesDiscount(http);
