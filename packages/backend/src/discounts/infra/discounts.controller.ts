@@ -5,7 +5,7 @@ import { publishDiscountRequest, type PublishDiscountRequest } from '@app/types/
 import { DiscountService } from '../application/discount-service.js';
 import { DiscountDetails } from '../application/domain/discount-details.js';
 
-import { ParsedBy } from './request-rejection.js';
+import { ParsedBy } from './parsed-by.js';
 
 type Located = { location(url: string): unknown };
 
