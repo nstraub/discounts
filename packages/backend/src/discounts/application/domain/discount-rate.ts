@@ -12,12 +12,12 @@ export class DiscountRate {
     this.withADecimalPoint = written.replace(',', '.');
   }
 
-  whenValid(events: DomainEventPublisher, publish: () => void): void {
+  whenValid<Published>(events: DomainEventPublisher, publish: () => Published): Published {
     if (this.isNotWrittenAsADecimal() || this.isOutOfBounds()) {
       events.publish(new DiscountPublicationRejected(this.written, 'not valid'));
       throw new RateNotValidException();
     }
-    publish();
+    return publish();
   }
 
   private isNotWrittenAsADecimal(): boolean {

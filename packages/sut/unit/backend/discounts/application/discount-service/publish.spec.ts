@@ -56,7 +56,13 @@ describe('class DiscountService', () => {
 
       await expect(service.publish(spicesDetails.withRate('150'))).rejects.to.be.instanceOf(RateNotValidException);
     });
-    it.todo('should keep nothing when the rate is refused');
+    it('should keep nothing when the rate is refused', async () => {
+      const { repository, service } = setupSut();
+
+      await expect(service.publish(spicesDetails.withRate('150'))).rejects.to.be.instanceOf(RateNotValidException);
+
+      expect(await repository.all()).to.deep.equal([]);
+    });
     it.todo('should announce DiscountPublicationRejected for the rate refused');
   });
 });

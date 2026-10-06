@@ -20,8 +20,10 @@ export class Discount {
   ) {}
 
   async publish(keep: (discount: Discount) => Promise<void>): Promise<void> {
-    await keep(this);
-    new DiscountRate(this.details.toJSON().rate).whenValid(this.events, () => this.events.publish(new DiscountPublished(this.toJSON())));
+    await new DiscountRate(this.details.toJSON().rate).whenValid(this.events, async () => {
+      await keep(this);
+      this.events.publish(new DiscountPublished(this.toJSON()));
+    });
   }
 
   changeRate(rate: string): void {
