@@ -23,6 +23,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const publish = async (discount: Partial<PublishDiscountRequest>): Promise<void> => {
     try {
       await restApi.post('/discounts', discount);
+      rateNotValid.value = false;
     } catch {
       rateNotValid.value = true;
     }

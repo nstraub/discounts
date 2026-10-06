@@ -42,6 +42,15 @@ describe('Store discounts', () => {
 
       expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(true);
     });
-    it.todo('should no longer hold the rate as not valid once the next discount is published');
+    it('should no longer hold the rate as not valid once the next discount is published', async () => {
+      const { restApi, discounts } = setupSut();
+      const spicesDiscount = { item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
+      restApi.post.mockRejectedValueOnce(new Error('POST /discounts answered 400')).mockResolvedValueOnce(undefined);
+      await discounts.publish({ ...spicesDiscount, rate: '150' });
+
+      await discounts.publish(spicesDiscount);
+
+      expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(false);
+    });
   });
 });

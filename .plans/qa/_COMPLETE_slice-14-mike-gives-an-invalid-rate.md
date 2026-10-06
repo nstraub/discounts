@@ -17,32 +17,32 @@ No implementation body was read.
 
 ## Outlined
 
-27 new `it.todo` lines: 26 built in this slice, 1 recorded. The slice also builds 6 lines recorded with "Mike
-publishes a discount at any rate up to 100%" (below): 32 built. One spec file is new; lines for five existing
+28 new `it.todo` lines: 27 built in this slice, 1 recorded. The slice also builds 6 lines recorded with "Mike
+publishes a discount at any rate up to 100%" (below): 33 built. Two spec files are new; lines for four existing
 spec files are added inside each file's top-level `describe`, in groups of their own; no existing line is
 changed or removed.
 
 | Lines | Criterion or case | Found by | Spec file (under `packages/sut/`) |
 |---|---|---|---|
-| 2 — raises `DiscountPublicationRejected` with the rate and that it is not valid; raises no `DiscountPublished` | invariant 1: the rule emits its rejection | edge-case-discovery | `unit/backend/discounts/application/domain/discount/publish.spec.ts` (added) |
+| 2 — raises `DiscountPublicationRejected` with the rate and that it is not valid; raises no `DiscountPublished` | invariant 1: the rule emits its rejection | edge-case-discovery | `unit/backend/discounts/application/domain/discount/publish-at-a-rate.spec.ts` (new) |
 | 9 — accepts 20, 12.5, 100 and 0.1; refuses 0, −10, 100.1, 150 and 12.25, each rejection naming the rate as not valid | the scenario's rows and the rule's bounds: 0.1 the lowest, 100 the highest, 100.1 the tightest off-point above it (settled) | edge-case-discovery (boundary) | same file |
 | 3 — refuses a rate that is not a number, such as "a fifth"; refuses 12,25; refuses 0,0 | a rate that is not a number is not valid (settled); a decimal comma reads as the decimal point, so 12,25 has two decimals and 0,0 is zero (settled) | edge-case-discovery (type) | same file |
 | 3 — reports the rate as not valid; keeps nothing; announces `DiscountPublicationRejected` | the scenario ("the discount is not published") | edge-case-discovery | `unit/backend/discounts/application/discount-service/publish.spec.ts` (added) |
 | 5 — 400 naming the rate as not valid for the scenario's five rates; body matching the error schema; nothing published; the rejection on the wired app's emitter; no rejection raised for a body the request schema refuses before any rule decides | the scenario; invariant 2; only a rule that decides raises its rejection (settled) | api-testing (exception family, event) | `contract/discounts/post-discounts-invalid-rate.spec.ts` (new; `post-discounts.spec.ts` is near 200 lines) |
 | 1 — a discount kept before the rules at a rate they refuse listed as written, matching the response schema | the rules apply on write only; the column stays text and the response schema is not tightened (settled); invariant 5 | database-testing (state); api-testing (strictness) | `contract/discounts/get-discounts.spec.ts` (added) |
-| 1 — holds that the rate is not valid | the page reaches the publish through the store | edge-case-discovery | `unit/frontend/stores/discounts-store/publish.spec.ts` (added) |
+| 2 — holds that the rate is not valid; holds it no longer once the next discount is published | the page reaches the publish through the store | edge-case-discovery | `unit/frontend/stores/discounts-store/publish.spec.ts` (added) |
 | 2 — tells Mike the rate is not valid once refused; says nothing of it before | the scenario ("he is told the rate is not valid"); the message `The rate must be above 0 % and at most 100 %, with at most one decimal.` in `discountTexts`, shown only once a publish is refused (settled); invariant 6 | edge-case-discovery (state) | `unit/frontend/discounts/components/publish-discount-form/publish.spec.ts` (added) |
 
 Lines recorded with "Mike publishes a discount at any rate up to 100%" and built here:
 
 | Line | Spec file (under `packages/sut/`) |
 |---|---|
-| refuses 1e2, 0x14 or Infinity as not valid | `unit/backend/discounts/application/domain/discount/publish.spec.ts` |
+| refuses 1e2, 0x14 or Infinity as not valid | `unit/backend/discounts/application/domain/discount/publish-at-a-rate.spec.ts` |
 | a rate sent as a JSON number answered 400 naming the rate or published, never a 500 | `contract/discounts/post-discounts-rate.spec.ts` |
 | a rate of 10 000 characters answered 400 naming the rate | the same file |
 | a rate of 33.3 kept and loaded back exactly | `contract/discounts/discount-kept-in-postgres.spec.ts` |
 | rates published before the rate rules read back as written | the same file |
-| accepts a rate written with a decimal comma as the rate it names | `unit/backend/discounts/application/domain/discount/publish.spec.ts` |
+| accepts a rate written with a decimal comma as the rate it names | `unit/backend/discounts/application/domain/discount/publish-at-a-rate.spec.ts` |
 
 A decimal comma reads as the decimal point: 12,5 is valid as 12.5, and is kept and shown as written (settled).
 Lines already built that depend on it:
