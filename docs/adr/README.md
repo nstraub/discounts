@@ -8,4 +8,5 @@ gets none.
 |-----|-------|--------|------|
 | [0001](0001-domain-events-through-a-port-with-an-eventemitter2-adapter.md) | Domain events are raised in the entity and published through a port whose adapter uses EventEmitter2 | accepted | 2026-10-05 |
 | [0002](0002-anyone-can-act-for-any-store.md) | Anyone can act for any store: no store key, no identity | accepted | 2026-09-27 |
+| [0004](0004-coupon-token-form-and-entropy.md) | A coupon's token is ten Crockford base32 characters from a CSPRNG | accepted | 2026-10-05 |
 | [0003](0003-one-database-pool-per-process.md) | One database pool per process, closed on shutdown | accepted | 2026-10-05 |
