@@ -1,8 +1,12 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 
 describe('class CouponToken', () => {
   describe('reading a code typed at the till', () => {
-    it.todo('should read a code typed as it was drawn as its token');
+    it('should read a code typed as it was drawn as its token', () => {
+      expect(CouponToken.read('7K3QX9M2PD').toJSON()).to.equal('7K3QX9M2PD');
+    });
     it.todo('should read a code typed in lower case as its token');
     it.todo('should read a letter O typed for a zero as a zero');
     it.todo('should read a letter I or a letter L typed for a one as a one');

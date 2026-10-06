@@ -15,6 +15,10 @@ export class CouponToken {
     return new CouponToken(characters);
   }
 
+  static read(typed: string): CouponToken {
+    return new CouponToken(typed);
+  }
+
   toJSON(): string {
     return this.characters;
   }
