@@ -118,4 +118,4 @@ export const publishFromSomeoneElsesPage = async (world: PlaywrightWorld, discou
   world.publishedDiscount = discount;
 };
 
-export const suesPage = (world: PlaywrightWorld): DiscountsPage => new DiscountsPage(world.page);
+export const ownDiscountsPage = (world: PlaywrightWorld): DiscountsPage => new DiscountsPage(world.page);

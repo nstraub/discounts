@@ -2,7 +2,7 @@ import { Given, Then } from '@cucumber/cucumber';
 
 import { stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
-import { openSomeoneElsesDiscountsPage, suesPage } from '../../support/discounts-page';
+import { openSomeoneElsesDiscountsPage, ownDiscountsPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
 
 const newSupplier = 'Our produce now comes from a new supplier';
@@ -18,9 +18,9 @@ Given('her discount says the produce comes from a new supplier', function (this:
 });
 
 Then("she finds Stephanie's store", async function (this: PlaywrightWorld) {
-  await suesPage(this).verifyShowsTheStoreOf(this.publishedDiscount);
+  await ownDiscountsPage(this).verifyShowsTheStoreOf(this.publishedDiscount);
 });
 
 Then('she sees what is new about its produce', async function (this: PlaywrightWorld) {
-  await suesPage(this).verifyShowsWhatIsNew(this.publishedDiscount, this.whatIsNew);
+  await ownDiscountsPage(this).verifyShowsWhatIsNew(this.publishedDiscount, this.whatIsNew);
 });

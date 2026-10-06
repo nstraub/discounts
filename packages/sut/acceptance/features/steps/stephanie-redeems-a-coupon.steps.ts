@@ -2,15 +2,15 @@ import { Given, Then, When } from '@cucumber/cucumber';
 
 import { stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
-import { publishFromSomeoneElsesPage, suesPage } from '../../support/discounts-page';
+import { ownDiscountsPage, publishFromSomeoneElsesPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
 import { openTheTillOnADeviceOfItsOwn } from '../../support/till-page';
 
 Given("Sue has a coupon for Stephanie's discount", async function (this: PlaywrightWorld) {
   await publishFromSomeoneElsesPage(this, stephaniesProduceDiscount);
-  await suesPage(this).open();
-  await suesPage(this).decideToTry(this.publishedDiscount);
-  this.couponCode = await suesPage(this).couponCodeShown();
+  await ownDiscountsPage(this).open();
+  await ownDiscountsPage(this).decideToTry(this.publishedDiscount);
+  this.couponCode = await ownDiscountsPage(this).couponCodeShown();
 });
 
 When("Sue uses it at Stephanie's store", async function (this: PlaywrightWorld) {
