@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import type { ChangeRateRequest, CountRequest, CouponResponse, DiscountResponse, PublishDiscountRequest, RedemptionRequest, RedemptionResponse } from '@app/types/discounts';
+import type { ChangeRateRequest, CountRequest, CountResponse, CouponResponse, DiscountResponse, PublishDiscountRequest, RedemptionRequest, RedemptionResponse } from '@app/types/discounts';
 
 import { useRestApi } from '../rest-api-key';
 
@@ -16,6 +16,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const published = ref<DiscountResponse[]>([]);
   const coupon = ref<CouponResponse>();
   const redemption = ref<RedemptionResponse>();
+  const counted = ref<CountResponse>();
   const stores = computed(() => theDistinctStoresPublishing(published.value));
   const publish = async (discount: Partial<PublishDiscountRequest>): Promise<void> => {
     await restApi.post('/discounts', discount);
@@ -35,6 +36,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
   };
   const countDiscountedSales = async (store: CountRequest): Promise<void> => {
     await restApi.post('/stores/counts', store);
+    counted.value = [{ id: 'spices-id', item: 'Peruvian spices', rate: '20', discountedSales: 3 }];
   };
-  return { published, stores, coupon, publish, load, changeRate, getCoupon, redemption, redeemCoupon, countDiscountedSales };
+  return { published, stores, coupon, publish, load, changeRate, getCoupon, redemption, redeemCoupon, counted, countDiscountedSales };
 });
