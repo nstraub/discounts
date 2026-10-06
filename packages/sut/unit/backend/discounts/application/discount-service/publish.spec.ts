@@ -9,12 +9,15 @@ import { DiscountPublicationRejected } from '@backend/discounts/application/doma
 import { DiscountPublished } from '@backend/discounts/application/domain/discount-published';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
+import { PiecesMissingException } from '@backend/discounts/application/domain/pieces-missing-exception';
 import { RateNotValidException } from '@backend/discounts/application/domain/rate-not-valid-exception';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 const spicesDetails = new DiscountDetails(spicesDiscount);
 const aRateItsRulesRefuse = '150';
 const spicesDetailsAtARateItsRulesRefuse = spicesDetails.withRate(aRateItsRulesRefuse);
+
+const spicesDetailsWithItsItemAndStoreNameLeftOut = new DiscountDetails({ ...spicesDiscount, item: '', storeName: ' ' });
 
 const setupSut = () => {
   const events = mock<DomainEventPublisher>();
@@ -75,7 +78,17 @@ describe('class DiscountService', () => {
     });
   });
   describe('publishing a discount with a piece left out', () => {
-    it.todo('should report the pieces left out as missing');
-    it.todo('should keep nothing when a piece is left out');
+    it('should report the pieces left out as missing', async () => {
+      const { service } = setupSut();
+
+      await expect(service.publish(spicesDetailsWithItsItemAndStoreNameLeftOut)).rejects.to.have.deep.property('pieces', ['item', 'storeName']);
+    });
+    it('should keep nothing when a piece is left out', async () => {
+      const { repository, service } = setupSut();
+
+      await expect(service.publish(spicesDetailsWithItsItemAndStoreNameLeftOut)).rejects.to.be.instanceOf(PiecesMissingException);
+
+      expect(await repository.all()).to.deep.equal([]);
+    });
   });
 });
