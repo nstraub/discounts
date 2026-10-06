@@ -4,7 +4,7 @@ import { requestRejection } from '@app/types/request-rejection';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
-import { theFieldsNamedBy } from '../support/error-schema';
+import { bodiesNotMatchingTheErrorSchema, theFieldsNamedBy } from '../support/error-schema';
 
 const { item, rate, storeName, storeAddress } = spicesDiscount;
 
@@ -52,7 +52,16 @@ describe('POST /discounts with a piece left out', () => {
       expect(response.status).to.equal(400);
       expect(requestRejection.parse(response.body).missing).to.deep.equal(['item', 'storeName', 'storeAddress']);
     });
-    it.todo('should answer with a body matching the error schema when pieces are missing');
+    it('should answer with a body matching the error schema when pieces are missing', async () => {
+      const { http } = await setupSut();
+
+      const answers = [
+        await http.post('/discounts').send({ item, storeName, storeAddress }),
+        await http.post('/discounts').send({ ...spicesDiscount, item: '' }),
+      ];
+
+      expect(bodiesNotMatchingTheErrorSchema(answers)).to.deep.equal([]);
+    });
     it.todo('should publish nothing when a piece is missing, listing no discount afterwards');
     it.todo('should publish DiscountPublicationRejected on the application event emitter for a piece made only of blank space');
   });
