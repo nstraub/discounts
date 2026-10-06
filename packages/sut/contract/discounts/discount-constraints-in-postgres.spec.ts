@@ -66,7 +66,14 @@ describe('the discounts table refusing what Discount refuses', () => {
 
       expect(outcome).to.equal('23505');
     });
-    it.todo('should refuse a coupon without a token: 23502, NOT NULL mirrors "a coupon has a token"');
+    it('should refuse a coupon without a token: 23502, NOT NULL mirrors "a coupon has a token"', async () => {
+      const { client } = await setupSut();
+      await insertADiscountWithout(client, 'hook');
+
+      const outcome = await insertACoupon(client, { discount_id: 'constraint-id' });
+
+      expect(outcome).to.equal('23502');
+    });
     it.todo('should refuse a coupon of no kept discount: 23503, the foreign key mirrors "a coupon belongs to its discount"');
   });
 });
