@@ -95,7 +95,12 @@ describe('class Discount', () => {
     });
 
     describe('boundary', () => {
-      it.todo('should refuse its coupon at a store with the same name at another address');
+      it('should refuse its coupon at a store with the same name at another address', () => {
+        const discount = setupSut();
+        const atAnotherAddress = new Store({ storeName: publishedSpicesDiscount.storeName, storeAddress: '9 Quay Street' });
+
+        expect(() => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atAnotherAddress)).to.throw(CouponNotForThisStoreException);
+      });
       it.todo('should refuse its coupon at a store with another name at the same address');
       it.todo('should refuse its coupon at a store whose name differs from its own only in its capitals');
       it.todo('should refuse its coupon at a store whose name has spaces around it that its own has not');
