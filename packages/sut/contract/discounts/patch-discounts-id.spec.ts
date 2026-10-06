@@ -79,7 +79,23 @@ describe('PATCH /discounts/:id', () => {
 
       expect(response.status).to.equal(400);
     });
-    it.todo('should answer every error with a body matching the error schema');
+    it('should answer every error with a body matching the error schema', async () => {
+      const { http } = await setupSut();
+      const published = await publishTheSpicesDiscount(http);
+      const errors = [
+        await patchTheDiscount(http, published.id).send({}),
+        await patchTheDiscount(http, published.id).send({ rate: 25 }),
+        await patchWrittenAsJson(http, published.id, '[]'),
+        await patchWrittenAsJson(http, published.id, '"25"'),
+        await patchWrittenAsJson(http, published.id, '25'),
+        await patchWrittenAsJson(http, published.id, 'null'),
+        await patchWrittenAsJson(http, published.id, '{"rate": "25",'),
+      ];
+
+      const unmatched = errors.map((response) => response.body).filter((body) => !requestRejection.safeParse(body).success);
+
+      expect(unmatched).to.deep.equal([]);
+    });
   });
 
   describe('strictness', () => {
