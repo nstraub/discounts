@@ -39,7 +39,7 @@ export class DiscountsController {
 
   @Post(':id/coupons')
   async issueCoupon(@Param('id') id: string) {
-    const coupon = await this.discounts.issueCoupon(id);
+    const coupon = await this.discounts.issueCoupon(id).catch(answerAMissingDiscount);
     return couponResponse.parse(coupon.toJSON());
   }
 

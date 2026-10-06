@@ -74,7 +74,16 @@ describe('POST /discounts/:id/coupons', () => {
       expect(Object.keys(second.body).toSorted()).to.deep.equal(['storeName', 'token']);
       expect(second.body.token).to.not.equal(first.body.token);
     });
-    it.todo('should answer 404 for an id no discount has, issuing no coupon');
+    it('should answer 404 for an id no discount has, issuing no coupon', async () => {
+      const { app, http } = await setupSut();
+      const issued: unknown[] = [];
+      app.get(EventEmitter2).on('coupon.issued', (event: unknown) => issued.push(event));
+
+      const response = await getACouponFor(http, 'an-id-no-discount-has');
+
+      expect(response.status).to.equal(404);
+      expect(issued, 'the coupons issued').to.deep.equal([]);
+    });
   });
 
   describe('A4 concurrency', () => {
