@@ -37,6 +37,13 @@ describe('class DiscountFactory', () => {
     });
   });
   describe('rebuilding a kept discount with a redeemed coupon', () => {
-    it.todo('should rebuild each kept coupon redeemed or unused, as it was kept');
+    it('should rebuild each kept coupon redeemed or unused, as it was kept', () => {
+      const factory = new DiscountFactory(mock<DomainEventPublisher>());
+      const coupons = [{ token: '7K3QX9M2PD', redeemed: true }, { token: 'R4WZ0BH8NE', redeemed: false }];
+
+      const rebuilt = factory.reconstitute({ id: 'kept-spices-id', ...spicesDiscount, coupons });
+
+      expect(rebuilt.toJSON().coupons.map(({ redeemed }) => redeemed), 'each coupon redeemed').to.deep.equal([true, false]);
+    });
   });
 });
