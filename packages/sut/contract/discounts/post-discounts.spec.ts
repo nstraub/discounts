@@ -10,6 +10,8 @@ type Http = Awaited<ReturnType<typeof setupSut>>['http'];
 
 const aDiscountAboveTheTransportLimit = { ...spicesDiscount, item: 'x'.repeat(200_000) };
 
+const bodiesThatAreNotObjects = ['[]', '"Peruvian spices"', '20', 'null'];
+
 const postWrittenAsJson = (http: Http, body: string) => http.post('/discounts').set('Content-Type', 'application/json').send(body);
 
 describe('POST /discounts', () => {
@@ -67,7 +69,6 @@ describe('POST /discounts', () => {
     });
     it('should answer 400 for a JSON body that is an array, a string, a number or null', async () => {
       const { http } = await setupSut();
-      const bodiesThatAreNotObjects = ['[]', '"Peruvian spices"', '20', 'null'];
 
       const statuses = [];
       for (const body of bodiesThatAreNotObjects) {
@@ -79,7 +80,6 @@ describe('POST /discounts', () => {
     });
     it('should name no field for a JSON body that is an array, a string, a number or null', async () => {
       const { http } = await setupSut();
-      const bodiesThatAreNotObjects = ['[]', '"Peruvian spices"', '20', 'null'];
 
       const fieldsNamed = [];
       for (const body of bodiesThatAreNotObjects) {
