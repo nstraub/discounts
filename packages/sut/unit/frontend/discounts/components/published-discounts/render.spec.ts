@@ -117,4 +117,16 @@ describe('Component PublishedDiscounts', () => {
       expect(queryAllByRole(document.body, 'form', { name: namingTheWholeOf(publishedProduceDiscount) })).to.have.length(1);
     });
   });
+  describe('showing the hook of a discount', () => {
+    it.todo('should show its hook');
+    it.todo('should show only its item, rate, store name and store address when it has no hook, with no empty place for one');
+    it.todo('should show each hook on its own discount\'s entry, the entry without one showing none');
+    it.todo('should show its hook without its surrounding spaces');
+    it.todo('should keep the line breaks its hook is written with');
+  });
+
+  describe('A2 injection through the hook', () => {
+    it.todo('should show a hook written as markup as plain text, never as markup');
+    it.todo('should show a web address in a hook as plain text, never as a link');
+  });
 });

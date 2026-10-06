@@ -42,4 +42,8 @@ describe('class DiscountFactory', () => {
       });
     });
   });
+  describe('creating a discount with a hook', () => {
+    it.todo('should hold the hook it was created with');
+    it.todo('should hold no hook when created without one');
+  });
 });

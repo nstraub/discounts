@@ -76,4 +76,8 @@ describe('GET /discounts', () => {
   describe('A5 resource exhaustion', () => {
     it.todo('should answer every published discount when a very large number are published, without failing');
   });
+  describe('the hook', () => {
+    it.todo('should list a discount with its hook');
+    it.todo('should list a discount published without a hook with no hook');
+  });
 });

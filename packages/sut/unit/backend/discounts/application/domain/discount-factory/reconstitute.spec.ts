@@ -16,4 +16,7 @@ describe('class DiscountFactory', () => {
       expect(rebuilt.toJSON()).to.deep.equal(kept);
     });
   });
+  describe('rebuilding a kept discount with a hook', () => {
+    it.todo('should rebuild a kept discount with its hook');
+  });
 });

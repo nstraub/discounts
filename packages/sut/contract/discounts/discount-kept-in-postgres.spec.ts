@@ -55,4 +55,9 @@ describe('a discount kept in PostgreSQL', () => {
       { id: produce.toJSON().id, ...produceDiscount },
     ]);
   });
+  describe('with a hook', () => {
+    it.todo('should save a discount with a hook and load it back equal, in a separate transaction');
+    it.todo('should keep a hook with quotes, semicolons and SQL keywords verbatim');
+    it.todo('should keep a hook with accents, apostrophes and emoji verbatim');
+  });
 });

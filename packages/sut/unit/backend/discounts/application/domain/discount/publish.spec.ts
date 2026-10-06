@@ -40,4 +40,18 @@ describe('class Discount', () => {
       it.todo('should refuse a store address longer than allowed');
     });
   });
+  describe('publishing a discount with a hook', () => {
+    describe('the discount published', () => {
+      it.todo('should raise DiscountPublished carrying its hook');
+      it.todo('should raise DiscountPublished carrying no hook when it has none');
+    });
+
+    describe('empty', () => {
+      it.todo('should count a hook that is empty or made only of blank space as no hook');
+    });
+
+    describe('boundary', () => {
+      it.todo('should refuse a hook longer than allowed');
+    });
+  });
 });

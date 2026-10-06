@@ -70,4 +70,7 @@ describe('class Discount', () => {
       it.todo('should refuse a new rate that is not a number, its rejection naming the rate as not valid, keeping its rate');
     });
   });
+  describe('changing the rate of a discount with a hook', () => {
+    it.todo('should keep its hook when its rate changes');
+  });
 });

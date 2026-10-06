@@ -22,4 +22,7 @@ describe('Store discounts', () => {
     });
     it.todo('should hold the discount just published without loading the page again');
   });
+  describe('publishing a discount with a hook', () => {
+    it.todo('should hand the hook over to be published with the rest');
+  });
 });

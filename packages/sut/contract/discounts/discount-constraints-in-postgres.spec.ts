@@ -46,4 +46,7 @@ describe('the discounts table refusing what Discount refuses', () => {
       { name: 'store_address', type: 'text', nullable: 'NO' },
     ]);
   });
+  describe('the hook', () => {
+    it.todo('should accept a discount without a hook: the hook column nullable mirrors "a discount may carry a hook"');
+  });
 });

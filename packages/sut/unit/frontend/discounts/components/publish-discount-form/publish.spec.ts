@@ -100,4 +100,13 @@ describe('Component PublishDiscountForm', () => {
       it.todo('should publish once when Mike asks to publish twice before the first answer');
     });
   });
+  describe('publishing a discount with a hook', () => {
+    it.todo('should publish the hook as Stephanie gave it');
+    it.todo('should publish no hook when the hook is left empty');
+    it.todo('should clear the hook once the discount is published');
+
+    describe('empty', () => {
+      it.todo('should publish a hook of only blank space as no hook');
+    });
+  });
 });

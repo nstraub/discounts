@@ -135,4 +135,7 @@ describe('PATCH /discounts/:id', () => {
   describe('A6 business-logic abuse', () => {
     it.todo('should change only the rate, leaving the item, store name and store address the request carries unused');
   });
+  describe('A6 business-logic abuse of the hook', () => {
+    it.todo('should leave the hook as it was when a change request carries another one');
+  });
 });

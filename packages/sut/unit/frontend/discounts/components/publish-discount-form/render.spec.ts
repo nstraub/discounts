@@ -40,4 +40,7 @@ describe('Component PublishDiscountForm', () => {
       expect(setupSut().get('[data-testid="publish-discount"]').text()).to.equal(discountTexts.publish);
     });
   });
+  describe('what the form asks for about the hook', () => {
+    it.todo('should ask for the hook under its caption');
+  });
 });
