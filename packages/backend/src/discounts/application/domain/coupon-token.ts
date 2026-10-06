@@ -16,7 +16,7 @@ export class CouponToken {
   }
 
   static read(typed: string): CouponToken {
-    return new CouponToken(typed.toUpperCase());
+    return new CouponToken(typed.toUpperCase().replaceAll('O', '0'));
   }
 
   toJSON(): string {
