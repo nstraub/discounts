@@ -14,7 +14,7 @@ const newRate = ref('');
 
 <template>
   <form
-    aria-label="Peruvian spices, Mike's Groceries"
+    :aria-label="`${discount.item}, ${discount.storeName}`"
     data-testid="change-rate-form"
     @submit.prevent
   >

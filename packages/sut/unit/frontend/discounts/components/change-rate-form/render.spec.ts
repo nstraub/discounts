@@ -6,7 +6,9 @@ import { discountTexts } from '@frontend/discounts/texts';
 
 const spicesDiscount = { id: 'spices-id', item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
-const setupSut = () => mount(ChangeRateForm, { props: { discount: spicesDiscount } });
+const produceDiscount = { id: 'produce-id', item: 'Fresh produce', rate: '10', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' };
+
+const setupSut = ({ discount = spicesDiscount } = {}) => mount(ChangeRateForm, { props: { discount } });
 
 describe('Component ChangeRateForm', () => {
   describe('what the control asks for', () => {
@@ -23,6 +25,11 @@ describe('Component ChangeRateForm', () => {
       const label = setupSut().get('[data-testid="change-rate-form"]').attributes('aria-label') ?? '';
 
       expect(label).to.contain(spicesDiscount.item).and.to.contain(spicesDiscount.storeName);
+    });
+    it('should name another discount in the label of its own control', () => {
+      const label = setupSut({ discount: produceDiscount }).get('[data-testid="change-rate-form"]').attributes('aria-label') ?? '';
+
+      expect(label).to.contain(produceDiscount.item).and.to.contain(produceDiscount.storeName);
     });
   });
 });
