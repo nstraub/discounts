@@ -24,9 +24,7 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   }
 
   async all(): Promise<Discount[]> {
-    const rows = await this.keptDiscounts();
-    const issued = await couponsIssuedByEachDiscount(this.database);
-    return rows.map((row) => this.rebuilt(row, issued.get(row.id) ?? []));
+    return this.rebuiltWithTheirCoupons(await this.keptDiscounts());
   }
 
   async withId(id: string): Promise<Discount | undefined> {
@@ -42,13 +40,16 @@ export class DiscountDrizzleRepository implements DiscountRepository {
 
   async ofStore(store: Store): Promise<Discount[]> {
     const { storeName, storeAddress } = store.toJSON();
-    const rows = await this.keptDiscounts().where(and(eq(discounts.storeName, storeName), eq(discounts.storeAddress, storeAddress)));
-    const issued = await couponsIssuedByEachDiscount(this.database);
-    return rows.map((row) => this.rebuilt(row, issued.get(row.id) ?? []));
+    return this.rebuiltWithTheirCoupons(await this.keptDiscounts().where(and(eq(discounts.storeName, storeName), eq(discounts.storeAddress, storeAddress))));
   }
 
   private keptDiscounts() {
     return this.database.select(theColumnsOfADiscount).from(discounts);
+  }
+
+  private async rebuiltWithTheirCoupons(rows: (typeof discounts.$inferSelect)[]): Promise<Discount[]> {
+    const issued = await couponsIssuedByEachDiscount(this.database);
+    return rows.map((row) => this.rebuilt(row, issued.get(row.id) ?? []));
   }
 
   private rebuilt(row: typeof discounts.$inferSelect, issued: ReturnType<Discount['toJSON']>['coupons']): Discount {
