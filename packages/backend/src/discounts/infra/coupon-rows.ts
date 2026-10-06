@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 
 import type { Coupon } from '../application/domain/coupon.js';
 
@@ -23,10 +23,20 @@ export const idsOfTheDiscountsThatIssued = async (database: Database, token: str
   return rows.map((row) => row.discountId);
 };
 
-export const keepTheNewlyIssued = async (database: Database, discountId: string, issued: KeptCoupon[]): Promise<void> => {
+const keepTheNewlyIssued = async (database: Database, discountId: string, issued: KeptCoupon[]): Promise<void> => {
   const kept = (await couponsIssuedBy(database, discountId)).map(({ token }) => token);
   const newlyIssued = issued.filter(({ token }) => !kept.includes(token));
   if (newlyIssued.length > 0) {
     await database.insert(coupons).values(newlyIssued.map((coupon) => ({ ...coupon, discountId })));
   }
+};
+
+const keepTheRedeemed = async (database: Database, issued: KeptCoupon[]): Promise<void> => {
+  const redeemed = issued.filter((coupon) => coupon.redeemed).map(({ token }) => token);
+  await database.update(coupons).set({ redeemed: true }).where(inArray(coupons.token, redeemed));
+};
+
+export const keepTheCouponsIssued = async (database: Database, discountId: string, issued: KeptCoupon[]): Promise<void> => {
+  await keepTheNewlyIssued(database, discountId, issued);
+  await keepTheRedeemed(database, issued);
 };

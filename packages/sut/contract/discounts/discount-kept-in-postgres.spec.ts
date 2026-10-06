@@ -125,6 +125,17 @@ describe('a discount kept in PostgreSQL', () => {
       expect(loaded?.toJSON().coupons.at(0)?.redeemed, 'the coupon loaded back, redeemed').to.equal(true);
       expect(loaded?.toJSON(), 'the discount loaded back').to.deep.equal(discount.toJSON());
     });
+    it('should keep a coupon redeemed once its discount, kept with it unused, is saved again', async () => {
+      const sut = await setupSut();
+      await sut.repository.save(await keepWithACouponIssued(sut));
+      const [found] = await sut.loadOnItsOwnConnection();
+      found?.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+
+      await sut.repository.save(found!);
+
+      const [loaded] = await sut.loadOnItsOwnConnection();
+      expect(loaded?.toJSON().coupons.at(0)?.redeemed, 'the coupon loaded back, redeemed').to.equal(true);
+    });
     it.todo('should keep a discount\'s other coupons unused when one is redeemed and it is saved again');
     it.todo('should keep a redeemed coupon redeemed when another coupon is issued and the discount is saved again');
   });

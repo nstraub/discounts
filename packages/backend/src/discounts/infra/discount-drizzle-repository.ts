@@ -5,7 +5,7 @@ import type { Discount } from '../application/domain/discount.js';
 import type { DiscountFactory } from '../application/domain/discount-factory.js';
 import type { DiscountRepository } from '../application/domain/discount-repository.js';
 
-import { couponsIssuedBy, couponsIssuedByEachDiscount, idsOfTheDiscountsThatIssued, keepTheNewlyIssued } from './coupon-rows.js';
+import { couponsIssuedBy, couponsIssuedByEachDiscount, idsOfTheDiscountsThatIssued, keepTheCouponsIssued } from './coupon-rows.js';
 import type { Database } from './database.module.js';
 import { theColumnsOfADiscount, withNoHookWhenNoneIsKept } from './discount-rows.js';
 import { discounts } from './schema.js';
@@ -19,7 +19,7 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   async save(discount: Discount): Promise<void> {
     const { coupons, ...state } = discount.toJSON();
     await this.database.insert(discounts).values(state).onConflictDoUpdate({ target: discounts.id, set: state });
-    await keepTheNewlyIssued(this.database, state.id, coupons);
+    await keepTheCouponsIssued(this.database, state.id, coupons);
   }
 
   async all(): Promise<Discount[]> {
