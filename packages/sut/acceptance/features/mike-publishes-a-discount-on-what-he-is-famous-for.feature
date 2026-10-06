@@ -126,7 +126,6 @@ Feature: Mike publishes a discount on what he is famous for
     When someone gets coupons for it far faster than anyone deciding to try it would
     Then every coupon they get gives the item away
 
-  @wip
   Scenario: Mike's earlier discounts stay published
     Given Mike has published a discount on an item
     When Mike publishes a discount on another item

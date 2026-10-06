@@ -1,5 +1,7 @@
 export const spicesDiscount = { item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
+export const chiliPasteDiscount = { item: 'Yellow chili paste', rate: '15', storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress };
+
 export const produceDiscount = { item: 'Fresh produce', rate: '10', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' };
 
 export const stephaniesProduceDiscount = { item: 'Organic produce', rate: '15', storeName: "Stephanie's Market", storeAddress: '8 Orchard Lane' };
