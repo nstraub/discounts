@@ -4,6 +4,7 @@ import { CouponIssued } from './coupon-issued.js';
 import type { CouponToken } from './coupon-token.js';
 import type { DiscountDetails } from './discount-details.js';
 import { DiscountedSalesCounted } from './discounted-sales-counted.js';
+import { DiscountPublicationRejected } from './discount-publication-rejected.js';
 import { DiscountPublished } from './discount-published.js';
 import { DiscountRate } from './discount-rate.js';
 import { DiscountRateChanged } from './discount-rate-changed.js';
@@ -20,10 +21,10 @@ export class Discount {
   ) {}
 
   async publish(keep: (discount: Discount) => Promise<void>): Promise<void> {
-    await new DiscountRate(this.details.toJSON().rate).whenValid(this.events, async () => {
+    await new DiscountRate(this.details.toJSON().rate).whenValid(async () => {
       await keep(this);
       this.events.publish(new DiscountPublished(this.toJSON()));
-    });
+    }, (rate) => this.events.publish(new DiscountPublicationRejected(rate, 'not valid')));
   }
 
   changeRate(rate: string): void {

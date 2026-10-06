@@ -1,5 +1,3 @@
-import { DiscountPublicationRejected } from './discount-publication-rejected.js';
-import type { DomainEventPublisher } from './domain-event-publisher.js';
 import { RateNotValidException } from './rate-not-valid-exception.js';
 
 const digitsWithAtMostOneDecimalAfterAPointOrAComma = /^(0|[1-9][0-9]*)([.,][0-9])?$/;
@@ -7,12 +5,12 @@ const digitsWithAtMostOneDecimalAfterAPointOrAComma = /^(0|[1-9][0-9]*)([.,][0-9
 export class DiscountRate {
   constructor(private readonly written: string) {}
 
-  whenValid<Published>(events: DomainEventPublisher, publish: () => Published): Published {
+  whenValid<Published>(valid: () => Published, refused: (written: string) => void): Published {
     if (this.isNotWrittenAsADecimal() || this.isOutOfBounds()) {
-      events.publish(new DiscountPublicationRejected(this.written, 'not valid'));
+      refused(this.written);
       throw new RateNotValidException();
     }
-    return publish();
+    return valid();
   }
 
   private isNotWrittenAsADecimal(): boolean {
