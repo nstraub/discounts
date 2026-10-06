@@ -9,12 +9,12 @@ const theNameAndAddressOf = (store: Store) => `${store.storeName}, ${store.store
 </script>
 
 <template>
-  <label class="flex flex-col gap-1">
+  <label class="flex flex-col gap-1 text-sm font-medium">
     {{ caption }}
     <select
       v-model="picked"
       required
-      class="rounded border border-gray-400 px-2 py-1"
+      class="font-normal"
     >
       <option :value="undefined" />
       <option

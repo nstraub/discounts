@@ -1,1 +1,40 @@
 @import "tailwindcss";
+
+@theme {
+  --color-counter: #f3f5f4;
+  --color-paper: #ffffff;
+  --color-ink: #1d2624;
+  --color-slate: #56635f;
+  --color-shopfront: #1e5b4f;
+  --color-tag: #f4c542;
+  --color-alert: #a12a2a;
+  --font-sans: Seravek, "Gill Sans Nova", Ubuntu, Calibri, "DejaVu Sans", source-sans-pro, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-counter text-ink font-sans antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-3 outline-offset-2 outline-shopfront;
+  }
+
+  input,
+  select {
+    @apply min-h-11 rounded-md border border-ink/40 bg-paper px-3 text-base text-ink;
+  }
+
+  button {
+    @apply min-h-11 cursor-pointer rounded-md px-4 font-medium;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
+}

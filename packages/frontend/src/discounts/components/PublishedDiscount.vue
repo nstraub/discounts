@@ -5,6 +5,7 @@ import type { DiscountResponse } from '@app/types/discounts';
 
 import ChangeRateForm from './ChangeRateForm.vue';
 import GetCouponButton from './GetCouponButton.vue';
+import PublishedDiscountText from './PublishedDiscountText.vue';
 
 const props = defineProps<{ discount: DiscountResponse }>();
 
@@ -13,30 +14,22 @@ const textId = computed(() => `published-discount-${props.discount.id}-text`);
 
 <template>
   <li
-    class="flex gap-2"
+    class="flex flex-col gap-3 p-4"
     data-testid="published-discount"
   >
-    <div
+    <PublishedDiscountText
       :id="textId"
-      class="flex gap-2"
-      data-testid="published-discount-text"
-    >
-      <span data-testid="published-item">{{ discount.item.trim() }}</span>
-      <span data-testid="published-rate">{{ discount.rate }}%</span>
-      <span data-testid="published-store-name">{{ discount.storeName.trim() }}</span>
-      <span data-testid="published-store-address">{{ discount.storeAddress.trim() }}</span>
-      <span
-        v-if="discount.hook"
-        data-testid="published-hook"
-      >{{ discount.hook.trim() }}</span>
+      :discount="discount"
+    />
+    <div class="flex flex-wrap items-end gap-2">
+      <ChangeRateForm
+        :discount="discount"
+        :named-by="textId"
+      />
+      <GetCouponButton
+        :discount="discount"
+        :named-by="textId"
+      />
     </div>
-    <ChangeRateForm
-      :discount="discount"
-      :named-by="textId"
-    />
-    <GetCouponButton
-      :discount="discount"
-      :named-by="textId"
-    />
   </li>
 </template>

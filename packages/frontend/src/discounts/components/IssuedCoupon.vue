@@ -12,11 +12,17 @@ const code = computed(() => `${props.coupon.token.slice(0, charactersInAGroup)} 
 </script>
 
 <template>
-  <section data-testid="issued-coupon">
+  <section
+    class="rounded-lg border-2 border-dashed border-ink bg-tag p-5"
+    data-testid="issued-coupon"
+  >
     <p data-testid="coupon-store">
       {{ discountTexts.yourCouponToUseAt }} {{ coupon.storeName }}
     </p>
-    <p data-testid="coupon-code">
+    <p
+      class="mt-2 text-3xl font-semibold tracking-widest tabular-nums"
+      data-testid="coupon-code"
+    >
       {{ code }}
     </p>
   </section>

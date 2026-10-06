@@ -30,7 +30,7 @@ const count = async (): Promise<void> => {
     />
     <button
       type="submit"
-      class="rounded border px-3 py-1"
+      class="justify-self-start bg-shopfront text-paper hover:bg-ink"
     >
       {{ discountTexts.countDiscountedSales }}
     </button>

@@ -21,6 +21,7 @@ const changeRate = async (): Promise<void> => {
 
 <template>
   <form
+    class="flex items-end gap-2"
     :aria-labelledby="namedBy"
     data-testid="change-rate-form"
     @submit.prevent="changeRate"
@@ -32,7 +33,7 @@ const changeRate = async (): Promise<void> => {
     />
     <button
       type="submit"
-      class="rounded border px-3 py-1"
+      class="border border-shopfront bg-paper text-shopfront hover:bg-counter"
       data-testid="change-rate"
     >
       {{ discountTexts.changeRate }}

@@ -15,7 +15,7 @@ const ownId = `${props.namedBy}-get-coupon`;
     :id="ownId"
     type="button"
     :aria-labelledby="`${ownId} ${namedBy}`"
-    class="rounded border px-3 py-1"
+    class="bg-shopfront text-paper hover:bg-ink"
     data-testid="get-coupon"
     @click="discounts.getCoupon(discount.id)"
   >

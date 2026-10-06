@@ -6,11 +6,11 @@ const value = defineModel<string>({ required: true });
 
 <template>
   <div :data-testid="`${testId}-field`">
-    <label class="flex flex-col gap-1">
+    <label class="flex flex-col gap-1 text-sm font-medium">
       {{ caption }}
       <input
         v-model="value"
-        class="rounded border border-gray-400 px-2 py-1"
+        class="font-normal"
         :data-testid="testId"
         :required="required"
       >
@@ -18,6 +18,7 @@ const value = defineModel<string>({ required: true });
     <p
       v-if="told"
       role="status"
+      class="mt-1 text-sm text-alert"
     >
       {{ told }}
     </p>

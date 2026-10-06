@@ -6,7 +6,10 @@ const till = useTillStore();
 </script>
 
 <template>
-  <p role="status">
+  <p
+    role="status"
+    class="min-h-6 font-medium"
+  >
     {{ till.answer.told(discountTexts) }}
   </p>
 </template>

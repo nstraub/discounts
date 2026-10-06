@@ -10,5 +10,8 @@ onMounted(discounts.load);
 </script>
 
 <template>
-  <CountDiscountedSalesForm :stores="discounts.stores" />
+  <CountDiscountedSalesForm
+    class="grid gap-4 rounded-lg border border-ink/15 bg-paper p-5"
+    :stores="discounts.stores"
+  />
 </template>

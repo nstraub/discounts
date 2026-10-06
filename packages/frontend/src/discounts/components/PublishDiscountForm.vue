@@ -17,14 +17,17 @@ const publish = async (): Promise<void> => {
 </script>
 
 <template>
-  <form @submit.prevent="publish">
+  <form
+    class="grid gap-4 rounded-lg border border-ink/15 bg-paper p-5 sm:grid-cols-2"
+    @submit.prevent="publish"
+  >
     <TypedDiscountFields
       v-model="discount"
       :answer="discounts.publishAnswer"
     />
     <button
       type="submit"
-      class="rounded border px-3 py-1"
+      class="justify-self-start bg-shopfront text-paper hover:bg-ink"
       data-testid="publish-discount"
     >
       {{ discountTexts.publish }}
@@ -32,6 +35,7 @@ const publish = async (): Promise<void> => {
     <p
       v-if="discounts.publishAnswer.told(discountTexts)"
       role="status"
+      class="self-center text-sm text-alert"
     >
       {{ discounts.publishAnswer.told(discountTexts) }}
     </p>

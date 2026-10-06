@@ -38,6 +38,7 @@ const discount = defineModel<ReturnType<typeof nothingTyped>>({ required: true }
   />
   <CaptionedInput
     v-model="discount.hook"
+    class="sm:col-span-2"
     :caption="discountTexts.hook"
     test-id="discount-hook"
   />
