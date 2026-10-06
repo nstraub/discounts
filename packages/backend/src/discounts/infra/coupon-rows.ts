@@ -36,7 +36,13 @@ const keepTheRedeemed = async (database: Database, issued: KeptCoupon[]): Promis
   await database.update(coupons).set({ redeemed: true }).where(inArray(coupons.token, redeemed));
 };
 
+const keepTheCounted = async (database: Database, issued: KeptCoupon[]): Promise<void> => {
+  const counted = issued.filter((coupon) => coupon.counted).map(({ token }) => token);
+  await database.update(coupons).set({ counted: true }).where(inArray(coupons.token, counted));
+};
+
 export const keepTheCouponsIssued = async (database: Database, discountId: string, issued: KeptCoupon[]): Promise<void> => {
   await keepTheNewlyIssued(database, discountId, issued);
   await keepTheRedeemed(database, issued);
+  await keepTheCounted(database, issued);
 };

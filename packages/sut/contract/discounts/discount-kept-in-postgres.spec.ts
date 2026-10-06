@@ -170,7 +170,21 @@ describe('a discount kept in PostgreSQL', () => {
     });
   });
   describe('with its sales counted', () => {
-    it.todo('should save a discount with a counted and an uncounted redeemed coupon and load it back equal, in a separate transaction');
+    it('should save a discount with a counted and an uncounted redeemed coupon and load it back equal, in a separate transaction', async () => {
+      const sut = await setupSut();
+      const discount = await keepWithACouponIssued(sut);
+      await sut.repository.save(discount);
+      discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+      discount.count();
+      discount.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
+      discount.redeemCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
+
+      await sut.repository.save(discount);
+
+      const [loaded] = await sut.loadOnItsOwnConnection();
+      expect(loaded?.toJSON().coupons.map(({ counted }) => counted), 'each coupon loaded back, counted').to.deep.equal([true, false]);
+      expect(loaded?.toJSON(), 'the discount loaded back').to.deep.equal(discount.toJSON());
+    });
     it.todo('should keep a counted coupon counted when another coupon is redeemed and the discount is saved again');
   });
 });
