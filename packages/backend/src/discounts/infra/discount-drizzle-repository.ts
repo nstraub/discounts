@@ -5,7 +5,7 @@ import type { DiscountFactory } from '../application/domain/discount-factory.js'
 import type { DiscountRepository } from '../application/domain/discount-repository.js';
 
 import type { Database } from './database.module.js';
-import { discounts } from './schema.js';
+import { coupons, discounts } from './schema.js';
 
 const theColumnsOfADiscount = {
   id: discounts.id,
@@ -25,21 +25,25 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   ) {}
 
   async save(discount: Discount): Promise<void> {
-    const state = discount.toJSON();
+    const { coupons: tokens, ...state } = discount.toJSON();
     await this.database.insert(discounts).values(state).onConflictDoUpdate({ target: discounts.id, set: state });
+    if (tokens.length > 0) {
+      await this.database.insert(coupons).values(tokens.map((token) => ({ token, discountId: state.id })));
+    }
   }
 
   async all(): Promise<Discount[]> {
     const rows = await this.database.select(theColumnsOfADiscount).from(discounts);
-    return rows.map((row) => this.rebuilt(row));
+    const issued = await this.database.select({ token: coupons.token, discountId: coupons.discountId }).from(coupons).orderBy(coupons.id);
+    return rows.map((row) => this.rebuilt(row, issued.filter((coupon) => coupon.discountId === row.id).map((coupon) => coupon.token)));
   }
 
   async withId(id: string): Promise<Discount | undefined> {
     const rows = await this.database.select(theColumnsOfADiscount).from(discounts).where(eq(discounts.id, id));
-    return rows.map((row) => this.rebuilt(row)).at(0);
+    return rows.map((row) => this.rebuilt(row, [])).at(0);
   }
 
-  private rebuilt(row: typeof discounts.$inferSelect): Discount {
-    return this.factory.reconstitute({ ...withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) }), coupons: [] });
+  private rebuilt(row: typeof discounts.$inferSelect, issued: string[]): Discount {
+    return this.factory.reconstitute({ ...withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) }), coupons: issued });
   }
 }

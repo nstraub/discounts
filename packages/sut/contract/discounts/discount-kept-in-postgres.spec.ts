@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import { produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/discount-repository';
@@ -84,7 +85,16 @@ describe('a discount kept in PostgreSQL', () => {
     });
   });
   describe('with its coupons', () => {
-    it.todo('should save a discount with its coupons and load it back equal, in a separate transaction');
+    it('should save a discount with its coupons and load it back equal, in a separate transaction', async () => {
+      const { keep, repository, loadOnItsOwnConnection } = await setupSut();
+      const discount = await keep(spicesDiscount);
+      discount.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+
+      await repository.save(discount);
+
+      const [loaded] = await loadOnItsOwnConnection();
+      expect(loaded?.toJSON(), 'the discount loaded back with its coupons').to.deep.equal(discount.toJSON());
+    });
     it.todo('should keep a discount\'s earlier coupons when another is issued and it is saved again');
   });
 });
