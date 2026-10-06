@@ -1,3 +1,5 @@
+import { eq } from 'drizzle-orm';
+
 import type { Discount } from '../application/domain/discount.js';
 import type { DiscountFactory } from '../application/domain/discount-factory.js';
 import type { DiscountRepository } from '../application/domain/discount-repository.js';
@@ -20,7 +22,8 @@ export class DiscountDrizzleRepository implements DiscountRepository {
     return rows.map((row) => this.factory.reconstitute({ ...row, rate: String(row.rate) }));
   }
 
-  async withId(): Promise<Discount | undefined> {
-    throw new Error('not implemented: DiscountDrizzleRepository.withId');
+  async withId(id: string): Promise<Discount | undefined> {
+    const rows = await this.database.select().from(discounts).where(eq(discounts.id, id));
+    return rows.map((row) => this.factory.reconstitute({ ...row, rate: String(row.rate) })).at(0);
   }
 }
