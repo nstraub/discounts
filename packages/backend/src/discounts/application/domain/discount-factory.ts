@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 
+import { CouponToken } from './coupon-token.js';
 import { Discount } from './discount.js';
 import { DiscountDetails } from './discount-details.js';
 import type { DomainEventPublisher } from './domain-event-publisher.js';
@@ -11,8 +12,7 @@ export class DiscountFactory {
     return new Discount(v4(), details, [], this.events);
   }
 
-  // eslint-disable-next-line unused-imports/no-unused-vars
   reconstitute({ id, coupons, ...details }: ReturnType<Discount['toJSON']>): Discount {
-    return new Discount(id, new DiscountDetails(details), [], this.events);
+    return new Discount(id, new DiscountDetails(details), coupons.map(CouponToken.keptAs), this.events);
   }
 }

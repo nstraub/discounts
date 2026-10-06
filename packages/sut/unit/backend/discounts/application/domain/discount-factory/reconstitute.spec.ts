@@ -27,6 +27,13 @@ describe('class DiscountFactory', () => {
     });
   });
   describe('rebuilding a kept discount with its coupons', () => {
-    it.todo('should rebuild a kept discount with the coupons it has issued');
+    it('should rebuild a kept discount with the coupons it has issued', () => {
+      const factory = new DiscountFactory(mock<DomainEventPublisher>());
+      const kept = { id: 'kept-spices-id', ...spicesDiscount, coupons: ['7K3QX9M2PD', 'R4WZ0BH8NE'] };
+
+      const rebuilt = factory.reconstitute(kept);
+
+      expect(rebuilt.toJSON().coupons).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
+    });
   });
 });

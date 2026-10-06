@@ -11,6 +11,10 @@ export class CouponToken {
     return new CouponToken([...drawn].map((value) => crockfordBase32.charAt(value % crockfordBase32.length)).join(''));
   }
 
+  static keptAs(characters: string): CouponToken {
+    return new CouponToken(characters);
+  }
+
   toJSON(): string {
     return this.characters;
   }
