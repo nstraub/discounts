@@ -39,7 +39,7 @@ describe('a discount kept in PostgreSQL', () => {
     await repository.save(discount);
 
     const loaded = await loadOnItsOwnConnection();
-    expect(loaded.map((kept) => kept.toJSON())).to.deep.equal([{ id: discount.toJSON().id, ...spicesDiscount, rate: '25' }]);
+    expect(loaded.map((kept) => kept.toJSON())).to.deep.equal([{ id: discount.toJSON().id, ...spicesDiscount, rate: '25', coupons: [] }]);
   });
   it('should change only the discount named, the other keeping its rate', async () => {
     const { keep, repository, loadOnItsOwnConnection } = await setupSut();
@@ -51,8 +51,8 @@ describe('a discount kept in PostgreSQL', () => {
 
     const loaded = await loadOnItsOwnConnection();
     expect(loaded.map((kept) => kept.toJSON())).to.have.deep.members([
-      { id: spices.toJSON().id, ...spicesDiscount, rate: '25' },
-      { id: produce.toJSON().id, ...produceDiscount },
+      { id: spices.toJSON().id, ...spicesDiscount, rate: '25', coupons: [] },
+      { id: produce.toJSON().id, ...produceDiscount, coupons: [] },
     ]);
   });
   describe('with a hook', () => {

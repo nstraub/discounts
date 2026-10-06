@@ -71,7 +71,7 @@ describe('the migration that keeps the rate as written', () => {
 
     const readBack = await aDiscountKeptBeforeAsReadAfterMigratingForward(sut);
 
-    expect(readBack).to.deep.equal(aDiscountKeptBefore);
+    expect(readBack).to.deep.equal({ ...aDiscountKeptBefore, coupons: [] });
   });
   it('should keep and load back a rate that is a number on the schema before the migration, as on the one after it', async () => {
     const { client, databaseUrl } = await setupSutMigratedForward();

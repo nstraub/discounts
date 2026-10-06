@@ -10,7 +10,7 @@ import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/
 const setupSut = () => {
   const factory = new DiscountFactory(mock<DomainEventPublisher>());
   const repository = new InMemoryDiscountRepository();
-  const keep = (discount: typeof publishedSpicesDiscount) => repository.save(factory.reconstitute(discount));
+  const keep = (discount: typeof publishedSpicesDiscount) => repository.save(factory.reconstitute({ ...discount, coupons: [] }));
   return { keep, service: new DiscountService(factory, repository) };
 };
 
@@ -30,7 +30,7 @@ describe('class DiscountService', () => {
 
         const published = await service.published();
 
-        expect(published.map((discount) => discount.toJSON())).to.deep.equal([publishedSpicesDiscount]);
+        expect(published.map((discount) => discount.toJSON())).to.deep.equal([{ ...publishedSpicesDiscount, coupons: [] }]);
       });
       it('should answer with every discount published when there are several', async () => {
         const { keep, service } = setupSut();
@@ -39,7 +39,10 @@ describe('class DiscountService', () => {
 
         const published = await service.published();
 
-        expect(published.map((discount) => discount.toJSON())).to.deep.equal([publishedSpicesDiscount, publishedProduceDiscount]);
+        expect(published.map((discount) => discount.toJSON())).to.deep.equal([
+          { ...publishedSpicesDiscount, coupons: [] },
+          { ...publishedProduceDiscount, coupons: [] },
+        ]);
       });
     });
 

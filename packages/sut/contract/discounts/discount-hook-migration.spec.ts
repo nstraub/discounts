@@ -37,7 +37,7 @@ describe('the migration that adds the hook to discounts', () => {
     const keptAgain = await keep(spicesDiscountWithItsHook);
     const loaded = await loadOnItsOwnConnection();
     expect(loaded.map((discount) => discount.toJSON()), 'forward again, the first hook lost').to.have.deep.members([
-      { id: keptBefore.toJSON().id, ...spicesDiscount },
+      { id: keptBefore.toJSON().id, ...spicesDiscount, coupons: [] },
       keptAgain.toJSON(),
     ]);
   });
@@ -48,7 +48,7 @@ describe('the migration that adds the hook to discounts', () => {
 
     const readBack = await aDiscountKeptBeforeAsReadAfterMigratingForward(sut);
 
-    expect(readBack).to.deep.equal(aDiscountKeptBefore);
+    expect(readBack).to.deep.equal({ ...aDiscountKeptBefore, coupons: [] });
   });
   it('should keep and load back, as the deployed version does, a discount without a hook on the migrated table', async () => {
     const { client, databaseUrl, migrateForward } = await setupSut();

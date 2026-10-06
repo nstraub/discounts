@@ -25,7 +25,7 @@ describe('class DiscountService', () => {
       await service.publish(spicesDetails);
 
       const kept = await repository.all();
-      expect(kept.map((discount) => discount.toJSON())).to.deep.equal([{ id: 'test-uuid', ...spicesDiscount }]);
+      expect(kept.map((discount) => discount.toJSON())).to.deep.equal([{ id: 'test-uuid', ...spicesDiscount, coupons: [] }]);
     });
     it('should announce DiscountPublished once the discount is kept', async () => {
       const { events, repository, service } = setupSut();
@@ -37,7 +37,7 @@ describe('class DiscountService', () => {
       await service.publish(spicesDetails);
 
       expect(events.publish).to.have.been.calledWith(expect.any(DiscountPublished));
-      expect(keptWhenAnnounced).to.deep.equal([{ id: 'test-uuid', ...spicesDiscount }]);
+      expect(keptWhenAnnounced).to.deep.equal([{ id: 'test-uuid', ...spicesDiscount, coupons: [] }]);
     });
     it('should answer with the discount it published', async () => {
       const { repository, service } = setupSut();

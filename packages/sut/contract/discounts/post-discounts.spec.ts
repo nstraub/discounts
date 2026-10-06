@@ -47,7 +47,7 @@ describe('POST /discounts', () => {
 
       const response = await http.post('/discounts').send(spicesDiscount);
 
-      expect(published).to.deep.equal([{ id: response.body.id, ...spicesDiscount }]);
+      expect(published).to.deep.equal([{ id: response.body.id, ...spicesDiscount, coupons: [] }]);
     });
   });
 

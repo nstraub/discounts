@@ -12,7 +12,7 @@ const setupSut = () => {
   const events = mock<DomainEventPublisher>();
   const factory = new DiscountFactory(events);
   const repository = mock<DiscountRepository>();
-  repository.withId.calledWith('spices-id').mockResolvedValue(factory.reconstitute({ id: 'spices-id', ...spicesDiscount }));
+  repository.withId.calledWith('spices-id').mockResolvedValue(factory.reconstitute({ id: 'spices-id', ...spicesDiscount, coupons: [] }));
   return { events, repository, service: new DiscountService(factory, repository) };
 };
 
@@ -23,7 +23,7 @@ describe('class DiscountService', () => {
 
       await service.changeRate('spices-id', '25');
 
-      expect(repository.save.mock.lastCall?.at(0)?.toJSON()).to.deep.equal({ id: 'spices-id', ...spicesDiscount, rate: '25' });
+      expect(repository.save.mock.lastCall?.at(0)?.toJSON()).to.deep.equal({ id: 'spices-id', ...spicesDiscount, rate: '25', coupons: [] });
     });
     it('should announce DiscountRateChanged when the rate is changed', async () => {
       const { events, service } = setupSut();

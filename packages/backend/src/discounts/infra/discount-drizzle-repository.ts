@@ -40,6 +40,6 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   }
 
   private rebuilt(row: typeof discounts.$inferSelect): Discount {
-    return this.factory.reconstitute(withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) }));
+    return this.factory.reconstitute({ ...withNoHookWhenNoneIsKept({ ...row, rate: String(row.rate) }), coupons: [] });
   }
 }

@@ -34,7 +34,7 @@ describe('class Discount', () => {
       });
       it('should raise DiscountRateChanged carrying the id and new rate of another discount changed', () => {
         const { events, factory } = setupSut();
-        const discount = factory.reconstitute({ id: 'produce-id', ...produceDiscount });
+        const discount = factory.reconstitute({ id: 'produce-id', ...produceDiscount, coupons: [] });
 
         discount.changeRate('15');
 
@@ -73,7 +73,7 @@ describe('class Discount', () => {
   describe('changing the rate of a discount with a hook', () => {
     it('should keep its hook when its rate changes', () => {
       const { factory } = setupSut();
-      const discount = factory.reconstitute({ id: 'spices-id', ...spicesDiscountWithItsHook });
+      const discount = factory.reconstitute({ id: 'spices-id', ...spicesDiscountWithItsHook, coupons: [] });
 
       discount.changeRate('25');
 
