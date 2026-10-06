@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
-import { publishedSpicesDiscount } from '@sut/support/example-discounts';
+import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
 
 import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
 
@@ -24,6 +24,13 @@ describe('class Discount', () => {
       const redeemed = discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
 
       expect(redeemed.toJSON()).to.deep.equal({ item: publishedSpicesDiscount.item });
+    });
+    it('should answer with the item of another discount when one of its coupons is redeemed', () => {
+      const discount = setupSut({ kept: publishedProduceDiscount });
+
+      const redeemed = discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+
+      expect(redeemed.toJSON()).to.deep.equal({ item: publishedProduceDiscount.item });
     });
 
     describe('combination', () => {

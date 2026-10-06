@@ -33,7 +33,7 @@ export class Discount {
 
   redeemCoupon(token: CouponToken): RedeemedCoupon {
     this.coupons.filter((coupon) => coupon.isIdentifiedBy(token)).forEach((coupon) => coupon.redeem(this.id));
-    return new RedeemedCoupon('Peruvian spices');
+    return new RedeemedCoupon(this.details.toJSON().item);
   }
 
   toJSON(): { id: string; coupons: ReturnType<Coupon['toJSON']>[] } & ReturnType<DiscountDetails['toJSON']> {
