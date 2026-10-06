@@ -37,8 +37,8 @@ export const constraintsAndColumnsOfTheDiscountsTable = async (client: pg.Client
 
 export const aDiscountKeptBefore = { id: 'kept-before', item: 'Saffron', rate: '12.5', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' };
 
-const insertADiscountKeptBefore = async (client: pg.Client): Promise<void> => {
-  const { id, item, rate, storeName, storeAddress } = aDiscountKeptBefore;
+export const insertADiscountRow = async (client: pg.Client, discount: typeof aDiscountKeptBefore): Promise<void> => {
+  const { id, item, rate, storeName, storeAddress } = discount;
   await client.query('INSERT INTO app.discounts (id, item, rate, store_name, store_address) VALUES ($1, $2, $3, $4, $5)', [id, item, rate, storeName, storeAddress]);
 };
 
@@ -51,7 +51,7 @@ export const aDiscountKeptAndLoadedBackAfterMigratingForward = async (sut: { cli
 };
 
 export const aDiscountKeptBeforeAsReadAfterMigratingForward = async (sut: { client: pg.Client; databaseUrl: string; migrateForward: () => Promise<void> }) => {
-  await insertADiscountKeptBefore(sut.client);
+  await insertADiscountRow(sut.client, aDiscountKeptBefore);
   await sut.migrateForward();
   const [loaded] = await discountRepositoryOn(sut.client, sut.databaseUrl).loadOnItsOwnConnection();
   return loaded?.toJSON();

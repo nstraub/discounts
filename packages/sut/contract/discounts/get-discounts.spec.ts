@@ -4,6 +4,7 @@ import { publishedDiscountsResponse } from '@app/types/discounts';
 import { longTextInAnyCharacters, produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 
 import { publishTheSpicesDiscount, setupSut } from '../support/app';
+import { insertADiscountRow } from '../support/discounts-table';
 
 describe('GET /discounts', () => {
   describe('success', () => {
@@ -111,8 +112,7 @@ describe('GET /discounts', () => {
   describe('a rate kept before the rate rules', () => {
     it('should list a discount kept before the rate rules at a rate they refuse, as written, matching the response schema', async () => {
       const { client, http } = await setupSut();
-      const { item, storeName, storeAddress } = spicesDiscount;
-      await client.query('INSERT INTO app.discounts (id, item, rate, store_name, store_address) VALUES ($1, $2, $3, $4, $5)', ['kept-before-the-rate-rules', item, 'a fifth', storeName, storeAddress]);
+      await insertADiscountRow(client, { ...spicesDiscount, id: 'kept-before-the-rate-rules', rate: 'a fifth' });
 
       const response = await http.get('/discounts');
 
