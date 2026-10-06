@@ -9,6 +9,12 @@ const aRefusalListingAsMissing = (pieces: string[]) => new BadRequestException('
 
 const aRefusalOfTheRate = aRefusalListingAsMissing([]);
 
+const setupSutRefusing = (refusal: BadRequestException) => {
+  const sut = setupSut();
+  sut.restApi.post.mockRejectedValue(refusal);
+  return sut;
+};
+
 describe('Store discounts', () => {
   describe('publishing a discount', () => {
     it('should hand the item, rate, store name and store address over to be published', async () => {
@@ -39,8 +45,7 @@ describe('Store discounts', () => {
   });
   describe('publishing a discount at a rate that is not valid', () => {
     it('should hold that the rate is not valid when the publish is refused for it', async () => {
-      const { restApi, discounts } = setupSut();
-      restApi.post.mockRejectedValue(aRefusalOfTheRate);
+      const { discounts } = setupSutRefusing(aRefusalOfTheRate);
 
       await discounts.publish({ ...spicesDiscount, rate: '150' });
 
@@ -58,16 +63,14 @@ describe('Store discounts', () => {
   });
   describe('publishing a discount with a piece left out', () => {
     it('should hold which pieces are missing as the refusal lists them', async () => {
-      const { restApi, discounts } = setupSut();
-      restApi.post.mockRejectedValue(aRefusalListingAsMissing(['item', 'storeAddress']));
+      const { discounts } = setupSutRefusing(aRefusalListingAsMissing(['item', 'storeAddress']));
 
       await discounts.publish({ rate: '20', storeName: spicesDiscount.storeName });
 
       expect(discounts.missing, 'the pieces held as missing').to.deep.equal(['item', 'storeAddress']);
     });
     it('should hold other pieces as missing when the refusal lists others', async () => {
-      const { restApi, discounts } = setupSut();
-      restApi.post.mockRejectedValue(aRefusalListingAsMissing(['rate']));
+      const { discounts } = setupSutRefusing(aRefusalListingAsMissing(['rate']));
 
       await discounts.publish({ item: spicesDiscount.item, storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
 
