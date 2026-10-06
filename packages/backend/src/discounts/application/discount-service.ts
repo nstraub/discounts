@@ -1,4 +1,4 @@
-import { DiscountChanges } from './discount-changes.js';
+import { DiscountChanges, theOneWithId } from './discount-changes.js';
 import type { CountedSales } from './domain/counted-sales.js';
 import { CouponToken } from './domain/coupon-token.js';
 import type { Discount } from './domain/discount.js';
@@ -6,7 +6,6 @@ import type { DiscountDetails } from './domain/discount-details.js';
 import type { DiscountFactory } from './domain/discount-factory.js';
 import type { DiscountRepository } from './domain/discount-repository.js';
 import type { IssuedCoupon } from './domain/issued-coupon.js';
-import { NoSuchDiscountException } from './domain/no-such-discount-exception.js';
 import type { RandomSource } from './domain/random-source.js';
 import type { RedeemedCoupon } from './domain/redeemed-coupon.js';
 import type { Store } from './domain/store.js';
@@ -29,10 +28,7 @@ export class DiscountService {
   }
 
   async changeRate(id: string, rate: string): Promise<void> {
-    const discount = await this.repository.withId(id);
-    if (!discount) {
-      throw new NoSuchDiscountException();
-    }
+    const discount = await theOneWithId(id)(this.repository);
     await this.changes.keptAfter(discount, (found) => found.changeRate(rate));
   }
 

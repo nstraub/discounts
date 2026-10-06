@@ -9,21 +9,19 @@ type Change<Answer> = (discount: Discount) => Answer;
 
 type Lookup = (repository: DiscountRepository) => Promise<Discount | undefined>;
 
-const theOneWithId = (id: string): Lookup => async (repository) => {
-  const discount = await repository.withId(id);
+type FoundOrRefused = (repository: DiscountRepository) => Promise<Discount>;
+
+const found = (find: Lookup, Refusal: new () => Error): FoundOrRefused => async (repository) => {
+  const discount = await find(repository);
   if (!discount) {
-    throw new NoSuchDiscountException();
+    throw new Refusal();
   }
   return discount;
 };
 
-const theOneThatIssued = (token: CouponToken): Lookup => async (repository) => {
-  const discount = await repository.withCouponToken(token);
-  if (!discount) {
-    throw new NoCouponHasTheCodeException();
-  }
-  return discount;
-};
+export const theOneWithId = (id: string): FoundOrRefused => found((repository) => repository.withId(id), NoSuchDiscountException);
+
+const theOneThatIssued = (token: CouponToken): FoundOrRefused => found((repository) => repository.withCouponToken(token), NoCouponHasTheCodeException);
 
 export class DiscountChanges {
   constructor(private readonly repository: DiscountRepository) {}
