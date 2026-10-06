@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { discountRepositoryOn } from '../support/discount-repository';
-import { aDiscountKeptBefore, constraintsAndColumnsOfTheDiscountsTable, insertADiscountKeptBefore } from '../support/discounts-table';
+import { aDiscountKeptBefore, aDiscountKeptBeforeAsReadAfterMigratingForward, constraintsAndColumnsOfTheDiscountsTable } from '../support/discounts-table';
 import { migrateBackward, setupSut } from '../support/migrations';
 
 const theMigration = '0003_rate_as_written';
@@ -66,14 +66,12 @@ describe('the migration that keeps the rate as written', () => {
     expect(refusal, 'invalid text representation of a number').to.equal('22P02');
   });
   it('should read back as text, through the repository, the rate of a discount kept before the migration', async () => {
-    const { client, databaseUrl, migrateForward } = await setupSutMigratedForward();
-    await migrateBackwardPastIt(client);
-    await insertADiscountKeptBefore(client);
+    const sut = await setupSutMigratedForward();
+    await migrateBackwardPastIt(sut.client);
 
-    await migrateForward();
+    const readBack = await aDiscountKeptBeforeAsReadAfterMigratingForward(sut);
 
-    const [loaded] = await discountRepositoryOn(client, databaseUrl).loadOnItsOwnConnection();
-    expect(loaded?.toJSON()).to.deep.equal(aDiscountKeptBefore);
+    expect(readBack).to.deep.equal(aDiscountKeptBefore);
   });
   it('should keep and load back a rate that is a number on the schema before the migration, as on the one after it', async () => {
     const { client, databaseUrl } = await setupSutMigratedForward();
