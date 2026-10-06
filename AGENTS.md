@@ -180,6 +180,11 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   `discounts.module.ts` wires as `crypto.getRandomValues`. `POST /discounts/:id/coupons` answers the
   coupon through `couponResponse`. They are kept in the `coupons` table (migration `0005`, lossy down),
   written and read with their discount (`infra/coupon-rows.ts`).
+- **Redeeming:** `Coupon` is an entity inside the aggregate that owns single use (`redeem()` raises
+  `CouponRedeemed`); `Discount.redeemCoupon(token)` answers with the item. `CouponToken.read(code)`
+  normalises a typed code. `DiscountService.redeemCoupon(code)` loads the discount through
+  `DiscountRepository.withCouponToken`. `infra/redemptions.controller.ts` serves `POST /redemptions`
+  (201 `{ item }`); it parses only the code. Migration `0006` adds `coupons.redeemed` (lossy down).
 - **The rate** is text end to end (column, schema, domain, page), kept exactly as written
   (migration `0003_rate_as_written`).
 - **`src/discounts/infra/database.module.ts`:** the one connection pool, exported as the Drizzle
@@ -242,7 +247,7 @@ first slice.
   `aDiscountKeptBeforeAsReadAfterMigratingForward`, for a discount kept before a migration. A new
   migration joins `theMigrationsAfterIt` in each earlier migration spec; otherwise the migrator
   silently skips an earlier migration that a spec ran backward: today those are the lists in the
-  table, rate and hook migration specs. A random source in a spec is `aSourceDrawing(token)`
+  table, rate, hook and coupons migration specs. A random source in a spec is `aSourceDrawing(token)`
   (`@backend/app/mocks/random-sources`); `couponForTheSpicesDiscount`, `stephaniesProduceDiscount` are
   among the shared examples; `contract/support/discounts-table.ts` has `insertACoupon` and
   `migrations.ts` has `migrateBackwardPast`.
