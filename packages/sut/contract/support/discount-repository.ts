@@ -58,3 +58,10 @@ export const keepADiscountWithACouponRedeemed = async (client: pg.Client, databa
   await repository.save(kept);
   return kept;
 };
+
+export const keepADiscountWithASaleCounted = async (client: pg.Client, databaseUrl: string): Promise<Discount> => {
+  const kept = await keepADiscountWithACouponRedeemed(client, databaseUrl);
+  kept.count();
+  await discountRepositoryOn(client, databaseUrl).repository.save(kept);
+  return kept;
+};

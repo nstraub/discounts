@@ -1,18 +1,16 @@
 import type pg from 'pg';
 import { describe, expect, it } from 'vitest';
 
-import { discountRepositoryOn, isKeptAndLoadedBackOnEmptiedTables, keepADiscountWithACouponRedeemed } from '../support/discount-repository';
+import {
+  discountRepositoryOn,
+  isKeptAndLoadedBackOnEmptiedTables,
+  keepADiscountWithACouponRedeemed,
+  keepADiscountWithASaleCounted,
+} from '../support/discount-repository';
 import { insertACoupon, insertADiscountWithout } from '../support/discounts-table';
 import { migrateBackwardPast, setupSut } from '../support/migrations';
 
 const theMigration = '0007_let_a_coupon_be_counted';
-
-const keepADiscountWithASaleCounted = async (client: pg.Client, databaseUrl: string) => {
-  const kept = await keepADiscountWithACouponRedeemed(client, databaseUrl);
-  kept.count();
-  await discountRepositoryOn(client, databaseUrl).repository.save(kept);
-  return kept;
-};
 
 const theCountedSaleLoadedBackAsKept = (client: pg.Client, databaseUrl: string) =>
   isKeptAndLoadedBackOnEmptiedTables(client, databaseUrl, keepADiscountWithASaleCounted);
