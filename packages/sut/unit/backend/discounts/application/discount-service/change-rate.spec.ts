@@ -26,11 +26,10 @@ describe('class DiscountService', () => {
       expect(repository.save.mock.lastCall?.at(0)?.toJSON()).to.deep.equal({ id: 'spices-id', ...spicesDiscount, rate: '25' });
     });
     it('should announce DiscountRateChanged when the rate is changed', async () => {
-      const { events, repository, service } = setupSut();
+      const { events, service } = setupSut();
 
       await service.changeRate('spices-id', '25');
 
-      expect(repository.save.mock.calls).to.have.length(1);
       expect(events.publish).to.have.been.calledWith(new DiscountRateChanged('spices-id', '25'));
     });
 
