@@ -50,5 +50,14 @@ describe('the migration that adds the hook to discounts', () => {
 
     expect(readBack).to.deep.equal(aDiscountKeptBefore);
   });
-  it.todo('should keep and load back, as the deployed version does, a discount without a hook on the migrated table');
+  it('should keep and load back, as the deployed version does, a discount without a hook on the migrated table', async () => {
+    const { client, databaseUrl, migrateForward } = await setupSut();
+    await migrateForward();
+    const { keep, loadOnItsOwnConnection } = discountRepositoryOn(client, databaseUrl);
+    const kept = await keep(spicesDiscount);
+
+    const [loaded] = await loadOnItsOwnConnection();
+
+    expect(loaded?.toJSON()).to.deep.equal(kept.toJSON());
+  });
 });
