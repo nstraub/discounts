@@ -85,6 +85,13 @@ describe('class FetchRestApi', () => {
 
       expect(refusal).to.deep.include({ missing: ['storeName', 'storeAddress'] });
     });
+    it('should carry no field as missing when a 400 lists none', async () => {
+      const { restApi } = await setupSut();
+
+      const refusal = await refusalOf(restApi.post('/discounts', { ...spicesDiscount, rate: '150' }));
+
+      expect(refusal).to.deep.include({ missing: [] });
+    });
   });
 
   describe('getting', () => {
