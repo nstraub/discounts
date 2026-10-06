@@ -50,7 +50,11 @@ describe('Component RedeemCouponForm', () => {
 
       expect(theStorePickers().map((picker) => picker.value), 'the store picked when the till opens').to.deep.equal(['']);
     });
-    it.todo('should ask for the coupon\'s code under its caption');
+    it('should ask for the coupon\'s code under its caption', () => {
+      setupSut();
+
+      expect(queryAllByRole(document.body, 'textbox', { name: discountTexts.couponCode }), 'code fields under the caption').to.have.length(1);
+    });
     it.todo('should offer to redeem the coupon under its caption');
   });
 });

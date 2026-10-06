@@ -1,13 +1,19 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+
 import type { DiscountResponse } from '@app/types/discounts';
 
 import { discountTexts } from '../texts';
+
+import CaptionedInput from './CaptionedInput.vue';
 
 type Store = Pick<DiscountResponse, 'storeName' | 'storeAddress'>;
 
 defineProps<{ stores: Store[] }>();
 
 const theNameAndAddressOf = (store: Store) => `${store.storeName}, ${store.storeAddress}`;
+
+const code = ref('');
 </script>
 
 <template>
@@ -27,5 +33,10 @@ const theNameAndAddressOf = (store: Store) => `${store.storeName}, ${store.store
         </option>
       </select>
     </label>
+    <CaptionedInput
+      v-model="code"
+      :caption="discountTexts.couponCode"
+      test-id="typed-coupon-code"
+    />
   </form>
 </template>
