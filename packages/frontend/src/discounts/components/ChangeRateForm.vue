@@ -23,6 +23,8 @@ const newRate = ref('');
       type="submit"
       class="rounded border px-3 py-1"
       data-testid="change-rate"
-    />
+    >
+      {{ discountTexts.changeRate }}
+    </button>
   </form>
 </template>

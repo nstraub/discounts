@@ -16,7 +16,9 @@ describe('Component ChangeRateForm', () => {
       expect(field.text()).to.equal(discountTexts.newRate);
       expect(field.find('[data-testid="new-rate"]').exists()).to.equal(true);
     });
-    it.todo('should offer to change the rate under its caption');
+    it('should offer to change the rate under its caption', () => {
+      expect(setupSut().get('[data-testid="change-rate"]').text()).to.equal(discountTexts.changeRate);
+    });
     it.todo('should name the discount it changes in its label, for a person and a screen reader alike');
   });
 });
