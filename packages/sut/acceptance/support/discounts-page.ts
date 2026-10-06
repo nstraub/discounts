@@ -119,3 +119,10 @@ export const publishFromSomeoneElsesPage = async (world: PlaywrightWorld, discou
 };
 
 export const ownDiscountsPage = (world: PlaywrightWorld): DiscountsPage => new DiscountsPage(world.page);
+
+export const publishFromOwnPage = async (world: PlaywrightWorld, discount: ExampleDiscount): Promise<void> => {
+  const ownPage = ownDiscountsPage(world);
+  await ownPage.open();
+  await ownPage.publish(discount);
+  world.publishedDiscount = discount;
+};

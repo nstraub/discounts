@@ -2,7 +2,7 @@ import { Given, Then, When } from '@cucumber/cucumber';
 
 import { spicesDiscount } from '@sut/support/example-discounts';
 
-import { openSomeoneElsesDiscountsPage, ownDiscountsPage } from '../../support/discounts-page';
+import { openSomeoneElsesDiscountsPage, ownDiscountsPage, publishFromOwnPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
 
 const raisedRate = '30';
@@ -10,8 +10,7 @@ const raisedRate = '30';
 const loweredRateSortingAfterThePublishedOneAsText = '5';
 
 Given('Mike has published a discount on an item', async function (this: PlaywrightWorld) {
-  await ownDiscountsPage(this).open();
-  await ownDiscountsPage(this).publish(spicesDiscount);
+  await publishFromOwnPage(this, spicesDiscount);
 });
 
 When('he raises its rate', async function (this: PlaywrightWorld) {
