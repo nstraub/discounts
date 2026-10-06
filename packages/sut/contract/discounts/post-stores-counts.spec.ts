@@ -5,6 +5,7 @@ import { countRequest, countResponse, requestRejection } from '@app/types/discou
 import { longTextInAnyCharacters, spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
+import { statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
 
 type ExampleDiscount = typeof spicesDiscount;
 
@@ -19,6 +20,8 @@ const setupSutWithACouponUsedFor = async (discount: ExampleDiscount = spicesDisc
   await useACouponFor(sut.http, published, discount);
   return { ...sut, published };
 };
+
+const countWrittenAsJson = (http: Http, body: string) => http.post('/stores/counts').set('Content-Type', 'application/json').send(body);
 
 const countTheStoreOf = (http: Http, discount: ExampleDiscount = spicesDiscount) =>
   http.post('/stores/counts').send({ storeName: discount.storeName, storeAddress: discount.storeAddress });
@@ -99,7 +102,13 @@ describe('POST /stores/counts', () => {
         ['storeName', 'storeAddress'],
       ]);
     });
-    it.todo('should answer 400 for a JSON body that is an array, a string, a number or null');
+    it('should answer 400 for a JSON body that is an array, a string, a number or null', async () => {
+      const { http } = await setupSut();
+
+      const statuses = await statusesAnsweringBodiesThatAreNotObjects((body) => countWrittenAsJson(http, body));
+
+      expect(statuses, 'the statuses answering an array, a string, a number and null').to.deep.equal([400, 400, 400, 400]);
+    });
     it.todo('should answer 400 for a body that is not valid JSON');
     it.todo('should answer every error with a body matching the error schema');
   });
