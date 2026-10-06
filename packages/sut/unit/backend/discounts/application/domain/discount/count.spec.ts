@@ -58,7 +58,13 @@ describe('class Discount', () => {
 
         expect(counted.toJSON().discountedSales, 'the sales since the last count').to.equal(1);
       });
-      it.todo('should not count a coupon issued and not yet redeemed');
+      it('should not count a coupon issued and not yet redeemed', () => {
+        const { discount } = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: true }, { token: 'R4WZ0BH8NE', redeemed: false }] });
+
+        const counted = discount.count();
+
+        expect(counted.toJSON().discountedSales, 'the sales counted').to.equal(1);
+      });
     });
 
     describe('boundary', () => {
