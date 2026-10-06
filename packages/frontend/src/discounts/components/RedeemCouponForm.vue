@@ -41,5 +41,8 @@ const redeem = async (): Promise<void> => {
     >
       {{ discountTexts.redeem }}
     </button>
+    <p role="status">
+      {{ discountTexts.theDiscountAppliesTo }}
+    </p>
   </form>
 </template>

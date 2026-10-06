@@ -1,8 +1,10 @@
+import { queryAllByRole } from '@testing-library/dom';
 import type { VueWrapper } from '@vue/test-utils';
 import { mount } from '@vue/test-utils';
-import { describe, expect, it, onTestFinished } from 'vitest';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import RedeemCouponForm from '@frontend/discounts/components/RedeemCouponForm.vue';
+import { discountTexts } from '@frontend/discounts/texts';
 import { useDiscountsStore } from '@frontend/stores/discounts-store';
 import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
@@ -25,6 +27,8 @@ const redeemThroughTheForm = async (form: VueWrapper, storeShown: string, code: 
   await form.get('form').trigger('submit');
 };
 
+const whatTheTillTells = () => queryAllByRole(document.body, 'status').map((told) => told.textContent).join(' ');
+
 describe('Component RedeemCouponForm', () => {
   describe('redeeming the coupon Sue shows', () => {
     it('should redeem the code as typed at the store picked', async () => {
@@ -41,7 +45,16 @@ describe('Component RedeemCouponForm', () => {
 
       expect(discounts.redeemCoupon).to.have.been.calledWith({ code: 'R4WZ0-BH8NE', storeName: "Stephanie's Market", storeAddress: '8 Orchard Lane' });
     });
-    it.todo('should say the discount applies once the coupon is redeemed');
+    it('should say the discount applies once the coupon is redeemed', async () => {
+      const { form, discounts } = setupSut();
+      vi.mocked(discounts.redeemCoupon).mockImplementation(async () => {
+        discounts.redemption = { item: spicesDiscount.item };
+      });
+
+      await redeemThroughTheForm(form, "Mike's Groceries, 12 Market Street", '7k3qx 9m2pd');
+
+      expect(whatTheTillTells(), 'what the till tells').to.contain(discountTexts.theDiscountAppliesTo);
+    });
     it.todo('should name the item the discount is for once the coupon is redeemed');
 
     describe('state', () => {
