@@ -3,6 +3,7 @@ import type { Discount } from './domain/discount.js';
 import type { DiscountDetails } from './domain/discount-details.js';
 import type { DiscountFactory } from './domain/discount-factory.js';
 import type { DiscountRepository } from './domain/discount-repository.js';
+import type { IssuedCoupon } from './domain/issued-coupon.js';
 import type { RandomSource } from './domain/random-source.js';
 
 export class DiscountService {
@@ -28,12 +29,11 @@ export class DiscountService {
     await this.repository.save(discount);
   }
 
-  async issueCoupon(id: string): Promise<{ token: string; storeName: string }> {
+  async issueCoupon(id: string): Promise<IssuedCoupon> {
     const discount = (await this.repository.withId(id))!;
-    const token = CouponToken.drawnFrom(this.random);
-    discount.issueCoupon(token);
+    const coupon = discount.issueCoupon(CouponToken.drawnFrom(this.random));
     await this.repository.save(discount);
-    return { token: token.toJSON(), storeName: discount.toJSON().storeName };
+    return coupon;
   }
 
   async published(): Promise<Discount[]> {

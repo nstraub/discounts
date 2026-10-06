@@ -3,6 +3,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Param, Patch, Post
 import {
   changeRateRequest,
   type ChangeRateRequest,
+  couponResponse,
   discountResponse,
   publishDiscountRequest,
   type PublishDiscountRequest,
@@ -36,7 +37,8 @@ export class DiscountsController {
 
   @Post(':id/coupons')
   async issueCoupon(@Param('id') id: string) {
-    return this.discounts.issueCoupon(id);
+    const coupon = await this.discounts.issueCoupon(id);
+    return couponResponse.parse(coupon.toJSON());
   }
 
   @Get()

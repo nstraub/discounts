@@ -4,6 +4,7 @@ import type { DiscountDetails } from './discount-details.js';
 import { DiscountPublished } from './discount-published.js';
 import { DiscountRateChanged } from './discount-rate-changed.js';
 import type { DomainEventPublisher } from './domain-event-publisher.js';
+import { IssuedCoupon } from './issued-coupon.js';
 
 export class Discount {
   constructor(
@@ -22,9 +23,10 @@ export class Discount {
     this.events.publish(new DiscountRateChanged(this.id, rate));
   }
 
-  issueCoupon(token: CouponToken): void {
+  issueCoupon(token: CouponToken): IssuedCoupon {
     this.coupons = [...this.coupons, token];
     this.events.publish(new CouponIssued(this.id, token.toJSON()));
+    return new IssuedCoupon(token, this.details.toJSON().storeName);
   }
 
   toJSON(): { id: string; coupons: string[] } & ReturnType<DiscountDetails['toJSON']> {
