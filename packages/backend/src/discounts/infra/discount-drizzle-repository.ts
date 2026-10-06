@@ -27,8 +27,10 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   async save(discount: Discount): Promise<void> {
     const { coupons: tokens, ...state } = discount.toJSON();
     await this.database.insert(discounts).values(state).onConflictDoUpdate({ target: discounts.id, set: state });
-    if (tokens.length > 0) {
-      await this.database.insert(coupons).values(tokens.map((token) => ({ token, discountId: state.id })));
+    const kept = await this.database.select({ token: coupons.token }).from(coupons).where(eq(coupons.discountId, state.id));
+    const newlyIssued = tokens.filter((token) => !kept.some((coupon) => coupon.token === token));
+    if (newlyIssued.length > 0) {
+      await this.database.insert(coupons).values(newlyIssued.map((token) => ({ token, discountId: state.id })));
     }
   }
 
