@@ -15,3 +15,11 @@ export const discounts = app.table('discounts', {
   storeAddress: text('store_address').notNull(),
   hook: text('hook'),
 });
+
+export const coupons = app.table('coupons', {
+  id: serial('id').primaryKey(),
+  token: text('token').notNull().unique(),
+  discountId: text('discount_id')
+    .notNull()
+    .references(() => discounts.id),
+});

@@ -4,9 +4,11 @@ import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-
 
 import { discountRepositoryOn } from '../support/discount-repository';
 import { aDiscountKeptBefore, aDiscountKeptBeforeAsReadAfterMigratingForward, constraintsAndColumnsOfTheDiscountsTable } from '../support/discounts-table';
-import { migrateBackward, setupSut } from '../support/migrations';
+import { migrateBackwardPast, setupSut } from '../support/migrations';
 
 const theMigration = '0004_add_discount_hook';
+
+const theMigrationsAfterIt = ['0005_create_coupons'];
 
 describe('the migration that adds the hook to discounts', () => {
   it('should migrate forward from empty, a discount with a hook kept and loaded back', async () => {
@@ -25,7 +27,7 @@ describe('the migration that adds the hook to discounts', () => {
     const { keep, loadOnItsOwnConnection } = discountRepositoryOn(client, databaseUrl);
     const keptBefore = await keep(spicesDiscountWithItsHook);
 
-    await migrateBackward(client, theMigration);
+    await migrateBackwardPast(client, theMigration, theMigrationsAfterIt);
 
     const { columns } = await constraintsAndColumnsOfTheDiscountsTable(client);
     expect(columns.map((column) => column.name), 'the columns, backward').to.not.include('hook');
@@ -44,7 +46,7 @@ describe('the migration that adds the hook to discounts', () => {
   it('should read back with no hook, through the repository, a discount kept before the migration', async () => {
     const sut = await setupSut();
     await sut.migrateForward();
-    await migrateBackward(sut.client, theMigration);
+    await migrateBackwardPast(sut.client, theMigration, theMigrationsAfterIt);
 
     const readBack = await aDiscountKeptBeforeAsReadAfterMigratingForward(sut);
 
