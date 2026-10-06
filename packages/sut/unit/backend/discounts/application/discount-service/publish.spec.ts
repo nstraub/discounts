@@ -13,6 +13,8 @@ import { RateNotValidException } from '@backend/discounts/application/domain/rat
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 const spicesDetails = new DiscountDetails(spicesDiscount);
+const aRateItsRulesRefuse = '150';
+const spicesDetailsAtARateItsRulesRefuse = spicesDetails.withRate(aRateItsRulesRefuse);
 
 const setupSut = () => {
   const events = mock<DomainEventPublisher>();
@@ -55,21 +57,21 @@ describe('class DiscountService', () => {
     it('should report the rate as not valid', async () => {
       const { service } = setupSut();
 
-      await expect(service.publish(spicesDetails.withRate('150'))).rejects.to.be.instanceOf(RateNotValidException);
+      await expect(service.publish(spicesDetailsAtARateItsRulesRefuse)).rejects.to.be.instanceOf(RateNotValidException);
     });
     it('should keep nothing when the rate is refused', async () => {
       const { repository, service } = setupSut();
 
-      await expect(service.publish(spicesDetails.withRate('150'))).rejects.to.be.instanceOf(RateNotValidException);
+      await expect(service.publish(spicesDetailsAtARateItsRulesRefuse)).rejects.to.be.instanceOf(RateNotValidException);
 
       expect(await repository.all()).to.deep.equal([]);
     });
     it('should announce DiscountPublicationRejected for the rate refused', async () => {
       const { events, service } = setupSut();
 
-      await expect(service.publish(spicesDetails.withRate('150'))).rejects.to.be.instanceOf(RateNotValidException);
+      await expect(service.publish(spicesDetailsAtARateItsRulesRefuse)).rejects.to.be.instanceOf(RateNotValidException);
 
-      expect(events.publish).to.have.been.calledWith(new DiscountPublicationRejected('150', 'not valid'));
+      expect(events.publish).to.have.been.calledWith(new DiscountPublicationRejected(aRateItsRulesRefuse, 'not valid'));
     });
   });
 });
