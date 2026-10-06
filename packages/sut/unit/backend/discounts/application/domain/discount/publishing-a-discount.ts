@@ -11,7 +11,8 @@ export const setupSut = () => {
   const events = mock<DomainEventPublisher>();
   const factory = new DiscountFactory(events);
   const discountWith = (details: ConstructorParameters<typeof DiscountDetails>[0]) => factory.create(new DiscountDetails(details));
-  return { events, discountWith, discountAt: (rate: string) => discountWith({ ...spicesDiscount, rate }) };
+  const keep = async () => {};
+  return { events, keep, discountWith, discountAt: (rate: string) => discountWith({ ...spicesDiscount, rate }) };
 };
 
 export const lastEventOf = (events: MockProxy<DomainEventPublisher>) => {

@@ -19,7 +19,8 @@ export class Discount {
     private readonly events: DomainEventPublisher,
   ) {}
 
-  publish(): void {
+  async publish(keep: (discount: Discount) => Promise<void>): Promise<void> {
+    await keep(this);
     new DiscountRate(this.details.toJSON().rate).whenValid(this.events, () => this.events.publish(new DiscountPublished(this.toJSON())));
   }
 

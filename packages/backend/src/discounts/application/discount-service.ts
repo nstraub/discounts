@@ -23,8 +23,7 @@ export class DiscountService {
 
   async publish(details: DiscountDetails): Promise<Discount> {
     const discount = this.factory.create(details);
-    await this.repository.save(discount);
-    discount.publish();
+    await discount.publish((published) => this.repository.save(published));
     return discount;
   }
 

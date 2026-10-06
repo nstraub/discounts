@@ -5,15 +5,14 @@ import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-
 
 import { lastEventOf, setupSut } from './publishing-a-discount';
 
-
 describe('class Discount', () => {
   describe('publishing a discount', () => {
     describe('the discount published', () => {
-      it('should raise DiscountPublished carrying the item, rate, store name and store address', () => {
-        const { events, discountWith } = setupSut();
+      it('should raise DiscountPublished carrying the item, rate, store name and store address', async () => {
+        const { events, keep, discountWith } = setupSut();
         const discount = discountWith(spicesDiscount);
 
-        discount.publish();
+        await discount.publish(keep);
 
         expect(lastEventOf(events)).to.be.instanceOf(DiscountPublished);
         expect(lastEventOf(events).discount).to.deep.include(spicesDiscount);
@@ -34,19 +33,19 @@ describe('class Discount', () => {
   });
   describe('publishing a discount with a hook', () => {
     describe('the discount published', () => {
-      it('should raise DiscountPublished carrying its hook', () => {
-        const { events, discountWith } = setupSut();
+      it('should raise DiscountPublished carrying its hook', async () => {
+        const { events, keep, discountWith } = setupSut();
         const discount = discountWith(spicesDiscountWithItsHook);
 
-        discount.publish();
+        await discount.publish(keep);
 
         expect(lastEventOf(events).discount.hook).to.equal(spicesDiscountWithItsHook.hook);
       });
-      it('should raise DiscountPublished carrying no hook when it has none', () => {
-        const { events, discountWith } = setupSut();
+      it('should raise DiscountPublished carrying no hook when it has none', async () => {
+        const { events, keep, discountWith } = setupSut();
         const discount = discountWith(spicesDiscount);
 
-        discount.publish();
+        await discount.publish(keep);
 
         expect(lastEventOf(events).discount).to.not.have.property('hook');
       });
