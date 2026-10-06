@@ -1,0 +1,1 @@
+ALTER TABLE "app"."coupons" ADD COLUMN "redeemed" boolean DEFAULT false NOT NULL;

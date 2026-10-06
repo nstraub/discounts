@@ -1,4 +1,4 @@
-import { pgSchema, serial, text } from 'drizzle-orm/pg-core';
+import { boolean, pgSchema, serial, text } from 'drizzle-orm/pg-core';
 
 export const app = pgSchema('app');
 
@@ -22,4 +22,5 @@ export const coupons = app.table('coupons', {
   discountId: text('discount_id')
     .notNull()
     .references(() => discounts.id),
+  redeemed: boolean('redeemed').notNull().default(false),
 });

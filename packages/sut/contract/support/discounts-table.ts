@@ -3,6 +3,7 @@ import type pg from 'pg';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { discountRepositoryOn } from './discount-repository';
+import { migrateBackwardPast } from './migrations';
 
 const aDiscountRow = { id: "'constraint-id'", item: "'Peruvian spices'", rate: "'20'", store_name: "'Mike''s Groceries'", store_address: "'12 Market Street'", hook: "'Our spices now come from a new supplier'" };
 
@@ -54,4 +55,14 @@ export const aDiscountKeptBeforeAsReadAfterMigratingForward = async (sut: { clie
   await sut.migrateForward();
   const [loaded] = await discountRepositoryOn(sut.client, sut.databaseUrl).loadOnItsOwnConnection();
   return loaded?.toJSON();
+};
+
+export const aDiscountKeptBeforeTheMigrationAsReadAfterIt = async (
+  sut: { client: pg.Client; databaseUrl: string; migrateForward: () => Promise<void> },
+  migration: string,
+  migrationsAfterIt: string[],
+) => {
+  await sut.migrateForward();
+  await migrateBackwardPast(sut.client, migration, migrationsAfterIt);
+  return aDiscountKeptBeforeAsReadAfterMigratingForward(sut);
 };

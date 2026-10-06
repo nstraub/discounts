@@ -11,7 +11,7 @@ import { migrateBackwardPast, setupSut, tableStatus } from '../support/migration
 
 const theMigration = '0002_create_discounts';
 
-const theMigrationsAfterIt = ['0003_rate_as_written', '0004_add_discount_hook', '0005_create_coupons'];
+const theMigrationsAfterIt = ['0003_rate_as_written', '0004_add_discount_hook', '0005_create_coupons', '0006_let_a_coupon_be_redeemed'];
 
 const theDiscountLinesPassing = {
   listedWhenNoneKept: [],

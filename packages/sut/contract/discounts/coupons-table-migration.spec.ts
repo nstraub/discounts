@@ -10,12 +10,13 @@ import { discountRepositoryOn } from '../support/discount-repository';
 import {
   aDiscountKeptAndLoadedBackAfterMigratingForward,
   aDiscountKeptBefore,
-  aDiscountKeptBeforeAsReadAfterMigratingForward,
+  aDiscountKeptBeforeTheMigrationAsReadAfterIt,
   insertACoupon,
 } from '../support/discounts-table';
-import { migrateBackward, setupSut, tableStatus } from '../support/migrations';
+import { migrateBackwardPast, setupSut, tableStatus } from '../support/migrations';
 
 const theMigration = '0005_create_coupons';
+const theMigrationsAfterIt = ['0006_let_a_coupon_be_redeemed'];
 
 const theCouponLinesPassing = {
   loadedBackAsKept: true,
@@ -55,7 +56,7 @@ describe('the migration that adds the coupons table', () => {
     keptBefore.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
     await repository.save(keptBefore);
 
-    await migrateBackward(client, theMigration);
+    await migrateBackwardPast(client, theMigration, theMigrationsAfterIt);
 
     expect(await tableStatus(client, 'app.coupons'), 'the coupons table, backward').to.equal(null);
     const backward = await client.query('SELECT item FROM app.discounts');
@@ -68,11 +69,7 @@ describe('the migration that adds the coupons table', () => {
     expect(foundAgain?.toJSON().coupons, 'forward again, the first coupon lost').to.deep.equal([]);
   });
   it('should read back, through the repository, a discount kept before the migration, with no coupon', async () => {
-    const sut = await setupSut();
-    await sut.migrateForward();
-    await migrateBackward(sut.client, theMigration);
-
-    const readBack = await aDiscountKeptBeforeAsReadAfterMigratingForward(sut);
+    const readBack = await aDiscountKeptBeforeTheMigrationAsReadAfterIt(await setupSut(), theMigration, theMigrationsAfterIt);
 
     expect(readBack).to.deep.equal({ ...aDiscountKeptBefore, coupons: [] });
   });

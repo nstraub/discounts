@@ -43,6 +43,13 @@
       "when": 1791258635326,
       "tag": "0005_create_coupons",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791262951066,
+      "tag": "0006_let_a_coupon_be_redeemed",
+      "breakpoints": true
     }
   ]
 }
