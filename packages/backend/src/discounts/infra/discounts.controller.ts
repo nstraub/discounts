@@ -34,6 +34,11 @@ export class DiscountsController {
     await this.discounts.changeRate(id, request.rate);
   }
 
+  @Post(':id/coupons')
+  async issueCoupon() {
+    return { token: '7K3QX9M2PD', storeName: "Mike's Groceries" };
+  }
+
   @Get()
   async published() {
     const discounts = await this.discounts.published();

@@ -1,8 +1,25 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { spicesDiscount } from '@sut/support/example-discounts';
+
+import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
+
+const getACouponFor = (http: Http, id: string) => http.post(`/discounts/${id}/coupons`).send({});
+
+const tenCrockfordCharacters = /^[0-9A-HJKMNP-TV-Z]{10}$/;
 
 describe('POST /discounts/:id/coupons', () => {
   describe('success', () => {
-    it.todo('should answer 201 with the coupon\'s token and its store\'s name');
+    it('should answer 201 with the coupon\'s token and its store\'s name', async () => {
+      const { http } = await setupSut();
+      const published = await publishTheSpicesDiscount(http);
+
+      const response = await getACouponFor(http, published.id);
+
+      expect(response.status).to.equal(201);
+      expect(response.body.token).to.match(tenCrockfordCharacters);
+      expect(response.body.storeName).to.equal(spicesDiscount.storeName);
+    });
     it.todo('should answer with a body matching the coupon response schema');
     it.todo('should publish CouponIssued on the application event emitter for the coupon issued');
   });
