@@ -1,11 +1,24 @@
 import { describe, expect, it } from 'vitest';
 
 import { oneRaceAfterAnother } from '../support/at-the-same-moment';
-import { redeemAtTheStoreOf, setupSutWithACouponForEachRace } from '../support/redemptions';
+import { issueACouponFor, redeemAtTheStoreOf, setupSutWithACouponForEachRace } from '../support/redemptions';
 
 describe('changes to one discount at the same moment', () => {
   describe('A4 concurrency', () => {
-    it.todo('should keep both a coupon issued and another coupon redeemed at the same moment');
+    it('should keep both a coupon issued and another coupon redeemed at the same moment', async () => {
+      const { http, published, codes } = await setupSutWithACouponForEachRace();
+
+      const keptAfterEachPair = await oneRaceAfterAnother(codes, async (code) => {
+        const [, issued] = await Promise.all([redeemAtTheStoreOf(http, code), issueACouponFor(http, published)]);
+        const usedAgain = await redeemAtTheStoreOf(http, code);
+        const issuedUsed = await redeemAtTheStoreOf(http, issued);
+        return { redemptionKept: usedAgain.status === 409, issuedKept: issuedUsed.status === 201 };
+      });
+
+      expect(keptAfterEachPair, 'the redemption and the coupon issued kept after each pair').to.deep.equal(
+        codes.map(() => ({ redemptionKept: true, issuedKept: true })),
+      );
+    });
     it.todo('should keep both of two coupons issued for one discount at the same moment');
     it('should keep a coupon\'s redemption and a change of its discount\'s rate made at the same moment', async () => {
       const { http, published, codes } = await setupSutWithACouponForEachRace();
