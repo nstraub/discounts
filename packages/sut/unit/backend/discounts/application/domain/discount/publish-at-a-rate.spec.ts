@@ -20,7 +20,16 @@ describe('class Discount', () => {
       it.todo('should accept a rate written with or without a percent sign as the rate it names');
       it.todo('should accept a rate written with spaces around it as the rate it names');
       it.todo('should accept a rate written with a trailing zero as the rate it names');
-      it.todo('should refuse a rate written as 1e2, 0x14 or Infinity, its rejection naming the rate as not valid');
+      it('should refuse a rate written as 1e2, 0x14 or Infinity, its rejection naming the rate as not valid', () => {
+        const { events, discountAt } = setupSut();
+        const computersNotations = ['1e2', '0x14', 'Infinity'];
+
+        computersNotations.forEach((rate) => discountAt(rate).publish());
+
+        expect(events.publish.mock.calls.map(([event]) => event)).to.deep.equal(
+          computersNotations.map((rate) => new DiscountPublicationRejected(rate, 'not valid')),
+        );
+      });
     });
   });
   describe('publishing a discount at a rate its rules refuse', () => {
