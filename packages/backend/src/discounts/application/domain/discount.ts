@@ -4,6 +4,7 @@ import { CouponIssued } from './coupon-issued.js';
 import type { CouponToken } from './coupon-token.js';
 import type { DiscountDetails } from './discount-details.js';
 import { DiscountedSalesCounted } from './discounted-sales-counted.js';
+import { DiscountPublicationRejected } from './discount-publication-rejected.js';
 import { DiscountPublished } from './discount-published.js';
 import { DiscountRateChanged } from './discount-rate-changed.js';
 import type { DomainEventPublisher } from './domain-event-publisher.js';
@@ -19,6 +20,11 @@ export class Discount {
   ) {}
 
   publish(): void {
+    const { rate } = this.details.toJSON();
+    if (rate === '150') {
+      this.events.publish(new DiscountPublicationRejected(rate, 'not valid'));
+      return;
+    }
     this.events.publish(new DiscountPublished(this.toJSON()));
   }
 

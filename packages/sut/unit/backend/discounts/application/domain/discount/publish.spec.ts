@@ -2,6 +2,7 @@ import { mock, type MockProxy } from 'vitest-mock-extended';
 import { describe, expect, it } from 'vitest';
 
 import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
+import { DiscountPublicationRejected } from '@backend/discounts/application/domain/discount-publication-rejected';
 import { DiscountPublished } from '@backend/discounts/application/domain/discount-published';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
@@ -16,6 +17,11 @@ const setupSut = () => {
 const lastEventOf = (events: MockProxy<DomainEventPublisher>) => {
   const [published] = events.publish.mock.lastCall ?? [];
   return published as DiscountPublished;
+};
+
+const lastRejectionOf = (events: MockProxy<DomainEventPublisher>) => {
+  const [rejected] = events.publish.mock.lastCall ?? [];
+  return rejected as DiscountPublicationRejected;
 };
 
 describe('class Discount', () => {
@@ -83,7 +89,15 @@ describe('class Discount', () => {
   });
   describe('publishing a discount at a rate its rules refuse', () => {
     describe('the rejection', () => {
-      it.todo('should raise DiscountPublicationRejected carrying the rate and that it is not valid');
+      it('should raise DiscountPublicationRejected carrying the rate and that it is not valid', () => {
+        const { events, discountWith } = setupSut();
+        const discount = discountWith({ ...spicesDiscount, rate: '150' });
+
+        discount.publish();
+
+        expect(lastRejectionOf(events)).to.be.instanceOf(DiscountPublicationRejected);
+        expect(lastRejectionOf(events)).to.include({ rate: '150', reason: 'not valid' });
+      });
       it.todo('should not raise DiscountPublished when its rate is refused');
     });
 
