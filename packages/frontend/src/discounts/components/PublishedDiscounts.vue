@@ -6,6 +6,8 @@ import { discountTexts } from '../texts';
 import ChangeRateForm from './ChangeRateForm.vue';
 
 defineProps<{ discounts: DiscountResponse[] }>();
+
+const textIdOf = (discount: DiscountResponse): string => `published-discount-${discount.id}-text`;
 </script>
 
 <template>
@@ -23,7 +25,7 @@ defineProps<{ discounts: DiscountResponse[] }>();
       data-testid="published-discount"
     >
       <div
-        :id="`published-discount-${discount.id}-text`"
+        :id="textIdOf(discount)"
         class="flex gap-2"
         data-testid="published-discount-text"
       >
@@ -34,7 +36,7 @@ defineProps<{ discounts: DiscountResponse[] }>();
       </div>
       <ChangeRateForm
         :discount="discount"
-        :named-by="`published-discount-${discount.id}-text`"
+        :named-by="textIdOf(discount)"
       />
     </li>
   </ul>
