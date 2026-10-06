@@ -74,4 +74,8 @@ describe('class DiscountService', () => {
       expect(events.publish).to.have.been.calledWith(new DiscountPublicationRejected(aRateItsRulesRefuse, 'not valid'));
     });
   });
+  describe('publishing a discount with a piece left out', () => {
+    it.todo('should report the pieces left out as missing');
+    it.todo('should keep nothing when a piece is left out');
+  });
 });

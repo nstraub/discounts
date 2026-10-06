@@ -51,4 +51,10 @@ describe('Store discounts', () => {
       expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(false);
     });
   });
+  describe('publishing a discount with a piece left out', () => {
+    it.todo('should hold which pieces are missing as the refusal lists them');
+    it.todo('should not hold the rate as not valid when the refusal lists it as missing');
+    it.todo('should not hold the rate as not valid when the refusal lists only other pieces as missing');
+    it.todo('should no longer hold any piece as missing once the next discount is published');
+  });
 });

@@ -70,6 +70,7 @@ describe('class FetchRestApi', () => {
 
       expect(refusal).to.not.be.instanceOf(UnprocessableContentException);
     });
+    it.todo('should carry the fields a 400 lists as missing in the rejection');
   });
 
   describe('getting', () => {
