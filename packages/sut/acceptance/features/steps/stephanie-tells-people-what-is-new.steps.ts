@@ -1,9 +1,9 @@
 import { Given, Then } from '@cucumber/cucumber';
 
+import { stephaniesProduceDiscount } from '@sut/support/example-discounts';
+
 import { openSomeoneElsesDiscountsPage, suesPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
-
-const stephaniesProduceDiscount = { item: 'Organic produce', rate: '15', storeName: "Stephanie's Market", storeAddress: '8 Orchard Lane' };
 
 const newSupplier = 'Our produce now comes from a new supplier';
 

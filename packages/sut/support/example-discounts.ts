@@ -2,6 +2,8 @@ export const spicesDiscount = { item: 'Peruvian spices', rate: '20', storeName: 
 
 export const produceDiscount = { item: 'Fresh produce', rate: '10', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' };
 
+export const stephaniesProduceDiscount = { item: 'Organic produce', rate: '15', storeName: "Stephanie's Market", storeAddress: '8 Orchard Lane' };
+
 export const longTextInAnyCharacters = {
   item: 'Ají panca 🌶️ '.repeat(1_000),
   storeName: "D'Ángelo's <b>Bodega</b>",
