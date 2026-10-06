@@ -144,7 +144,13 @@ describe('Component RedeemCouponForm', () => {
 
       expect(whatTheTillTells(), 'what the till tells').to.contain(discountTexts.couponNotValid);
     });
-    it.todo('should not say the discount applies when the coupon is not valid');
+    it('should not say the discount applies when the coupon is not valid', async () => {
+      const { form } = setupSutAnsweringAfterAnEarlierCouponApplied(new CouponNotValid());
+
+      await redeemThroughTheForm(form, "Mike's Groceries, 12 Market Street", 'ZZZZZZZZZZ');
+
+      expect(whatTheTillTells(), 'what the till tells after an earlier coupon applied').not.to.contain(discountTexts.theDiscountAppliesTo);
+    });
   });
   describe('no code typed', () => {
     it.todo('should tell Stephanie to type the coupon\'s code when she redeems with none typed, redeeming nothing');
