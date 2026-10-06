@@ -1,8 +1,19 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { spicesDiscount } from '@sut/support/example-discounts';
+
+import { setupSut } from './discounts-store-of-an-app';
 
 describe('Store discounts', () => {
   describe('counting the discounted sales', () => {
-    it.todo('should hand the store picked over to be counted');
+    it('should hand the store picked over to be counted', async () => {
+      const { restApi, discounts } = setupSut();
+      const theSpicesStore = { storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress };
+
+      await discounts.countDiscountedSales(theSpicesStore);
+
+      expect(restApi.post).to.have.been.calledWith('/stores/counts', theSpicesStore);
+    });
     it.todo('should hold what the count answers once it is made');
 
     describe('dependency failure', () => {
