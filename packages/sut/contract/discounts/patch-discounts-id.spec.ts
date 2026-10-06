@@ -107,7 +107,15 @@ describe('PATCH /discounts/:id', () => {
   });
 
   describe('A3 handle guessing (no accounts)', () => {
-    it.todo('should answer 404 for an id no discount has, changing no discount');
+    it('should answer 404 for an id no discount has, changing no discount', async () => {
+      const { http } = await setupSut();
+      const published = await publishTheSpicesDiscount(http);
+
+      const response = await patchTheDiscount(http, 'an-id-no-discount-has').send({ rate: '25' });
+
+      expect(response.status).to.equal(404);
+      expect((await http.get('/discounts')).body, 'the discounts listed after the change').to.deep.equal([published]);
+    });
     it.todo('should throttle changes from one source far faster than any store owner changes a rate');
   });
 
