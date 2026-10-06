@@ -9,9 +9,9 @@ import { CouponToken } from '@backend/discounts/application/domain/coupon-token'
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
 import { couponForTheProduceDiscount, publishedProduceDiscount } from '@sut/support/example-discounts';
 
-const setupSut = ({ token = '7K3QX9M2PD', redeemed = false } = {}) => {
+const setupSut = ({ token = '7K3QX9M2PD', redeemed = false, counted = false } = {}) => {
   const events = mock<DomainEventPublisher>();
-  return { events, coupon: new Coupon(CouponToken.keptAs(token), redeemed, false, events) };
+  return { events, coupon: new Coupon(CouponToken.keptAs(token), redeemed, counted, events) };
 };
 
 describe('class Coupon', () => {
@@ -85,7 +85,12 @@ describe('class Coupon', () => {
     });
 
     describe('state', () => {
-      it.todo('should refuse a second redemption once its first has been counted');
+      it('should refuse a second redemption once its first has been counted', () => {
+        const { coupon } = setupSut({ redeemed: true, counted: true });
+
+        expect(() => coupon.redeem('spices-id')).to.throw(CouponAlreadyUsedException);
+        expect(coupon.toJSON()).to.deep.include({ redeemed: true, counted: true });
+      });
     });
   });
 });
