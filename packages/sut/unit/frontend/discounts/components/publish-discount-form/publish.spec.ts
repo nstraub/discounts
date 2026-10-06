@@ -132,7 +132,14 @@ describe('Component PublishDiscountForm', () => {
     });
 
     describe('empty', () => {
-      it.todo('should publish a hook of only blank space as no hook');
+      it('should publish a hook of only blank space as no hook', async () => {
+        const { form, discounts } = setupSut();
+        await new DOMWrapper(getByRole(document.body, 'textbox', { name: discountTexts.hook })).setValue('   ');
+
+        await publishThroughTheForm(form, spicesDiscount);
+
+        expect(vi.mocked(discounts.publish).mock.lastCall?.at(0)).to.not.have.property('hook');
+      });
     });
   });
 });

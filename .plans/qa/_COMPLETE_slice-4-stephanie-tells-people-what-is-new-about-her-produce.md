@@ -20,7 +20,7 @@ and the props of `packages/frontend/src/discounts/components/*.vue`. No implemen
 
 ## Outlined
 
-37 `it.todo` lines: 28 are built in this slice (the table below); 9 are recorded for later and stay `it.todo`
+37 `it.todo` lines: 29 are built in this slice (the table below); 8 are recorded for later and stay `it.todo`
 (*Recorded for later*). Two spec files are new; lines for twelve existing spec files are added inside each
 file's top-level `describe`, in groups of their own; no existing line is changed or removed.
 
@@ -38,6 +38,7 @@ file's top-level `describe`, in groups of their own; no existing line is changed
 | 4 — Forward; Backward, lossy (every hook is lost); Preservation (a discount kept before reads back with no hook); Compatibility (the deployed version's round-trip on the migrated table) | the hook column is a new migration; a nullable column is itself the expand step (settled) | database-testing (migration slots) | `contract/discounts/discount-hook-migration.spec.ts` (new) |
 | 1 — asks for the hook under its caption | Stephanie writes the hook when she publishes, under the caption `Why it is worth a look (optional)` from the feature's texts module (settled); invariant 6 | edge-case-discovery | `unit/frontend/discounts/components/publish-discount-form/render.spec.ts` (added) |
 | 3 — publishes the hook as given; publishes no hook when it is left empty; clears the hook once published | the scenario; Mike publishes with no hook through the same form | edge-case-discovery (empty) | `unit/frontend/discounts/components/publish-discount-form/publish.spec.ts` (added) |
+| 1 — publishes a hook of only blank space as no hook (built after review, finding F1; recorded before) | blank counts as no hook (settled); `@todo` "Stephanie gives only blank space for what is new" | edge-case-discovery (empty) | `unit/frontend/discounts/components/publish-discount-form/publish.spec.ts` (added) |
 | 1 — hands the hook over to be published with the rest | the page reaches the publish through the store | edge-case-discovery | `unit/frontend/stores/discounts-store/publish.spec.ts` (added) |
 | 4 — shows its hook; shows only the four pieces with no empty place when it has none; each hook on its own entry, the entry without one showing none; shown without surrounding spaces | the scenario ("she sees what is new about its produce" on the store found); a discount without a hook shows nothing (settled, built); shown text is trimmed (settled); invariant 6 | edge-case-discovery (empty, combination) | `unit/frontend/discounts/components/published-discounts/render.spec.ts` (added) |
 | 1 — a hook written as markup shown as plain text | free text from anyone shown on a public page | adversarial-testing (A2) | same file |
@@ -56,7 +57,7 @@ migration joins those lists.
 
 ## Recorded for later
 
-9 lines stay `it.todo`, each with its `@todo` scenario.
+8 lines stay `it.todo`, each with its `@todo` scenario.
 
 | Lines | Spec file (under `packages/sut/`) | Owned by |
 |---|---|---|
@@ -66,13 +67,12 @@ migration joins those lists.
 | 1 — 400 naming the hook when it is a number, an array or an object, never a 500 | the same file | `@todo` "What is new is sent as something other than text"; the proposal beside it: not valid, never a 500 |
 | 1 — 400 naming the hook when it is longer than allowed | the same file | `@todo` "Stephanie says more about what is new than allowed" |
 | 1 — the hook a change request carries left unused | `contract/discounts/patch-discounts-id.spec.ts` | `@todo` "A change to a discount's rate carries something else to say"; settled: ignored |
-| 1 — a hook of only blank space published as no hook | `unit/frontend/discounts/components/publish-discount-form/publish.spec.ts` | `@todo` "Stephanie gives only blank space for what is new" |
 | 1 — line breaks in a hook kept | `unit/frontend/discounts/components/published-discounts/render.spec.ts` | `@todo` "Stephanie says what is new on several lines"; open question, the proposal beside it: keep them |
 | 1 — a web address in a hook shown as plain text, never as a link | the same file | `@todo` "What is new names a web address"; settled: never a link |
 
 Known gaps among these: a hook that is `null` is answered by whatever the request schema says until its line
 is built — a 400 if the schema takes the hook as optional text, where the settled reading is "no hook"; a hook
-that is `""` or only blank space is kept as sent and shown as an empty or blank place on its entry.
+that is `""` or only blank space sent to the API is kept as sent and shown as an empty or blank place on its entry.
 
 The `@todo` scenarios "Sue finds a discount that says nothing new", "Sue sees what is new only about the store
 that said it", "Stephanie says what is new with accents and apostrophes", "What is new is written as code" and

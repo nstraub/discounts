@@ -5,7 +5,7 @@ export const nothingTyped = () => ({ item: '', rate: '', storeName: '', storeAdd
 const isBlank = (typed: string): boolean => typed.trim() === '';
 
 const withTheHookGiven = (discount: Partial<PublishDiscountRequest>, hook: string): Partial<PublishDiscountRequest> => {
-  if (hook === '') {
+  if (isBlank(hook)) {
     return discount;
   }
   return { ...discount, hook };
