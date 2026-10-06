@@ -92,7 +92,15 @@ describe('Store discounts', () => {
 
       expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(false);
     });
-    it.todo('should no longer hold any piece as missing once the next discount is published');
+    it('should no longer hold any piece as missing once the next discount is published', async () => {
+      const { restApi, discounts } = setupSut();
+      restApi.post.mockRejectedValueOnce(aRefusalListingAsMissing(['rate'])).mockResolvedValueOnce(undefined);
+      await discounts.publish(spicesDiscountWithoutItsRate);
+
+      await discounts.publish(spicesDiscount);
+
+      expect(discounts.missing, 'the pieces held as missing').to.deep.equal([]);
+    });
   });
   describe('publishing a discount refused for another reason', () => {
     it('should pass on a refusal that is not a bad request', async () => {
