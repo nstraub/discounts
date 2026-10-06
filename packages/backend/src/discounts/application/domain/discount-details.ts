@@ -9,12 +9,17 @@ export class DiscountDetails {
   }
 
   whenComplete<Published>(complete: () => Published, refused: (rate: string, missing: readonly string[]) => void): Published {
-    if (this.details.item === '') {
-      const missing = ['item', 'rate', 'storeName', 'storeAddress'];
+    const missing = this.piecesLeftOut();
+    if (missing.length > 0) {
       refused(this.details.rate, missing);
       throw new PiecesMissingException(missing);
     }
     return complete();
+  }
+
+  private piecesLeftOut(): string[] {
+    const { item, rate, storeName, storeAddress } = this.details;
+    return Object.entries({ item, rate, storeName, storeAddress }).filter(([, text]) => text === '').map(([piece]) => piece);
   }
 
   store(): Store {

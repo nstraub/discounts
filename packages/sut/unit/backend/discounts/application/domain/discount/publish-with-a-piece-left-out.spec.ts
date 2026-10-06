@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { DiscountPublicationRejected } from '@backend/discounts/application/domain/discount-publication-rejected';
+import { DiscountPublished } from '@backend/discounts/application/domain/discount-published';
 import { PiecesMissingException } from '@backend/discounts/application/domain/pieces-missing-exception';
+import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { lastRejectionOf, setupSut } from './publishing-a-discount';
 
@@ -18,7 +20,14 @@ describe('class Discount', () => {
           new DiscountPublicationRejected('', 'missing', ['item', 'rate', 'storeName', 'storeAddress']),
         );
       });
-      it.todo('should not raise DiscountPublished when a piece is left out');
+      it('should not raise DiscountPublished when a piece is left out', async () => {
+        const { events, keep, discountWith } = setupSut();
+        const storeNameLeftOut = discountWith({ ...spicesDiscount, storeName: '' });
+
+        await expect(storeNameLeftOut.publish(keep)).rejects.to.be.instanceOf(PiecesMissingException);
+
+        expect(events.publish).to.not.have.been.calledWith(expect.any(DiscountPublished));
+      });
     });
 
     describe('empty', () => {
