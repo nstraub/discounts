@@ -80,4 +80,15 @@ describe('POST /discounts with a piece left out', () => {
       expect(rejected.map(({ reason, pieces }) => ({ reason, pieces }))).to.deep.equal([{ reason: 'missing', pieces: ['storeName'] }]);
     });
   });
+
+  describe('blank space', () => {
+    it('should answer 400 naming the item, the store name and the store address when each is only blank space', async () => {
+      const { http } = await setupSut();
+
+      const response = await http.post('/discounts').send({ item: ' ', rate, storeName: '\t', storeAddress: '  \n ' });
+
+      expect(response.status).to.equal(400);
+      expect(theFieldsNamedBy(response)).to.deep.equal([['item', 'storeName', 'storeAddress']]);
+    });
+  });
 });
