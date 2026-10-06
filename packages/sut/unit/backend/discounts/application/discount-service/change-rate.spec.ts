@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { DiscountService } from '@backend/discounts/application/discount-service';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
+import { DiscountRateChanged } from '@backend/discounts/application/domain/discount-rate-changed';
 import type { DiscountRepository } from '@backend/discounts/application/domain/discount-repository';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
 import { spicesDiscount } from '@sut/support/example-discounts';
@@ -24,7 +25,14 @@ describe('class DiscountService', () => {
 
       expect(repository.save.mock.lastCall?.at(0)?.toJSON()).to.deep.equal({ id: 'spices-id', ...spicesDiscount, rate: '25' });
     });
-    it.todo('should announce DiscountRateChanged once the change is kept');
+    it('should announce DiscountRateChanged once the change is kept', async () => {
+      const { events, repository, service } = setupSut();
+
+      await service.changeRate('spices-id', '25');
+
+      expect(repository.save.mock.calls).to.have.length(1);
+      expect(events.publish).to.have.been.calledWith(new DiscountRateChanged('spices-id', '25'));
+    });
 
     describe('state', () => {
       it.todo('should report that there is no such discount when no discount has that id, changing nothing');
