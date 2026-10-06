@@ -5,7 +5,7 @@ import { describe, expect, it, onTestFinished } from 'vitest';
 import type { DiscountResponse } from '@app/types/discounts';
 import PublishedDiscounts from '@frontend/discounts/components/PublishedDiscounts.vue';
 import { discountTexts } from '@frontend/discounts/texts';
-import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
+import { publishedProduceDiscount, publishedSpicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
 import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
 const setupSut = ({ discounts = [publishedSpicesDiscount] } = {}) =>
@@ -118,7 +118,11 @@ describe('Component PublishedDiscounts', () => {
     });
   });
   describe('showing the hook of a discount', () => {
-    it.todo('should show its hook');
+    it('should show its hook', () => {
+      const list = setupSut({ discounts: [{ id: 'spices-id', ...spicesDiscountWithItsHook }] });
+
+      expect(list.get('[data-testid="published-hook"]').text()).to.equal(spicesDiscountWithItsHook.hook);
+    });
     it.todo('should show only its item, rate, store name and store address when it has no hook, with no empty place for one');
     it.todo('should show each hook on its own discount\'s entry, the entry without one showing none');
     it.todo('should show its hook without its surrounding spaces');

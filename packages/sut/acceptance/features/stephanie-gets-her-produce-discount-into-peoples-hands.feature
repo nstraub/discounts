@@ -1,6 +1,5 @@
 Feature: Stephanie gets her produce discount into people's hands
 
-  @wip
   Scenario: Stephanie tells people what is new about her produce
     Given Stephanie has published a discount on produce
     And her discount says the produce comes from a new supplier
