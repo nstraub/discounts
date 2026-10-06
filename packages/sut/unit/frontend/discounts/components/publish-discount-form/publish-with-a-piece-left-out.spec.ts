@@ -17,6 +17,11 @@ const setupSutRefusingAsMissing = (pieces: string[]) => {
   return { form };
 };
 
+const askToPublish = async (form: VueWrapper): Promise<void> => {
+  await form.get('[data-testid="publish-discount"]').trigger('click');
+  await flushPromises();
+};
+
 const whatTheFieldTells = (form: VueWrapper, field: string) =>
   form.findAll(`[data-testid="${field}-field"] [role="status"]`).map((told) => told.text()).join(' ');
 
@@ -25,16 +30,14 @@ describe('Component PublishDiscountForm', () => {
     it('should tell Mike the item is missing beside its field when refused for it', async () => {
       const { form } = setupSutRefusingAsMissing(['item']);
 
-      await form.get('[data-testid="publish-discount"]').trigger('click');
-      await flushPromises();
+      await askToPublish(form);
 
       expect(whatTheFieldTells(form, 'discount-item'), "what the item's field tells").to.equal(discountTexts.itemMissing);
     });
     it('should tell Mike the rate is missing beside its field when refused for it', async () => {
       const { form } = setupSutRefusingAsMissing(['rate']);
 
-      await form.get('[data-testid="publish-discount"]').trigger('click');
-      await flushPromises();
+      await askToPublish(form);
 
       expect(whatTheFieldTells(form, 'discount-rate'), "what the rate's field tells").to.equal(discountTexts.rateMissing);
     });
