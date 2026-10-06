@@ -35,9 +35,8 @@ export class DiscountDrizzleRepository implements DiscountRepository {
   }
 
   async withCouponToken(token: CouponToken): Promise<Discount | undefined> {
-    const owners = await idsOfTheDiscountsThatIssued(this.database, token.toJSON());
-    const [found] = await Promise.all(owners.map((id) => this.withId(id)));
-    return found;
+    const [owner] = await idsOfTheDiscountsThatIssued(this.database, token.toJSON());
+    return owner === undefined ? undefined : this.withId(owner);
   }
 
   private rebuilt(row: typeof discounts.$inferSelect, issued: ReturnType<Discount['toJSON']>['coupons']): Discount {
