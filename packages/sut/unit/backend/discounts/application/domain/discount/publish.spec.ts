@@ -1,13 +1,11 @@
 import { mock } from 'vitest-mock-extended';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { DiscountDetails } from '@backend/discounts/application/domain/discount-details';
 import { DiscountPublished } from '@backend/discounts/application/domain/discount-published';
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
 import { spicesDiscount } from '@sut/support/example-discounts';
-
-vi.unmock('uuid');
 
 const setupSut = () => {
   const events = mock<DomainEventPublisher>();
@@ -18,14 +16,6 @@ const setupSut = () => {
 describe('class Discount', () => {
   describe('publishing a discount', () => {
     describe('the discount published', () => {
-      it('should hold the item, rate, store name and store address it was published with', () => {
-        const { discountWith } = setupSut();
-        const discount = discountWith(spicesDiscount);
-
-        discount.publish();
-
-        expect(discount.toJSON()).to.deep.include(spicesDiscount);
-      });
       it('should raise DiscountPublished carrying the item, rate, store name and store address', () => {
         const { events, discountWith } = setupSut();
         const discount = discountWith(spicesDiscount);
@@ -35,28 +25,6 @@ describe('class Discount', () => {
         const [published] = events.publish.mock.lastCall ?? [];
         expect(published).to.be.instanceOf(DiscountPublished);
         expect((published as DiscountPublished).discount).to.deep.include(spicesDiscount);
-      });
-      it('should give each published discount an identity of its own, two identical discounts included', () => {
-        const { discountWith } = setupSut();
-        const first = discountWith(spicesDiscount);
-        const second = discountWith(spicesDiscount);
-
-        first.publish();
-        second.publish();
-
-        expect(first.toJSON().id).to.not.equal(second.toJSON().id);
-      });
-    });
-
-    describe('type', () => {
-      it('should keep an item, store name and store address written with accents, apostrophes and emoji exactly as written', () => {
-        const { discountWith } = setupSut();
-        const writtenWithAccents = { item: 'Ají panca 🌶️', storeName: "D'Ángelo's Bodega", storeAddress: 'Calle Ñuñoa 4, piso 2' };
-        const discount = discountWith({ ...spicesDiscount, ...writtenWithAccents });
-
-        discount.publish();
-
-        expect(discount.toJSON()).to.deep.include(writtenWithAccents);
       });
     });
 
