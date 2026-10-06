@@ -39,8 +39,9 @@ export class Discount {
   }
 
   count(): CountedSales {
-    this.events.publish(new DiscountedSalesCounted('spices-id', 3));
-    return new CountedSales(this.id, this.details, 3);
+    const discountedSales = 3;
+    this.events.publish(new DiscountedSalesCounted('spices-id', discountedSales));
+    return new CountedSales(this.id, this.details, discountedSales);
   }
 
   toJSON(): { id: string; coupons: ReturnType<Coupon['toJSON']>[] } & ReturnType<DiscountDetails['toJSON']> {
