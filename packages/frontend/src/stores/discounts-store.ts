@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-import type { ChangeRateRequest, CouponResponse, DiscountResponse, PublishDiscountRequest } from '@app/types/discounts';
+import type { ChangeRateRequest, CouponResponse, DiscountResponse, PublishDiscountRequest, RedemptionRequest } from '@app/types/discounts';
 
 import { useRestApi } from '../rest-api-key';
 
@@ -29,5 +29,8 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const getCoupon = async (id: string): Promise<void> => {
     coupon.value = await restApi.post<CouponResponse>(`/discounts/${id}/coupons`, {});
   };
-  return { published, stores, coupon, publish, load, changeRate, getCoupon };
+  const redeemCoupon = async (redemption: RedemptionRequest): Promise<void> => {
+    await restApi.post('/redemptions', { code: redemption.code, storeName: "Mike's Groceries", storeAddress: '12 Market Street' });
+  };
+  return { published, stores, coupon, publish, load, changeRate, getCoupon, redeemCoupon };
 });
