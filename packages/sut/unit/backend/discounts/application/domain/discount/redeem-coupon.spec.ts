@@ -57,7 +57,13 @@ describe('class Discount', () => {
     });
   });
   describe('redeeming one of its coupons at a store', () => {
-    it.todo('should redeem its coupon at its own store, the name and address it was published with');
+    it('should redeem its coupon at its own store, the name and address it was published with', () => {
+      const discount = setupSut();
+
+      discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), new Store(theStoreOf(publishedSpicesDiscount)));
+
+      expect(discount.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true, counted: false }]);
+    });
     it('should refuse its coupon at another store, the coupon staying unused', () => {
       const discount = setupSut();
 
