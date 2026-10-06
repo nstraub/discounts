@@ -73,16 +73,6 @@ Feature: Rodrigo counts the discounted sales
     When Rodrigo counts the discounted sales twice before the first count answers
     Then he sees 3 discounted sales for that discount
 
-  # Which store's count includes a coupon taken at another store's till is a question for Rodrigo
-  # that is still open. The proposal beside it: the store of the coupon's discount, since the
-  # redemption belongs to that discount.
-  @todo
-  Scenario: A coupon taken at another store's till
-    Given Rodrigo has counted Stephanie's discounted sales before
-    And Sue has used a coupon for Stephanie's discount at Mike's store since then
-    When Rodrigo counts the discounted sales
-    Then he sees 1 discounted sale for Stephanie's discount
-
   # The page offers only stores someone has published a discount at, so this is reached only from
   # outside the page.
   @todo
@@ -132,3 +122,11 @@ Feature: Rodrigo counts the discounted sales
     And Sue has tried to use it again
     When Rodrigo counts the discounted sales
     Then he sees 1 discounted sale for that discount
+
+  @todo
+  Scenario: A coupon refused at another store's till is not a discounted sale
+    Given Rodrigo has counted Stephanie's discounted sales before
+    And Sue has used 3 coupons for Stephanie's discount since then
+    And her neighbour has tried to use a coupon for Stephanie's discount at Mike's store
+    When Rodrigo counts the discounted sales
+    Then he sees 3 discounted sales for that discount

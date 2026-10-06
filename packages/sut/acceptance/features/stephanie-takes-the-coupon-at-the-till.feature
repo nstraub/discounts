@@ -99,3 +99,39 @@ Feature: Stephanie takes the coupon at the till
     When Sue uses it at Stephanie's store while Stephanie changes the discount's rate
     Then Sue's coupon counts as used
     And people can see the new rate
+
+  @wip
+  Scenario: A coupon for another store's discount
+    Given Sue has a coupon for Mike's discount
+    When Sue tries to use it at Stephanie's store
+    Then Stephanie is told it is not for her store
+
+  @todo
+  Scenario: A coupon refused at another store still applies at its own
+    Given Sue has a coupon for Mike's discount
+    And Sue has tried to use it at Stephanie's store
+    When Sue uses it at Mike's store
+    Then Mike is told the discount applies
+
+  @todo
+  Scenario: A store with the same name at another address cannot take the coupon
+    Given Sue has a coupon for Stephanie's discount
+    And a store with the same name at another address has published a discount
+    When Sue tries to use it at the store with the same name at another address
+    Then that store is told it is not for its store
+    And Sue's coupon is still unused
+
+  # Which refusal a used coupon gets at another store is not settled. The proposal beside the
+  # question: it is not for her store, since the store is told nothing about a coupon that is not hers.
+  @todo
+  Scenario: A used coupon tried at another store
+    Given Sue has used her coupon for Mike's discount at Mike's store
+    When Sue tries to use it at Stephanie's store
+    Then Stephanie is told it is not for her store
+
+  @todo
+  Scenario: Sue's coupon is tried at another store while it is used at its own
+    Given Sue has a coupon for Mike's discount
+    When it is used at Mike's store while it is tried at Stephanie's store
+    Then Mike is told the discount applies
+    And Stephanie is told it is not for her store
