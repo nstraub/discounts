@@ -34,7 +34,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
     redemption.value = await restApi.post<RedemptionResponse>('/redemptions', request);
   };
   const countDiscountedSales = async (store: CountRequest): Promise<void> => {
-    await restApi.post('/stores/counts', { storeName: store.storeName, storeAddress: '12 Market Street' });
+    await restApi.post('/stores/counts', store);
   };
   return { published, stores, coupon, publish, load, changeRate, getCoupon, redemption, redeemCoupon, countDiscountedSales };
 });
