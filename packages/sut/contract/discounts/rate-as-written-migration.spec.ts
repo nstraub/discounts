@@ -62,4 +62,15 @@ describe('the migration that keeps the rate as written', () => {
     const [loaded] = await discountRepositoryOn(client, databaseUrl).loadOnItsOwnConnection();
     expect(loaded?.toJSON()).to.deep.equal({ id: 'kept-before', item: 'Saffron', rate: '12.5', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' });
   });
+  it('should keep and load back a rate that is a number on the schema before the migration, as on the one after it', async () => {
+    const { client, databaseUrl, migrateForward } = await setupSut();
+    await migrateForward();
+    await migrateBackward(client, theMigration);
+    const { keep, loadOnItsOwnConnection } = discountRepositoryOn(client, databaseUrl);
+    await keep(spicesDiscount);
+
+    const [loaded] = await loadOnItsOwnConnection();
+
+    expect(loaded?.toJSON()).to.deep.include(spicesDiscount);
+  });
 });
