@@ -19,6 +19,10 @@ describe('class CouponToken', () => {
     });
     it.todo('should draw only from Crockford base32, never I, L, O or U');
     it.todo('should favour no character over many draws from an even source');
-    it.todo('should draw another token from other random values');
+    it('should draw another token from other random values', () => {
+      const token = CouponToken.drawnFrom(aSourceGiving(10, 11, 12, 13, 14, 15, 16, 17, 18, 19));
+
+      expect(token.toJSON()).to.equal('ABCDEFGHJK');
+    });
   });
 });

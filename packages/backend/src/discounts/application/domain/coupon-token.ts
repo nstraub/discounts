@@ -1,11 +1,14 @@
 import type { RandomSource } from './random-source.js';
 
+const crockfordBase32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+const charactersInAToken = 10;
+
 export class CouponToken {
   private constructor(private readonly characters: string) {}
 
   static drawnFrom(random: RandomSource): CouponToken {
-    random(new Uint8Array(10));
-    return new CouponToken('0123456789');
+    const drawn = random(new Uint8Array(charactersInAToken));
+    return new CouponToken([...drawn].map((value) => crockfordBase32.charAt(value)).join(''));
   }
 
   toJSON(): string {
