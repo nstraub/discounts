@@ -101,7 +101,12 @@ describe('class Discount', () => {
 
         expect(() => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atAnotherAddress)).to.throw(CouponNotForThisStoreException);
       });
-      it.todo('should refuse its coupon at a store with another name at the same address');
+      it('should refuse its coupon at a store with another name at the same address', () => {
+        const discount = setupSut();
+        const underAnotherName = new Store({ storeName: 'Corner Grocery', storeAddress: publishedSpicesDiscount.storeAddress });
+
+        expect(() => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), underAnotherName)).to.throw(CouponNotForThisStoreException);
+      });
       it.todo('should refuse its coupon at a store whose name differs from its own only in its capitals');
       it.todo('should refuse its coupon at a store whose name has spaces around it that its own has not');
     });
