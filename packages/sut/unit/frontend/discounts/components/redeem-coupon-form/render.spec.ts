@@ -56,6 +56,11 @@ describe('Component RedeemCouponForm', () => {
     });
   });
   describe('what the till requires', () => {
-    it.todo('should require the coupon\'s code to be typed before the coupon is redeemed');
+    it('should require the coupon\'s code to be typed before the coupon is redeemed', () => {
+      setupSut();
+
+      const codeFields = queryAllByRole<HTMLInputElement>(document.body, 'textbox', { name: discountTexts.couponCode });
+      expect(codeFields.map((field) => field.required), 'the code field required').to.deep.equal([true]);
+    });
   });
 });

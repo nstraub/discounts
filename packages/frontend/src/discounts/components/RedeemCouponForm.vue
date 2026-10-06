@@ -36,6 +36,7 @@ const redeem = async (): Promise<void> => {
       v-model="code"
       :caption="discountTexts.couponCode"
       test-id="typed-coupon-code"
+      required
     />
     <button
       type="submit"

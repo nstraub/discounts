@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ caption: string; testId: string; told?: string }>();
+defineProps<{ caption: string; testId: string; told?: string; required?: boolean }>();
 
 const value = defineModel<string>({ required: true });
 </script>
@@ -12,6 +12,7 @@ const value = defineModel<string>({ required: true });
         v-model="value"
         class="rounded border border-gray-400 px-2 py-1"
         :data-testid="testId"
+        :required="required"
       >
     </label>
     <p
