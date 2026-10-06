@@ -13,7 +13,9 @@ describe('class CouponToken', () => {
     it('should read a letter O typed for a zero as a zero', () => {
       expect(CouponToken.read('R4WZOBH8NE').toJSON()).to.equal('R4WZ0BH8NE');
     });
-    it.todo('should read a letter I or a letter L typed for a one as a one');
+    it('should read a letter I or a letter L typed for a one as a one', () => {
+      expect(CouponToken.read('IK3QX9M2PL').toJSON()).to.equal('1K3QX9M2P1');
+    });
     it.todo('should read a code typed in two groups, with a space or a hyphen between them, as its token');
     it.todo('should read a code typed with spaces around it as its token');
 
