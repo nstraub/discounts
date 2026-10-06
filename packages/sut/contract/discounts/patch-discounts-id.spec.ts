@@ -10,6 +10,8 @@ type Http = Awaited<ReturnType<typeof setupSut>>['http'];
 
 const publishTheSpicesDiscount = async (http: Http): Promise<{ id: string }> => (await http.post('/discounts').send(spicesDiscount)).body;
 
+const bodiesThatAreNotObjects = ['[]', '"25"', '25', 'null'];
+
 const patchTheDiscount = (http: Http, id: string) => http.patch(`/discounts/${id}`);
 
 describe('PATCH /discounts/:id', () => {
@@ -55,7 +57,18 @@ describe('PATCH /discounts/:id', () => {
       expect([missing.status, notText.status]).to.deep.equal([400, 400]);
       expect([requestRejection.parse(missing.body).fields, requestRejection.parse(notText.body).fields]).to.deep.equal([['rate'], ['rate']]);
     });
-    it.todo('should answer 400 for a JSON body that is an array, a string, a number or null');
+    it('should answer 400 for a JSON body that is an array, a string, a number or null', async () => {
+      const { http } = await setupSut();
+      const published = await publishTheSpicesDiscount(http);
+
+      const statuses = [];
+      for (const body of bodiesThatAreNotObjects) {
+        const response = await patchTheDiscount(http, published.id).set('Content-Type', 'application/json').send(body);
+        statuses.push(response.status);
+      }
+
+      expect(statuses).to.deep.equal([400, 400, 400, 400]);
+    });
     it.todo('should answer 400 for a body that is not valid JSON');
     it.todo('should answer every error with a body matching the error schema');
   });
