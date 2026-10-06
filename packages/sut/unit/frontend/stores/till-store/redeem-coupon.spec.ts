@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { UnprocessableContentException } from '@app/types/rest-api-refusals';
-import { CouponAlreadyUsed, CouponNotForThisStore, DiscountApplies, NoStoreSaid } from '@frontend/discounts/till-answers';
+import { NotFoundException, UnprocessableContentException } from '@app/types/rest-api-refusals';
+import { CouponAlreadyUsed, CouponNotForThisStore, CouponNotValid, DiscountApplies, NoStoreSaid } from '@frontend/discounts/till-answers';
 import { produceDiscount, spicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
 
 import { setupSut } from './till-store-of-an-app';
@@ -105,7 +105,13 @@ describe('Store till', () => {
     });
   });
   describe('redeeming a code nobody issued', () => {
-    it.todo('should hold that the coupon is not valid');
+    it('should hold that the coupon is not valid', async () => {
+      const { till } = setupSutRefusing(new NotFoundException('POST /redemptions answered 404'));
+
+      await till.redeemCoupon(aCodeAtTheSpicesStore);
+
+      expect(till.answer, 'the answer the till holds').to.be.instanceOf(CouponNotValid);
+    });
     it.todo('should not hold a coupon nobody issued as already used');
     it.todo('should no longer hold a coupon as not valid once the next coupon is redeemed');
   });

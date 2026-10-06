@@ -2,12 +2,15 @@ import { defineStore } from 'pinia';
 import { shallowRef } from 'vue';
 
 import type { RedemptionRequest, RedemptionResponse } from '@app/types/discounts';
-import { UnprocessableContentException } from '@app/types/rest-api-refusals';
+import { NotFoundException, UnprocessableContentException } from '@app/types/rest-api-refusals';
 
-import { CouponAlreadyUsed, CouponNotForThisStore, DiscountApplies, NoStoreSaid, NothingTold, type TillAnswer } from '../discounts/till-answers';
+import { CouponAlreadyUsed, CouponNotForThisStore, CouponNotValid, DiscountApplies, NoStoreSaid, NothingTold, type TillAnswer } from '../discounts/till-answers';
 import { useRestApi } from '../rest-api-key';
 
-const answersToRefusals = [{ refused: UnprocessableContentException, Answer: CouponNotForThisStore }];
+const answersToRefusals = [
+  { refused: UnprocessableContentException, Answer: CouponNotForThisStore },
+  { refused: NotFoundException, Answer: CouponNotValid },
+];
 
 const theAnswerTo = (refusal: unknown): TillAnswer => {
   const Answer = answersToRefusals.find(({ refused }) => refusal instanceof refused)?.Answer ?? CouponAlreadyUsed;
