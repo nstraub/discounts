@@ -29,10 +29,8 @@ export const useDiscountsStore = defineStore('discounts', () => {
         throw refusal;
       }
       rateNotValid.value = true;
-      if (refusal instanceof BadRequestException) {
-        missing.value = refusal.missing;
-        rateNotValid.value = refusal.missing.length === 0;
-      }
+      missing.value = refusal.missing;
+      rateNotValid.value = refusal.missing.length === 0;
     }
   };
   const load = async (): Promise<void> => {
