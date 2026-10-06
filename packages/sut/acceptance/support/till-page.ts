@@ -31,6 +31,11 @@ export class TillPage {
     const told = this.page.getByRole('status').filter({ hasText: discountTexts.couponAlreadyUsed });
     await told.waitFor().catch(() => assert.fail('the till does not say the coupon has already been used'));
   }
+
+  async verifyTellsTheCouponIsNotForItsStore(): Promise<void> {
+    const told = this.page.getByRole('status').filter({ hasText: discountTexts.couponNotForYourStore });
+    await told.waitFor().catch(() => assert.fail('the till does not say the coupon is not for its store'));
+  }
 }
 
 export const openTheTillOnADeviceOfItsOwn = async (world: PlaywrightWorld): Promise<TillPage> => {
