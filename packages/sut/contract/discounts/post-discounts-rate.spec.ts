@@ -17,6 +17,12 @@ describe('POST /discounts with a rate written another way', () => {
   });
 
   describe('A1 input boundary', () => {
-    it.todo('should answer 400 naming the rate when it is 10 000 characters long');
+    it('should answer 400 naming the rate when it is 10 000 characters long', async () => {
+      const { http } = await setupSut();
+
+      const response = await http.post('/discounts').send({ ...spicesDiscount, rate: '1'.repeat(10_000) });
+
+      expect([response.status, response.body.fields]).to.deep.equal([400, ['rate']]);
+    });
   });
 });
