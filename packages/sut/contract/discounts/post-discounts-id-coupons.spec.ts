@@ -2,7 +2,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { describe, expect, it } from 'vitest';
 
 import { couponResponse } from '@app/types/discounts';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { longTextInAnyCharacters, spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
 
@@ -43,7 +43,15 @@ describe('POST /discounts/:id/coupons', () => {
   });
 
   describe('strictness', () => {
-    it.todo('should keep the coupon response schema no stricter than the coupon Discount issues');
+    it('should keep the coupon response schema no stricter than the coupon Discount issues', async () => {
+      const { http } = await setupSut();
+      const published = (await http.post('/discounts').send({ ...spicesDiscount, ...longTextInAnyCharacters })).body;
+
+      const response = await getACouponFor(http, published.id);
+
+      expect(response.body.storeName).to.equal(longTextInAnyCharacters.storeName);
+      expect(couponResponse.safeParse(response.body).error).to.equal(undefined);
+    });
   });
 
   describe('A3 handle guessing (no accounts)', () => {
