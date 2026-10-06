@@ -4,50 +4,50 @@ import { describe, expect, it } from 'vitest';
 import { redemptionResponse } from '@app/types/discounts';
 import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
-import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
+import { type Http, setupSut } from '../support/app';
 
-const setupSutWithACouponForTheSpicesDiscount = async () => {
+type ExampleDiscount = typeof spicesDiscount;
+
+const setupSutWithACouponFor = async (discount: ExampleDiscount = spicesDiscount) => {
   const sut = await setupSut();
-  const published = await publishTheSpicesDiscount(sut.http);
+  const published: { id: string } = (await sut.http.post('/discounts').send(discount)).body;
   const code: string = (await sut.http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
   return { ...sut, published, code };
 };
 
-const redeemAtTheSpicesStore = (http: Http, code: string) =>
-  http.post('/redemptions').send({ code, storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
+const redeemAtTheStoreOf = (http: Http, code: string, discount: ExampleDiscount = spicesDiscount) =>
+  http.post('/redemptions').send({ code, storeName: discount.storeName, storeAddress: discount.storeAddress });
 
 describe('POST /redemptions', () => {
   describe('success', () => {
     it('should answer 201 with the item of the discount the coupon is for', async () => {
-      const { http, code } = await setupSutWithACouponForTheSpicesDiscount();
+      const { http, code } = await setupSutWithACouponFor();
 
-      const response = await redeemAtTheSpicesStore(http, code);
+      const response = await redeemAtTheStoreOf(http, code);
 
       expect(response.status).to.equal(201);
       expect(response.body).to.deep.equal({ item: spicesDiscount.item });
     });
     it('should answer with the item of another discount when the coupon is for that one', async () => {
-      const { http } = await setupSut();
-      const published = (await http.post('/discounts').send(produceDiscount)).body;
-      const code: string = (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
+      const { http, code } = await setupSutWithACouponFor(produceDiscount);
 
-      const response = await http.post('/redemptions').send({ code, storeName: produceDiscount.storeName, storeAddress: produceDiscount.storeAddress });
+      const response = await redeemAtTheStoreOf(http, code, produceDiscount);
 
       expect(response.body).to.deep.equal({ item: produceDiscount.item });
     });
     it('should answer with a body matching the redemption response schema', async () => {
-      const { http, code } = await setupSutWithACouponForTheSpicesDiscount();
+      const { http, code } = await setupSutWithACouponFor();
 
-      const response = await redeemAtTheSpicesStore(http, code);
+      const response = await redeemAtTheStoreOf(http, code);
 
       expect(redemptionResponse.safeParse(response.body).error).to.equal(undefined);
     });
     it('should publish CouponRedeemed on the application event emitter for the coupon redeemed', async () => {
-      const { app, http, published, code } = await setupSutWithACouponForTheSpicesDiscount();
+      const { app, http, published, code } = await setupSutWithACouponFor();
       const redeemed: unknown[] = [];
       app.get(EventEmitter2).on('coupon.redeemed', (event: { id: string; token: string }) => redeemed.push({ id: event.id, token: event.token }));
 
-      await redeemAtTheSpicesStore(http, code);
+      await redeemAtTheStoreOf(http, code);
 
       expect(redeemed).to.deep.equal([{ id: published.id, token: code }]);
     });
