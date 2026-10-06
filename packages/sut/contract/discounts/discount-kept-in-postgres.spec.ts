@@ -113,4 +113,9 @@ describe('a discount kept in PostgreSQL', () => {
       expect(loaded?.toJSON().coupons).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
     });
   });
+  describe('with a redeemed coupon', () => {
+    it.todo('should save a discount with a redeemed coupon and load it back equal, in a separate transaction');
+    it.todo('should keep a discount\'s other coupons unused when one is redeemed and it is saved again');
+    it.todo('should keep a redeemed coupon redeemed when another coupon is issued and the discount is saved again');
+  });
 });

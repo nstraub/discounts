@@ -36,4 +36,7 @@ describe('class DiscountFactory', () => {
       expect(rebuilt.toJSON().coupons).to.deep.equal(['7K3QX9M2PD', 'R4WZ0BH8NE']);
     });
   });
+  describe('rebuilding a kept discount with a redeemed coupon', () => {
+    it.todo('should rebuild each kept coupon redeemed or unused, as it was kept');
+  });
 });

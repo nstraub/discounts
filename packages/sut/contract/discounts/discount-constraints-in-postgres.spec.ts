@@ -82,4 +82,7 @@ describe('the discounts table refusing what Discount refuses', () => {
       expect(outcome).to.equal('23503');
     });
   });
+  describe('a coupon\'s redemption', () => {
+    it.todo('should trace every constraint on a coupon\'s redemption to a rule of Discount, keeping no time and no one with it');
+  });
 });
