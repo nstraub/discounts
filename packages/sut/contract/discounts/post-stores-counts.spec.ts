@@ -51,7 +51,18 @@ describe('POST /stores/counts', () => {
 
       expect(counted).to.deep.equal([{ discountId: published.id, discountedSales: 1 }]);
     });
-    it.todo('should answer a count made after another with only the coupons redeemed since that one');
+    it('should answer a count made after another with only the coupons redeemed since that one', async () => {
+      const { http, published } = await setupSutWithACouponUsedFor();
+      await countTheStoreOf(http);
+      await useACouponFor(http, published, spicesDiscount);
+      await useACouponFor(http, published, spicesDiscount);
+
+      const response = await countTheStoreOf(http);
+
+      expect(response.body, 'the discounted sales since the first count').to.deep.equal([
+        { id: published.id, item: spicesDiscount.item, rate: spicesDiscount.rate, discountedSales: 2 },
+      ]);
+    });
   });
 
   describe('strictness', () => {
