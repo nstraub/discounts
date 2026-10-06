@@ -24,7 +24,7 @@ showcase ("adding feedback would be too onerous to be worth it").
 
 | Release | Mike | Sue | Stephanie / Rodrigo |
 |---|---|---|---|
-| 1 | *Slice 0, the walking skeleton*, then Mike publishes a new discount | Sue finds a discount on produce | *(through Mike's slice)* |
+| 1 (done) | *Slice 0, the walking skeleton*, then Mike publishes a new discount | Sue finds a discount on produce | *(through Mike's slice)* |
 | 2 | Mike raises a discount | Stephanie tells people what is new about her produce *(one slice, value to Sue and Stephanie)* | *(same slice)* |
 | 3 | Mike lowers a discount | Sue finds a store close to home | Sue decides to try Stephanie's produce + Stephanie redeems a coupon *(together)* |
 | 4 | Mike publishes a discount at any rate up to 100% | Sue finds more than one store | Rodrigo counts the discounted sales since his last count |
@@ -60,7 +60,7 @@ architecture is drawn in `docs/architecture.md`.
 |---|---|---|---|---|
 | 0 | 1 | *The walking skeleton* (no scenario), done | — | the developer |
 | 1 | 1 | Mike publishes a new discount, done | Mike · 1. Mike makes his new store known with a discount on what he is famous for | Mike (and Stephanie, through it) |
-| 2 | 1 | Sue finds a discount on produce | Sue · 1. Sue finds a produce discount at a store close to home | Sue |
+| 2 | 1 | Sue finds a discount on produce, done | Sue · 1. Sue finds a produce discount at a store close to home | Sue |
 | 3 | 2 | Mike raises a discount | Mike · 2. Mike raises a discount that is not working | Mike |
 | 4 | 2 | Stephanie tells people what is new about her produce | Stephanie · 1. Stephanie gets her produce discount into people's hands | Sue and Stephanie |
 | 5 | 3 | Mike lowers a discount | Mike · 2. Mike raises a discount that is not working | Mike |
