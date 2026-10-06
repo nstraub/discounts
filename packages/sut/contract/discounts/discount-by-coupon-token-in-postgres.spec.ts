@@ -42,6 +42,16 @@ describe('a discount found by one of its coupons\' tokens in PostgreSQL', () => 
   });
 
   describe('A2 injection', () => {
-    it.todo('should find nothing for a token with quotes, semicolons and SQL keywords, every kept discount and coupon left as it was');
+    it('should find nothing for a token with quotes, semicolons and SQL keywords, every kept discount and coupon left as it was', async () => {
+      const { keep, repository, loadOnItsOwnConnection } = await setupSut();
+      const spices = await keep(spicesDiscount);
+      spices.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+      await repository.save(spices);
+
+      const found = await repository.withCouponToken(CouponToken.keptAs("x' OR '1'='1'; DELETE FROM app.coupons; --"));
+
+      expect(found, 'the discount found').to.equal(undefined);
+      expect((await loadOnItsOwnConnection()).map((kept) => kept.toJSON()), 'every discount kept').to.deep.equal([spices.toJSON()]);
+    });
   });
 });
