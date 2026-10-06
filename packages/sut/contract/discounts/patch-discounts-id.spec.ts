@@ -98,7 +98,16 @@ describe('PATCH /discounts/:id', () => {
   });
 
   describe('strictness', () => {
-    it.todo('should keep the change request schema no stricter than Discount');
+    it('should keep the change request schema no stricter than Discount', async () => {
+      const { http } = await setupSut();
+      const published = await publishTheSpicesDiscount(http);
+      const aRateInLongTextOfAnyCharacters = 'Veinticinco ½ <b>%</b> 🌶️ '.repeat(500);
+
+      const response = await patchTheDiscount(http, published.id).send({ rate: aRateInLongTextOfAnyCharacters });
+
+      expect(response.status).to.equal(204);
+      expect((await http.get('/discounts')).body, 'the discounts listed after the change').to.deep.equal([{ ...published, rate: aRateInLongTextOfAnyCharacters }]);
+    });
   });
 
   describe('empty', () => {
