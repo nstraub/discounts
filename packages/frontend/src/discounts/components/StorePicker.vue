@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import type { DiscountResponse } from '@app/types/discounts';
-
-type Store = Pick<DiscountResponse, 'storeName' | 'storeAddress'>;
+import type { Store } from '@app/types/discounts';
 
 defineProps<{ caption: string; stores: Store[] }>();
 

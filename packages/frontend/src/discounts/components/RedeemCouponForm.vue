@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-import type { DiscountResponse } from '@app/types/discounts';
+import type { Store } from '@app/types/discounts';
 
 import { useDiscountsStore } from '../../stores/discounts-store';
 import { discountTexts } from '../texts';
@@ -9,8 +9,6 @@ import { discountTexts } from '../texts';
 import CaptionedInput from './CaptionedInput.vue';
 import DiscountApplies from './DiscountApplies.vue';
 import StorePicker from './StorePicker.vue';
-
-type Store = Pick<DiscountResponse, 'storeName' | 'storeAddress'>;
 
 defineProps<{ stores: Store[] }>();
 
