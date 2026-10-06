@@ -20,7 +20,9 @@ describe('class CouponToken', () => {
       expect(CouponToken.read('7K3QX 9M2PD').toJSON(), 'with a space').to.equal('7K3QX9M2PD');
       expect(CouponToken.read('7K3QX-9M2PD').toJSON(), 'with a hyphen').to.equal('7K3QX9M2PD');
     });
-    it.todo('should read a code typed with spaces around it as its token');
+    it('should read a code typed with spaces around it as its token', () => {
+      expect(CouponToken.read('  7K3QX9M2PD ').toJSON()).to.equal('7K3QX9M2PD');
+    });
 
     describe('combination', () => {
       it.todo('should read a lower-case o, i and l as a zero, a one and a one');
