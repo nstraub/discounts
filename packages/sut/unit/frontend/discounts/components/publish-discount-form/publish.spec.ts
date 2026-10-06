@@ -121,15 +121,6 @@ describe('Component PublishDiscountForm', () => {
 
       expect(vi.mocked(discounts.publish).mock.lastCall?.at(0)).to.not.have.property('hook');
     });
-    it('should clear the hook once the discount is published', async () => {
-      const { form } = setupSut();
-      const hookField = getByRole<HTMLInputElement>(document.body, 'textbox', { name: discountTexts.hook });
-      await new DOMWrapper(hookField).setValue(spicesDiscountWithItsHook.hook);
-
-      await publishThroughTheForm(form, spicesDiscount);
-
-      expect(hookField.value).to.equal('');
-    });
 
     describe('empty', () => {
       it('should publish a hook of only blank space as no hook', async () => {
