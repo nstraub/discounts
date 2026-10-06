@@ -65,6 +65,19 @@ describe('changes to one discount at the same moment', () => {
         codes.map(() => [201, 201, 204, 201]),
       );
     });
-    it.todo('should keep the rate of the later of two changes of rate made at the same moment');
+    it('should keep the rate of the later of two changes of rate made at the same moment', async () => {
+      const { http, published } = await setupSutWithACouponFor();
+      const races = Array.from({ length: timesTheRaceIsRun }, (_, race) => [String(race + 30), String(race + 60)]);
+
+      const keptAfterEachPair = await oneRaceAfterAnother(races, async (rates) => {
+        const pair = await Promise.all(rates.map((rate) => changeTheRateOf(http, published, rate)));
+        const [listed] = (await http.get('/discounts')).body;
+        return { statuses: pair.map((response) => response.status), oneOfTheRatesKept: rates.includes(listed.rate) };
+      });
+
+      expect(keptAfterEachPair, 'the answers and the rate kept after each pair of changes').to.deep.equal(
+        races.map(() => ({ statuses: [204, 204], oneOfTheRatesKept: true })),
+      );
+    });
   });
 });
