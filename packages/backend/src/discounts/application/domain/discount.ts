@@ -21,7 +21,7 @@ export class Discount {
 
   publish(): void {
     const { rate } = this.details.toJSON();
-    if (rate === '150') {
+    if (Number(rate) <= 0 || Number(rate) > 100) {
       this.events.publish(new DiscountPublicationRejected(rate, 'not valid'));
       return;
     }
