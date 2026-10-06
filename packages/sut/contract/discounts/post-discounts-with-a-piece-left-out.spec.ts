@@ -5,6 +5,7 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
 import { bodiesNotMatchingTheErrorSchema, theFieldsNamedBy } from '../support/error-schema';
+import { publicationRejectionsHeardBy } from '../support/publication-rejections';
 
 const { item, rate, storeName, storeAddress } = spicesDiscount;
 
@@ -70,6 +71,13 @@ describe('POST /discounts with a piece left out', () => {
       const listed = await http.get('/discounts');
       expect(listed.body).to.deep.equal([]);
     });
-    it.todo('should publish DiscountPublicationRejected on the application event emitter for a piece made only of blank space');
+    it('should publish DiscountPublicationRejected on the application event emitter for a piece made only of blank space', async () => {
+      const { app, http } = await setupSut();
+      const rejected = publicationRejectionsHeardBy(app);
+
+      await http.post('/discounts').send({ ...spicesDiscount, storeName: '   ' });
+
+      expect(rejected.map(({ reason, pieces }) => ({ reason, pieces }))).to.deep.equal([{ reason: 'missing', pieces: ['storeName'] }]);
+    });
   });
 });
