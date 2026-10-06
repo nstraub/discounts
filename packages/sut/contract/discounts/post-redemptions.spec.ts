@@ -100,7 +100,13 @@ describe('POST /redemptions', () => {
 
       expect(statuses).to.deep.equal([400, 400, 400, 400]);
     });
-    it.todo('should answer 400 for a body that is not valid JSON');
+    it('should answer 400 for a body that is not valid JSON', async () => {
+      const { http } = await setupSut();
+
+      const response = await redeemWrittenAsJson(http, '{"code": "7K3QX9M2PD",');
+
+      expect(response.status).to.equal(400);
+    });
     it.todo('should answer every error with a body matching the error schema');
   });
 
