@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import PublishedDiscounts from '@frontend/discounts/components/PublishedDiscounts.vue';
 import { discountTexts } from '@frontend/discounts/texts';
+import { publishedProduceDiscount } from '@sut/support/example-discounts';
 import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
 const spicesDiscount = { id: 'spices-id', item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
@@ -100,7 +101,15 @@ describe('Component PublishedDiscounts', () => {
     it.todo('should present each discount to a screen reader as one entry with its item, rate, store name and store address');
   });
   describe('changing a rate', () => {
-    it.todo('should offer to change the rate on each entry');
-    it.todo('should keep an entry\'s text apart from its control to change the rate');
+    it('should offer to change the rate on each entry', () => {
+      const list = setupSut({ discounts: [spicesDiscount, publishedProduceDiscount] });
+
+      const [spicesControl, produceControl] = list
+        .findAll('[data-testid="published-discount"]')
+        .map((entry) => entry.get('[data-testid="change-rate-form"]').attributes('aria-label') ?? '');
+
+      expect(spicesControl).to.contain(spicesDiscount.item);
+      expect(produceControl).to.contain(publishedProduceDiscount.item);
+    });
   });
 });
