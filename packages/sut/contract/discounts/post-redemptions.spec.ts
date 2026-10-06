@@ -162,4 +162,10 @@ describe('POST /redemptions', () => {
   describe('the rate at the till', () => {
     it.todo('should answer with the rate the coupon applies at');
   });
+  describe('a coupon already used', () => {
+    it.todo('should answer 409 with a body matching the error schema when the coupon has already been used');
+    it.todo('should keep the coupon used once, its discount and its other coupons as they were');
+    it.todo('should publish CouponRedemptionRejected on the application event emitter for the coupon already used');
+    it.todo('should refuse a used coupon whose code is sent in lower case, in two groups, the second time');
+  });
 });

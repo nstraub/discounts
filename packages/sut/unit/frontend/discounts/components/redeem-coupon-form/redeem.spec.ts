@@ -83,4 +83,8 @@ describe('Component RedeemCouponForm', () => {
       it.todo('should show the rate the coupon applies at');
     });
   });
+  describe('a coupon already used', () => {
+    it.todo('should tell Stephanie the coupon has already been used');
+    it.todo('should not say the discount applies when the coupon has already been used');
+  });
 });

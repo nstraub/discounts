@@ -46,4 +46,8 @@ describe('class DiscountService', () => {
       it.todo('should report that the coupon could not be checked when its discount cannot be loaded or kept, the coupon staying unused');
     });
   });
+  describe('redeeming a coupon already used', () => {
+    it.todo('should report that the coupon has already been used');
+    it.todo('should announce CouponRedemptionRejected for the coupon already used');
+  });
 });

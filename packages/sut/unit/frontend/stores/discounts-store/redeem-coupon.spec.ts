@@ -43,4 +43,7 @@ describe('Store discounts', () => {
       it.todo('should hold that the coupon could not be checked when it cannot be');
     });
   });
+  describe('redeeming a coupon already used', () => {
+    it.todo('should hold that the coupon has already been used');
+  });
 });

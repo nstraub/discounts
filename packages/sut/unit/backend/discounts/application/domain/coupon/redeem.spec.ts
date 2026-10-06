@@ -49,4 +49,13 @@ describe('class Coupon', () => {
       });
     });
   });
+  describe('being redeemed a second time', () => {
+    it.todo('should refuse a second redemption, staying used');
+    it.todo('should raise CouponRedemptionRejected carrying its discount\'s id, its token and that it has already been used');
+    it.todo('should not raise CouponRedeemed again when its second redemption is refused');
+
+    describe('state', () => {
+      it.todo('should refuse a second redemption once its first has been counted');
+    });
+  });
 });

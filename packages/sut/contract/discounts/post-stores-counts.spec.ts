@@ -170,4 +170,7 @@ describe('POST /stores/counts', () => {
   describe('A5 resource exhaustion', () => {
     it.todo('should answer 503 with a body matching the error schema when the store\'s discounts cannot be counted, restarting nothing');
   });
+  describe('a coupon used twice', () => {
+    it.todo('should count once a coupon whose second use was refused');
+  });
 });

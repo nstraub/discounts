@@ -43,4 +43,7 @@ describe('class Discount', () => {
       });
     });
   });
+  describe('redeeming a coupon already used', () => {
+    it.todo('should refuse the used coupon, leaving its other coupons as they were');
+  });
 });
