@@ -21,6 +21,8 @@ const askToPublish = async (form: VueWrapper): Promise<void> => {
 const whatTheFieldTells = (form: VueWrapper, field: string) =>
   form.findAll(`[data-testid="${field}-field"] [role="status"]`).map((told) => told.text()).join(' ');
 
+const theRequiredFields = ['discount-item', 'discount-rate', 'discount-store-name', 'discount-store-address'];
+
 describe('Component PublishDiscountForm', () => {
   describe('publishing a discount with a piece left out', () => {
     it('should tell Mike the item is missing beside its field when refused for it', async () => {
@@ -53,7 +55,11 @@ describe('Component PublishDiscountForm', () => {
     });
 
     describe('state', () => {
-      it.todo('should not tell Mike anything is missing before a publish is refused');
+      it('should not tell Mike anything is missing before a publish is refused', () => {
+        const { form } = setupSut();
+
+        expect(theRequiredFields.map((field) => whatTheFieldTells(form, field)), 'what the fields tell').to.deep.equal(['', '', '', '']);
+      });
       it.todo('should no longer tell Mike a piece is missing once he gives it and the discount is published');
     });
 
