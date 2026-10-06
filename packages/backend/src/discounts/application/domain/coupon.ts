@@ -14,7 +14,7 @@ export class Coupon {
 
   redeem(discountId: string): void {
     if (this.redeemed) {
-      this.events.publish(new CouponRedemptionRejected('spices-id', '7K3QX9M2PD', 'already used'));
+      this.events.publish(new CouponRedemptionRejected(discountId, this.token.toJSON(), 'already used'));
       throw new CouponAlreadyUsedException();
     }
     this.redeemed = true;
