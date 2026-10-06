@@ -1,16 +1,12 @@
-import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { flushPromises, type VueWrapper } from '@vue/test-utils';
+import { describe, expect, it, vi } from 'vitest';
 
-import PublishDiscountForm from '@frontend/discounts/components/PublishDiscountForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
-import { useDiscountsStore } from '@frontend/stores/discounts-store';
-import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
+
+import { setupSut } from './publish-discount-form-of-an-app';
 
 const setupSutRefusingAsMissing = (pieces: string[]) => {
-  const { pinia, global } = aTestingDiscountsStore();
-  const form = mount(PublishDiscountForm, { attachTo: document.body, global });
-  onTestFinished(() => form.unmount());
-  const discounts = useDiscountsStore(pinia);
+  const { form, discounts } = setupSut();
   vi.mocked(discounts.publish).mockImplementation(async () => {
     discounts.missing = pieces;
   });
