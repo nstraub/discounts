@@ -74,6 +74,12 @@ describe('the discounts table refusing what Discount refuses', () => {
 
       expect(outcome).to.equal('23502');
     });
-    it.todo('should refuse a coupon of no kept discount: 23503, the foreign key mirrors "a coupon belongs to its discount"');
+    it('should refuse a coupon of no kept discount: 23503, the foreign key mirrors "a coupon belongs to its discount"', async () => {
+      const { client } = await setupSut();
+
+      const outcome = await insertACoupon(client, { token: '7K3QX9M2PD', discount_id: 'an-id-no-discount-has' });
+
+      expect(outcome).to.equal('23503');
+    });
   });
 });
