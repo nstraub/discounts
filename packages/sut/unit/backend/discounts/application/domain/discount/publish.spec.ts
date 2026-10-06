@@ -118,7 +118,14 @@ describe('class Discount', () => {
 
         expect(lastEventOf(events)).to.be.instanceOf(DiscountPublished);
       });
-      it.todo('should accept a rate of 12.5, with one decimal place');
+      it('should accept a rate of 12.5, with one decimal place', () => {
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('12.5');
+
+        discount.publish();
+
+        expect(lastEventOf(events)).to.be.instanceOf(DiscountPublished);
+      });
       it('should accept a rate of 100, the highest a rate may be', () => {
         const { events, discountAt } = setupSut();
         const discount = discountAt('100');
