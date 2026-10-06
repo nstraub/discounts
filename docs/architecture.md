@@ -50,24 +50,31 @@ C4Component
     Component(fields, "TypedDiscountFields", "Vue component", "Five captioned inputs: item, rate, store name, store address and the optional hook")
     Component(changeForm, "ChangeRateForm", "Vue component", "One per listed discount: a new rate and a button to change it")
     Component(couponButton, "GetCouponButton", "Vue component", "One per listed discount: asks for a coupon")
+    Component(tillView, "TillView", "Vue view (#/till)", "The till page where Stephanie redeems a coupon")
+    Component(redeemForm, "RedeemCouponForm", "Vue component", "Her store, picked from the stores that publish, and the coupon's code; redeems on submit")
+    Component(storePicker, "StorePicker", "Vue component", "Picks one store, by name and address")
+    Component(applies, "DiscountApplies", "Vue component", "Says the discount applies to the item redeemed")
     Component(issuedCoupon, "IssuedCoupon", "Vue component", "Shows the coupon just issued: the store to use it at and its code as two groups of five")
-    Component(store, "discounts store", "Pinia", "publish(), load(), changeRate() and getCoupon(); goes through RestApi, reloads the list after a rate change and holds the coupon just issued")
+    Component(store, "discounts store", "Pinia", "publish(), load(), changeRate() and getCoupon() and redeemCoupon(); goes through RestApi, reloads the list after a rate change, holds the coupon just issued and the redemption, and derives the distinct stores from the published discounts")
   }
 
   Container_Boundary(backend, "Backend (NestJS)") {
-    Component(controller, "DiscountsController", "NestJS controller", "POST /discounts answers 201 with Location; PATCH /discounts/:id answers 204; POST /discounts/:id/coupons answers the coupon; GET /discounts lists")
+    Component(controller, "DiscountsController", "NestJS controller", "POST /discounts answers 201 with Location; PATCH /discounts/:id answers 204; POST /discounts/:id/coupons answers the coupon; GET /discounts lists"')
+    Component(redemptions, "RedemptionsController", "NestJS controller", "POST /redemptions answers 201 with the item; reads only the coupon's code")
     Component(parsedBy, "ParsedBy", "Nest pipe, zod", "Parses the request against the shared schema; a failure is a 400 requestRejection")
-    Component(service, "DiscountService", "Application service", "publish(), changeRate(), issueCoupon() and published()")
+    Component(service, "DiscountService", "Application service", "publish(), changeRate(), issueCoupon(), redeemCoupon(code) and published()")
     Component(factory, "DiscountFactory", "Domain factory", "create() gives a new identity; reconstitute() rebuilds a kept discount")
-    Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails (item, rate, store name, store address, optional hook); publish() raises DiscountPublished, changeRate() raises DiscountRateChanged, issueCoupon() adds a coupon token and raises CouponIssued")
+    Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails (item, rate, store name, store address, optional hook); publish() raises DiscountPublished, changeRate() raises DiscountRateChanged, issueCoupon() adds a coupon and raises CouponIssued, redeemCoupon(token) redeems it")
     Component(event, "DiscountPublished", "Domain event", "Carries the discount as published")
-    Component(token, "CouponToken", "Value object", "Ten characters of Crockford base32, drawn from a random source")
+    Component(token, "CouponToken", "Value object", "Ten characters of Crockford base32: drawnFrom(random) for a new one, read(code) for a typed one (case, O, I, L and spacing normalised)")
     Component(issued, "IssuedCoupon", "Domain value", "A coupon token and the name of the store it is for")
+    Component(coupon, "Coupon", "Entity in the aggregate", "A token and whether it was redeemed; owns single use; redeem() raises CouponRedeemed")
+    Component(couponRedeemed, "CouponRedeemed", "Domain event", "Raised when a coupon is redeemed")
     Component(couponIssued, "CouponIssued", "Domain event", "Raised when a coupon is issued")
     Component(rateChanged, "DiscountRateChanged", "Domain event", "Carries the discount id and its new rate")
-    Component(repositoryPort, "DiscountRepository", "Port", "save() (inserts or updates), all() and withId()")
+    Component(repositoryPort, "DiscountRepository", "Port", "save() (inserts or updates), all(), withId() and withCouponToken()")
     Component(publisherPort, "DomainEventPublisher", "Port", "publish(event)")
-    Component(repository, "DiscountDrizzleRepository", "Adapter", "Keeps a discount in app.discounts and its coupons in app.coupons, written and read with it; a null hook column is an absent hook")
+    Component(repository, "DiscountDrizzleRepository", "Adapter", "Keeps a discount in app.discounts and its coupons in app.coupons (token, redeemed), written and read with it; a null hook column is an absent hook")
     Component(publisher, "EventEmitterDomainEventPublisher", "Adapter", "Emits the event on the application's EventEmitter2")
   }
 
@@ -85,6 +92,15 @@ C4Component
   Rel(discount, token, "Holds its coupons as")
   Rel(discount, issued, "Answers with")
   Rel(discount, couponIssued, "Raises")
+  Rel(discount, coupon, "Holds its coupons as")
+  Rel(coupon, couponRedeemed, "Raises")
+  Rel(view, tillView, "Routes to")
+  Rel(tillView, redeemForm, "Shows")
+  Rel(tillView, applies, "Shows")
+  Rel(redeemForm, storePicker, "Asks through")
+  Rel(redeemForm, store, "redeemCoupon()")
+  Rel(store, redemptions, "POST /redemptions", "JSON over HTTP")
+  Rel(redemptions, service, "Calls")
   Rel(form, store, "publish()")
   Rel(changeForm, store, "changeRate()")
   Rel(view, store, "load()")
@@ -202,6 +218,45 @@ sequenceDiagram
   Service->>Repository: save(discount)
   Controller-->>Store: the token and the store's name
   Store-->>Sue: IssuedCoupon shows the store and the code, as two groups of five
+```
+
+### Redeeming a coupon
+
+A coupon is an entity inside the Discount aggregate, since it carries a rule of its own: it can be
+redeemed once (ADR 0005). `Coupon.redeem()` raises `CouponRedeemed`; `Discount.redeemCoupon(token)`
+finds its coupon and redeems it, and answers with the item. The service reads the typed code with
+`CouponToken.read` (any case; O read as 0, I and L as 1; a space or two groups), loads the discount
+that issued it through the one Discount repository (`withCouponToken`), redeems, saves, and answers
+`201 { item }` at `POST /redemptions`. The request also carries the till's store; the route reads only
+the code, and the store is ignored until a refusal depends on it. Migration `0006` adds
+`coupons.redeemed` (boolean, not null, default false; its down drops the column and loses which
+coupons were redeemed). The till is the page `#/till`: it offers the stores that publish a discount,
+derived from the published discounts, so Stephanie picks hers by name and address.
+
+```mermaid
+sequenceDiagram
+  actor Stephanie
+  participant Form as RedeemCouponForm
+  participant Store as discounts store
+  participant Controller as RedemptionsController
+  participant Service as DiscountService
+  participant Repository as DiscountRepository
+  participant Discount
+  participant Coupon
+  participant Events as DomainEventPublisher
+
+  Stephanie->>Form: picks her store, types the code; submits
+  Form->>Store: redeemCoupon(request)
+  Store->>Controller: POST /redemptions
+  Controller->>Service: redeemCoupon(code)
+  Service->>Service: CouponToken.read(code)
+  Service->>Repository: withCouponToken(token)
+  Service->>Discount: redeemCoupon(token)
+  Discount->>Coupon: redeem()
+  Coupon->>Events: publish(CouponRedeemed)
+  Service->>Repository: save(discount)
+  Controller-->>Store: 201, the item
+  Store-->>Stephanie: DiscountApplies says the discount applies to the item
 ```
 
 Every error answers with the one `requestRejection` schema in `@app/types/discounts`
