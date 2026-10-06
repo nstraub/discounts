@@ -64,5 +64,15 @@ describe('the migration that lets a coupon be redeemed', () => {
     const readBack = await discountRepositoryOn(client, databaseUrl).repository.withId('constraint-id');
     expect(readBack?.toJSON().coupons.map(({ redeemed }) => redeemed), 'the coupon issued before, redeemed').to.deep.equal([false]);
   });
-  it.todo('should keep and load back, as the deployed version does, a discount with its coupons on the migrated schema');
+  it('should keep and load back, as the deployed version does, a discount with its coupons on the migrated schema', async () => {
+    const { client, databaseUrl, migrateForward } = await setupSut();
+    await migrateForward();
+    const kept = await keepADiscountWithACouponRedeemed(client, databaseUrl);
+    kept.issueCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
+    await discountRepositoryOn(client, databaseUrl).repository.save(kept);
+
+    const [loaded] = await discountRepositoryOn(client, databaseUrl).loadOnItsOwnConnection();
+
+    expect(loaded?.toJSON(), 'the discount loaded back').to.deep.equal(kept.toJSON());
+  });
 });
