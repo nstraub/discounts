@@ -30,6 +30,14 @@ describe('Store discounts', () => {
 
       expect(discounts.counted).to.deep.equal([{ id: 'spices-id', item: 'Peruvian spices', rate: '20', discountedSales: 3 }]);
     });
+    it('should hold another count when the count answers another', async () => {
+      const { restApi, discounts } = setupSut();
+      restApi.post.mockResolvedValue([{ id: 'produce-id', item: stephaniesProduceDiscount.item, rate: stephaniesProduceDiscount.rate, discountedSales: 1 }]);
+
+      await discounts.countDiscountedSales({ storeName: stephaniesProduceDiscount.storeName, storeAddress: stephaniesProduceDiscount.storeAddress });
+
+      expect(discounts.counted).to.deep.equal([{ id: 'produce-id', item: 'Organic produce', rate: '15', discountedSales: 1 }]);
+    });
 
     describe('dependency failure', () => {
       it.todo('should hold that the sales could not be counted when they cannot be');
