@@ -44,7 +44,14 @@ describe('POST /discounts with a piece left out', () => {
       expect(theFieldsNamedBy(rateLeftOut, rateOf150), 'the fields named').to.deep.equal([['rate'], ['rate']]);
       expect([rateLeftOut, rateOf150].map((answer) => requestRejection.parse(answer.body).missing)).to.deep.equal([['rate'], undefined]);
     });
-    it.todo('should answer 400 listing the item, the store name and the store address as missing when each is empty text');
+    it('should answer 400 listing the item, the store name and the store address as missing when each is empty text', async () => {
+      const { http } = await setupSut();
+
+      const response = await http.post('/discounts').send({ item: '', rate, storeName: '', storeAddress: '' });
+
+      expect(response.status).to.equal(400);
+      expect(requestRejection.parse(response.body).missing).to.deep.equal(['item', 'storeName', 'storeAddress']);
+    });
     it.todo('should answer with a body matching the error schema when pieces are missing');
     it.todo('should publish nothing when a piece is missing, listing no discount afterwards');
     it.todo('should publish DiscountPublicationRejected on the application event emitter for a piece made only of blank space');
