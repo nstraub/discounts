@@ -13,13 +13,14 @@ type ExampleDiscount = typeof spicesDiscount;
 const useACouponFor = async (http: Http, published: { id: string }, discount: ExampleDiscount) => {
   const code: string = (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
   await http.post('/redemptions').send({ code, storeName: discount.storeName, storeAddress: discount.storeAddress });
+  return code;
 };
 
 const setupSutWithACouponUsedFor = async (discount: ExampleDiscount = spicesDiscount) => {
   const sut = await setupSut();
   const published: { id: string } = (await sut.http.post('/discounts').send(discount)).body;
-  await useACouponFor(sut.http, published, discount);
-  return { ...sut, published };
+  const code = await useACouponFor(sut.http, published, discount);
+  return { ...sut, published, code };
 };
 
 const countWrittenAsJson = (http: Http, body: string) => http.post('/stores/counts').set('Content-Type', 'application/json').send(body);
@@ -139,7 +140,14 @@ describe('POST /stores/counts', () => {
   });
 
   describe('A3 handle guessing (no accounts)', () => {
-    it.todo('should answer with no coupon token of the coupons counted');
+    it('should answer with no coupon token of the coupons counted', async () => {
+      const { http, code } = await setupSutWithACouponUsedFor();
+
+      const response = await countTheStoreOf(http);
+
+      expect(Object.keys(response.body[0]), 'what each entry carries').to.deep.equal(['id', 'item', 'rate', 'discountedSales']);
+      expect(response.text).to.not.contain(code);
+    });
   });
 
   describe('A4 concurrency', () => {
