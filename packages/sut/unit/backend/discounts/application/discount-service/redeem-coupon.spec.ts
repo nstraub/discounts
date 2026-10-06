@@ -122,6 +122,14 @@ describe('class DiscountService', () => {
 
       await expect(service.redeemCoupon('7K3QX', atTheSpicesStore)).rejects.to.be.instanceOf(NoCouponHasTheCodeException);
     });
-    it.todo('should keep nothing and announce nothing when no coupon has the code');
+    it('should keep nothing and announce nothing when no coupon has the code', async () => {
+      const { events, repository, service } = setupSut();
+      repository.withCouponToken.mockResolvedValue(undefined);
+
+      await expect(service.redeemCoupon('ZZZZZZZZZZ', atTheSpicesStore)).rejects.to.be.instanceOf(NoCouponHasTheCodeException);
+
+      expect(repository.save, 'the discounts kept').to.have.callCount(0);
+      expect(events.publish, 'the events announced').to.have.callCount(0);
+    });
   });
 });
