@@ -2,15 +2,19 @@ import { requestRejection } from '@app/types/request-rejection';
 
 const badRequest = 400;
 
-const notFound = 404;
-
-const unprocessableContent = 422;
-
 class RestApiException extends Error {}
 
-export class UnprocessableContentException extends RestApiException {}
+export class UnprocessableContentException extends RestApiException {
+  static readonly status = 422;
+}
 
-export class NotFoundException extends RestApiException {}
+export class NotFoundException extends RestApiException {
+  static readonly status = 404;
+}
+
+const refusalsOfTheirOwn = [UnprocessableContentException, NotFoundException];
+
+const theRefusalFor = (status: number) => refusalsOfTheirOwn.find((refusal) => refusal.status === status) ?? RestApiException;
 
 export class BadRequestException extends RestApiException {
   constructor(
@@ -28,13 +32,8 @@ export const refuseANotOkAnswer = async (request: string, response: Response): P
     const { missing, fields } = requestRejection.parse(await response.json());
     throw new BadRequestException(answered, missing ?? [], fields ?? []);
   }
-  if (response.status === unprocessableContent) {
-    throw new UnprocessableContentException(answered);
-  }
-  if (response.status === notFound) {
-    throw new NotFoundException(answered);
-  }
   if (!response.ok) {
-    throw new RestApiException(answered);
+    const Refusal = theRefusalFor(response.status);
+    throw new Refusal(answered);
   }
 };
