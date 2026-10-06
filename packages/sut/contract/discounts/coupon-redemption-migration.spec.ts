@@ -2,24 +2,14 @@ import type pg from 'pg';
 import { describe, expect, it } from 'vitest';
 
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
-import { spicesDiscount } from '@sut/support/example-discounts';
 
-import { discountRepositoryOn, isKeptAndLoadedBackOnEmptiedTables } from '../support/discount-repository';
+import { discountRepositoryOn, isKeptAndLoadedBackOnEmptiedTables, keepADiscountWithACouponRedeemed } from '../support/discount-repository';
 import { insertACoupon, insertADiscountWithout } from '../support/discounts-table';
 import { migrateBackwardPast, setupSut } from '../support/migrations';
 
 const theMigration = '0006_let_a_coupon_be_redeemed';
 
 const theMigrationsAfterIt = ['0007_let_a_coupon_be_counted'];
-
-const keepADiscountWithACouponRedeemed = async (client: pg.Client, databaseUrl: string) => {
-  const { repository, keep } = discountRepositoryOn(client, databaseUrl);
-  const kept = await keep(spicesDiscount);
-  kept.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
-  kept.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
-  await repository.save(kept);
-  return kept;
-};
 
 const theRedeemedCouponLoadedBackAsKept = (client: pg.Client, databaseUrl: string) =>
   isKeptAndLoadedBackOnEmptiedTables(client, databaseUrl, keepADiscountWithACouponRedeemed);

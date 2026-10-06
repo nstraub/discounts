@@ -10,6 +10,7 @@ import { DiscountDetails } from '@backend/discounts/application/domain/discount-
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
 import { DiscountDrizzleRepository } from '@backend/discounts/infra/discount-drizzle-repository';
+import { spicesDiscount } from '@sut/support/example-discounts';
 import { resetTestDatabase, testDatabaseUrl } from '@sut/support/test-database';
 
 import { connectToTestDatabase } from './test-database';
@@ -47,4 +48,13 @@ export const isKeptAndLoadedBackOnEmptiedTables = async (
   const kept = await keepADiscount(client, databaseUrl);
   const loaded = await discountRepositoryOn(client, databaseUrl).loadOnItsOwnConnection();
   return loaded.some((discount) => isDeepStrictEqual(discount.toJSON(), kept.toJSON()));
+};
+
+export const keepADiscountWithACouponRedeemed = async (client: pg.Client, databaseUrl: string): Promise<Discount> => {
+  const { repository, keep } = discountRepositoryOn(client, databaseUrl);
+  const kept = await keep(spicesDiscount);
+  kept.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+  kept.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+  await repository.save(kept);
+  return kept;
 };
