@@ -2,6 +2,9 @@ import type { RandomSource } from './random-source.js';
 
 const crockfordBase32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 const charactersInAToken = 10;
+const separatorsTypedBetweenOrAroundTheGroups = /[\s-]/g;
+const theLetterTypedForAZero = 'O';
+const theLettersTypedForAOne = /[IL]/g;
 
 export class CouponToken {
   private constructor(private readonly characters: string) {}
@@ -16,7 +19,8 @@ export class CouponToken {
   }
 
   static read(typed: string): CouponToken {
-    return new CouponToken(typed.toUpperCase().replaceAll(/[\s-]/g, '').replaceAll('O', '0').replaceAll(/[IL]/g, '1'));
+    const withoutSeparators = typed.toUpperCase().replaceAll(separatorsTypedBetweenOrAroundTheGroups, '');
+    return new CouponToken(withoutSeparators.replaceAll(theLetterTypedForAZero, '0').replaceAll(theLettersTypedForAOne, '1'));
   }
 
   toJSON(): string {
