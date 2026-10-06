@@ -171,6 +171,9 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   EventEmitter2), `discounts.module.ts` (the wiring). The request and response schemas
   (`publishDiscountRequest`, `discountResponse`, `publishedDiscountsResponse`, `requestRejection
   {statusCode, message, fields?}`) are in `@app/types/discounts`.
+- **The hook** is a discount's optional free text: absent from `DiscountDetails` when there is none,
+  optional on the wire, a nullable `hook` column in the database (migration `0004`, lossy down); the
+  repository maps a null column to an absent hook.
 - **The rate** is text end to end (column, schema, domain, page), kept exactly as written
   (migration `0003_rate_as_written`).
 - **`src/discounts/infra/database.module.ts`:** the one connection pool, exported as the Drizzle
@@ -228,7 +231,11 @@ first slice.
   runs a schema backward and forward again. The discounts the specs publish are shared in
   `@sut/support/example-discounts` (with `publishedSpicesDiscount`); `contract/support/error-schema.ts`
   holds `bodiesNotMatchingTheErrorSchema`. Frontend store specs arrange the store with
-  `aTestingDiscountsStore` (`unit/frontend/stores/discounts-store/`).
+  `aTestingDiscountsStore` (`unit/frontend/stores/discounts-store/`). A discount with a hook is
+  `spicesDiscountWithItsHook`; `discounts-table.ts` also holds `aDiscountKeptBefore` and
+  `aDiscountKeptBeforeAsReadAfterMigratingForward`, for a discount kept before a migration. A new
+  migration joins `theMigrationsAfterIt` in each earlier migration spec; otherwise the migrator
+  silently skips an earlier migration that a spec ran backward.
 - **Tags:** `@wip` marks the scenario being built (run it with `yarn test:wip`); `@todo` marks a
   recorded missing case whose steps are written and whose step definitions are not. Both are
   excluded from `yarn test:bdd`.
