@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import type { Page } from 'playwright';
+import type { Locator, Page } from 'playwright';
 
 type ExampleDiscount = { item: string; rate: string; storeName: string; storeAddress: string };
 
@@ -26,11 +26,16 @@ export class DiscountsPage {
   }
 
   async verifyShows(discount: ExampleDiscount): Promise<void> {
-    const shown = this.page.getByTestId('published-discount').filter({ hasText: discount.item });
-    await shown.waitFor().catch(() => assert.fail(`the page shows no published discount on ${discount.item}`));
+    const shown = await this.publishedEntryOn(discount);
     assert.equal(await shown.getByTestId('published-item').textContent(), discount.item);
     assert.equal(await shown.getByTestId('published-rate').textContent(), `${discount.rate}%`);
     assert.equal(await shown.getByTestId('published-store-name').textContent(), discount.storeName);
     assert.equal(await shown.getByTestId('published-store-address').textContent(), discount.storeAddress);
+  }
+
+  private async publishedEntryOn(discount: ExampleDiscount): Promise<Locator> {
+    const shown = this.page.getByTestId('published-discount').filter({ hasText: discount.item });
+    await shown.waitFor().catch(() => assert.fail(`the page shows no published discount on ${discount.item}`));
+    return shown;
   }
 }
