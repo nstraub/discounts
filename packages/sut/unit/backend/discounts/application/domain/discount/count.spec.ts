@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import { DiscountedSalesCounted } from '@backend/discounts/application/domain/discounted-sales-counted';
-import { publishedSpicesDiscount } from '@sut/support/example-discounts';
+import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
 
 import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
 
@@ -35,6 +35,14 @@ describe('class Discount', () => {
         const [raised] = events.publish.mock.lastCall ?? [];
         expect(raised).to.be.instanceOf(DiscountedSalesCounted);
         expect(raised).to.deep.include({ discountId: publishedSpicesDiscount.id, discountedSales: 3 });
+      });
+      it('should raise DiscountedSalesCounted carrying the id of another discount and the sales counted for it', () => {
+        const { events, discount } = setupSut({ kept: publishedProduceDiscount, coupons: threeRedeemedCoupons.slice(0, 1) });
+
+        discount.count();
+
+        const { discountId, discountedSales } = events.publish.mock.lastCall?.at(0) as DiscountedSalesCounted;
+        expect({ discountId, discountedSales }).to.deep.equal({ discountId: publishedProduceDiscount.id, discountedSales: 1 });
       });
     });
 

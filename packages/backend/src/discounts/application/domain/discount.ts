@@ -40,7 +40,7 @@ export class Discount {
 
   count(): CountedSales {
     const discountedSales = this.coupons.reduce((sales, coupon) => coupon.countInto(sales), 0);
-    this.events.publish(new DiscountedSalesCounted('spices-id', discountedSales));
+    this.events.publish(new DiscountedSalesCounted(this.id, discountedSales));
     return new CountedSales(this.id, this.details, discountedSales);
   }
 
