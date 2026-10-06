@@ -8,6 +8,7 @@ export class CountedSales {
   ) {}
 
   toJSON(): { id: string; item: string; rate: string; discountedSales: number } {
-    return { id: '', item: '', rate: '', discountedSales: this.discountedSales };
+    const { item, rate } = this.details.toJSON();
+    return { id: this.id, item, rate, discountedSales: this.discountedSales };
   }
 }

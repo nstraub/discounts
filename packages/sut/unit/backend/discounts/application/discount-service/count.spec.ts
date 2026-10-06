@@ -25,7 +25,15 @@ describe('class DiscountService', () => {
 
       expect(events.publish).to.have.been.calledWith(new DiscountedSalesCounted(publishedSpicesDiscount.id, 1));
     });
-    it.todo('should answer with the discount\'s id, item and rate and the number of sales counted');
+    it('should answer with the discount\'s id, item and rate and the number of sales counted', async () => {
+      const { service } = setupSut();
+
+      const counted = await service.count(theSpicesStore);
+
+      expect(counted.map((discount) => discount.toJSON())).to.deep.equal([
+        { id: publishedSpicesDiscount.id, item: publishedSpicesDiscount.item, rate: publishedSpicesDiscount.rate, discountedSales: 1 },
+      ]);
+    });
 
     describe('not found', () => {
       it.todo('should report that no such store exists when no published discount names it, counting nothing');
