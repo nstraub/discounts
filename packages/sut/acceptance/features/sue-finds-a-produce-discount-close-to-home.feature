@@ -61,7 +61,6 @@ Feature: Sue finds a produce discount close to home
     When Sue looks for a new store with fresh produce
     Then she sees where each of them is, on its own discount
 
-  @wip
   Scenario: Sue finds more than one store
     Given Mike and Stephanie have published discounts on produce
     When Sue looks for a new store with fresh produce

@@ -86,6 +86,11 @@ export class DiscountsPage {
     assert.equal(await shown.getByTestId('published-rate').textContent(), `${discount.rate}%`);
   }
 
+  async verifyShowsTheDiscountOnItsStoresEntry(discount: ExampleDiscount): Promise<void> {
+    await this.verifyShowsTheStoreOf(discount);
+    await this.verifyShowsTheDiscount(discount);
+  }
+
   async verifyShowsWhatIsNew(discount: ExampleDiscount, whatIsNew: string): Promise<void> {
     const shown = await this.publishedEntryOn(discount);
     const hooks = await shown.getByTestId('published-hook').allTextContents();

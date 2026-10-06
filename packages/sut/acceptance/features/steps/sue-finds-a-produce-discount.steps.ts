@@ -1,6 +1,6 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 
-import { produceDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
 import { ownDiscountsPage, publishFromSomeoneElsesPage } from '../../support/discounts-page';
 import type { PlaywrightWorld } from '../../support/playwright-world';
@@ -17,6 +17,14 @@ Given("Mike's store is within walking distance of Sue's home", async function (t
   await publishWithNoLocationAsSueJudgesTheDistanceFromTheAddress(this);
 });
 
+const mikesAndStephaniesDiscounts = [produceDiscount, stephaniesProduceDiscount];
+
+Given('Mike and Stephanie have published discounts on produce', async function (this: PlaywrightWorld) {
+  for (const discount of mikesAndStephaniesDiscounts) {
+    await publishFromSomeoneElsesPage(this, discount);
+  }
+});
+
 When('Sue looks for a new store with fresh produce', async function (this: PlaywrightWorld) {
   await ownDiscountsPage(this).open();
 });
@@ -31,4 +39,16 @@ Then('she sees where it is', async function (this: PlaywrightWorld) {
 
 Then('she sees the discount it offers', async function (this: PlaywrightWorld) {
   await ownDiscountsPage(this).verifyShowsTheDiscount(this.publishedDiscount);
+});
+
+Then("she finds Mike's store and Stephanie's store", async function (this: PlaywrightWorld) {
+  for (const discount of mikesAndStephaniesDiscounts) {
+    await ownDiscountsPage(this).verifyShowsTheStoreOf(discount);
+  }
+});
+
+Then('she sees the discount each one offers', async function (this: PlaywrightWorld) {
+  for (const discount of mikesAndStephaniesDiscounts) {
+    await ownDiscountsPage(this).verifyShowsTheDiscountOnItsStoresEntry(discount);
+  }
 });
