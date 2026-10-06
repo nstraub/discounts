@@ -64,7 +64,16 @@ describe('POST /discounts/:id/coupons', () => {
       expect(response.body.token).to.not.equal('CH0SENBYME');
       expect(response.body.token).to.match(tenCrockfordCharacters);
     });
-    it.todo('should answer with the coupon issued only, never another coupon\'s token');
+    it('should answer with the coupon issued only, never another coupon\'s token', async () => {
+      const { http } = await setupSut();
+      const published = await publishTheSpicesDiscount(http);
+      const first = await getACouponFor(http, published.id);
+
+      const second = await getACouponFor(http, published.id);
+
+      expect(Object.keys(second.body).toSorted()).to.deep.equal(['storeName', 'token']);
+      expect(second.body.token).to.not.equal(first.body.token);
+    });
     it.todo('should answer 404 for an id no discount has, issuing no coupon');
   });
 
