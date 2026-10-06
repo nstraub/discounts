@@ -135,7 +135,6 @@ describe('POST /redemptions', () => {
       expect(Object.keys(response.body), 'what the answer carries').to.deep.equal(['item']);
       expect(response.text).to.not.contain(code).and.not.contain(another);
     });
-    it.todo('should give the same answer to a malformed code and to a well-formed one nobody issued');
     it.todo('should throttle codes tried from one source far faster than anyone takes coupons at a till');
   });
 

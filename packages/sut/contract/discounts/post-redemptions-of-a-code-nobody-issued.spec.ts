@@ -80,5 +80,13 @@ describe('POST /redemptions', () => {
       expect(response.status).to.equal(404);
       expect(await theDiscountsAndCouponsKept(sut.client)).to.deep.equal(keptAsIssued(sut));
     });
+    it('should give the same answer to a malformed code and to a well-formed one nobody issued', async () => {
+      const { http } = await setupSut();
+
+      const answers = [await redeemAtTheStoreOf(http, 'not a code!'), await redeemAtTheStoreOf(http, aCodeNobodyIssued)];
+
+      const [malformed, wellFormed] = answers.map(({ status, body }) => ({ status, body }));
+      expect(malformed).to.deep.equal(wellFormed);
+    });
   });
 });
