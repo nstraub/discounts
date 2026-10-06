@@ -2,7 +2,7 @@
 
 A scaffold for building a web application test-first: a NestJS backend, a Vue frontend, shared
 types, and a test suite with unit, contract and acceptance tests. The app's root page (`#/`) lists the published discounts and offers a form to publish one (item, rate, store
-name, store address, and optionally why it is worth a look); each listed discount has a field to change its rate, open to anyone; anyone can get a coupon for a discount, and a till page (`#/till`) redeems a coupon at a store, and a count page (`#/count`) counts a store's discounted sales since the last count. A coupon works once; the till says when it has already been used. One pipeline builds, deploys and tests it. The walking skeleton's greeting page,
+name, store address, and optionally why it is worth a look); each listed discount has a field to change its rate, open to anyone; anyone can get a coupon for a discount, and a till page (`#/till`) redeems a coupon at a store, and a count page (`#/count`) counts a store's discounted sales since the last count. A rate is checked when a discount is published. A coupon works once; the till says when it has already been used. One pipeline builds, deploys and tests it. The walking skeleton's greeting page,
 which shows and saves a greeting through the backend and Postgres, is at `#/walking-skeleton`.
 
 ## Setting up
