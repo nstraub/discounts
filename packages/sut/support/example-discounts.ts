@@ -1,6 +1,8 @@
 export const spicesDiscount = { item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' };
 
-export const chiliPasteDiscount = { item: 'Yellow chili paste', rate: '15', storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress };
+export const theStoreOf = ({ storeName, storeAddress }: { storeName: string; storeAddress: string }) => ({ storeName, storeAddress });
+
+export const chiliPasteDiscount = { item: 'Yellow chili paste', rate: '15', ...theStoreOf(spicesDiscount) };
 
 export const produceDiscount = { item: 'Fresh produce', rate: '10', storeName: 'Corner Grocery', storeAddress: '3 Hill Road' };
 
@@ -11,8 +13,6 @@ export const longTextInAnyCharacters = {
   storeName: "D'Ángelo's <b>Bodega</b>",
   storeAddress: 'Calle Ñuñoa 4; piso 2 '.repeat(500),
 };
-
-export const theStoreOf = ({ storeName, storeAddress }: { storeName: string; storeAddress: string }) => ({ storeName, storeAddress });
 
 export const publishedSpicesDiscount = { id: 'spices-id', ...spicesDiscount };
 
