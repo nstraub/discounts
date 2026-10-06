@@ -1,5 +1,5 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, onTestFinished } from 'vitest';
 
 import { discountResponse } from '@app/types/discounts';
 import { requestRejection } from '@app/types/request-rejection';
@@ -102,6 +102,18 @@ describe('POST /discounts', () => {
       ];
 
       expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
+    });
+  });
+
+  describe('a discount that cannot be kept', () => {
+    it('should answer 500, not a refusal of the discount, when the discounts table cannot be written', async () => {
+      const { client, http } = await setupSut();
+      await client.query('ALTER TABLE app.discounts RENAME TO discounts_out_of_reach');
+      onTestFinished(() => client.query('ALTER TABLE app.discounts_out_of_reach RENAME TO discounts'));
+
+      const response = await http.post('/discounts').send(spicesDiscount);
+
+      expect(response.status).to.equal(500);
     });
   });
 
