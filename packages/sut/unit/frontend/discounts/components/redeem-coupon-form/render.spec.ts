@@ -4,8 +4,10 @@ import { describe, expect, it, onTestFinished } from 'vitest';
 
 import RedeemCouponForm from '@frontend/discounts/components/RedeemCouponForm.vue';
 import { discountTexts } from '@frontend/discounts/texts';
-import { produceDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
+
+const theStoreOf = ({ storeName, storeAddress }: typeof produceDiscount) => ({ storeName, storeAddress });
 
 const theCornerGrocery = { storeName: produceDiscount.storeName, storeAddress: produceDiscount.storeAddress };
 
@@ -34,6 +36,14 @@ describe('Component RedeemCouponForm', () => {
 
       const offered = theStorePickers().flatMap((picker) => queryAllByRole(picker, 'option', { name: 'Corner Grocery, 3 Hill Road' }));
       expect(offered, 'the Corner Grocery offered by its name and address').to.have.length(1);
+    });
+    it('should offer other stores, each by its name and address, when given others', () => {
+      setupSut({ stores: [theStoreOf(stephaniesProduceDiscount), theStoreOf(spicesDiscount)] });
+
+      const offered = ["Stephanie's Market, 8 Orchard Lane", "Mike's Groceries, 12 Market Street"].map(
+        (name) => theStorePickers().flatMap((picker) => queryAllByRole(picker, 'option', { name })).length,
+      );
+      expect(offered, 'times each store is offered').to.deep.equal([1, 1]);
     });
     it.todo('should ask for the coupon\'s code under its caption');
     it.todo('should offer to redeem the coupon under its caption');

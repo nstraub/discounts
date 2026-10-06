@@ -14,7 +14,12 @@ defineProps<{ stores: Pick<DiscountResponse, 'storeName' | 'storeAddress'>[] }>(
         required
         class="rounded border border-gray-400 px-2 py-1"
       >
-        <option>Corner Grocery, 3 Hill Road</option>
+        <option
+          v-for="store in stores"
+          :key="`${store.storeName}, ${store.storeAddress}`"
+        >
+          {{ store.storeName }}, {{ store.storeAddress }}
+        </option>
       </select>
     </label>
   </form>
