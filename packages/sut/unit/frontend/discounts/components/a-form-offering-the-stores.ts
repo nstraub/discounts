@@ -4,6 +4,7 @@ import { onTestFinished } from 'vitest';
 import type { Component } from 'vue';
 
 import { useDiscountsStore } from '@frontend/stores/discounts-store';
+import type { spicesDiscount } from '@sut/support/example-discounts';
 import { aTestingDiscountsStore } from '@sut/unit/frontend/stores/discounts-store/a-testing-discounts-store';
 
 export const aFormOfferingTheStores = (form: Component, stores: ReadonlyArray<{ storeName: string; storeAddress: string }>) => {
@@ -12,6 +13,10 @@ export const aFormOfferingTheStores = (form: Component, stores: ReadonlyArray<{ 
   onTestFinished(() => mounted.unmount());
   return { form: mounted, discounts: useDiscountsStore(pinia) };
 };
+
+const theStoreOf = ({ storeName, storeAddress }: typeof spicesDiscount) => ({ storeName, storeAddress });
+
+export const aFormOfferingTheStoresOf = (form: Component, discounts: ReadonlyArray<typeof spicesDiscount>) => aFormOfferingTheStores(form, discounts.map(theStoreOf));
 
 export const theStorePickersUnder = (caption: string) => queryAllByRole<HTMLSelectElement>(document.body, 'combobox', { name: caption });
 

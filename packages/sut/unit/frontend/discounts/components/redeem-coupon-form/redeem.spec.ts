@@ -6,11 +6,9 @@ import RedeemCouponForm from '@frontend/discounts/components/RedeemCouponForm.vu
 import { discountTexts } from '@frontend/discounts/texts';
 import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
-import { aFormOfferingTheStores } from '../a-form-offering-the-stores';
+import { aFormOfferingTheStoresOf } from '../a-form-offering-the-stores';
 
-const theStoreOf = ({ storeName, storeAddress }: typeof spicesDiscount) => ({ storeName, storeAddress });
-
-const setupSut = () => aFormOfferingTheStores(RedeemCouponForm, [theStoreOf(spicesDiscount), theStoreOf(stephaniesProduceDiscount)]);
+const setupSut = () => aFormOfferingTheStoresOf(RedeemCouponForm, [spicesDiscount, stephaniesProduceDiscount]);
 
 const setupSutRedeemingTo = (item: string) => {
   const sut = setupSut();

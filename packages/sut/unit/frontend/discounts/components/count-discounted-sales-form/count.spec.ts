@@ -5,11 +5,9 @@ import type { CountResponse } from '@app/types/discounts';
 import CountDiscountedSalesForm from '@frontend/discounts/components/CountDiscountedSalesForm.vue';
 import { spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
 
-import { aFormOfferingTheStores } from '../a-form-offering-the-stores';
+import { aFormOfferingTheStoresOf } from '../a-form-offering-the-stores';
 
-const theStoreOf = ({ storeName, storeAddress }: typeof spicesDiscount) => ({ storeName, storeAddress });
-
-const setupSut = () => aFormOfferingTheStores(CountDiscountedSalesForm, [theStoreOf(spicesDiscount), theStoreOf(stephaniesProduceDiscount)]);
+const setupSut = () => aFormOfferingTheStoresOf(CountDiscountedSalesForm, [spicesDiscount, stephaniesProduceDiscount]);
 
 const setupSutCountingTo = (counted: CountResponse) => {
   const sut = setupSut();
