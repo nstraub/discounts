@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { stephaniesProduceDiscount } from '@sut/support/example-discounts';
+
 import { oneRaceAfterAnother, timesTheRaceIsRun } from '../support/at-the-same-moment';
 import { countTheStoreOf } from '../support/counts';
 import { changeTheRateOf } from '../support/rates';
@@ -97,6 +99,16 @@ describe('changes to one discount at the same moment', () => {
     });
   });
   describe('A4 concurrency: a coupon tried at two stores', () => {
-    it.todo('should keep a coupon redeemed at its own store when it is tried at another store at the same moment');
+    it('should keep a coupon redeemed at its own store when it is tried at another store at the same moment', async () => {
+      const { http, codes } = await setupSutWithACouponForEachRace();
+
+      const outcomeOfEachPair = await oneRaceAfterAnother(codes, async (code) => {
+        const pair = await Promise.all([redeemAtTheStoreOf(http, code), redeemAtTheStoreOf(http, code, stephaniesProduceDiscount)]);
+        const usedAgain = await redeemAtTheStoreOf(http, code);
+        return `${pair.map((response) => response.status).join(' ')} then ${usedAgain.status}`;
+      });
+
+      expect([...new Set(outcomeOfEachPair)].join('; '), 'the statuses of each pair, then of the coupon used again').to.equal('201 422 then 409');
+    });
   });
 });
