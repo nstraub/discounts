@@ -43,6 +43,15 @@ describe('the discounts of a store found in PostgreSQL', () => {
   });
 
   describe('A2 injection', () => {
-    it.todo('should find nothing for a store name and address with quotes, semicolons and SQL keywords, every kept discount and coupon left as it was');
+    it('should find nothing for a store name and address with quotes, semicolons and SQL keywords, every kept discount and coupon left as it was', async () => {
+      const { keepWithCouponsIssued, repository, loadOnItsOwnConnection } = await setupSut();
+      const spices = await keepWithCouponsIssued(spicesDiscount, ['7K3QX9M2PD']);
+      const injected = "x' OR '1'='1'; DELETE FROM app.coupons; --";
+
+      const found = await repository.ofStore({ storeName: injected, storeAddress: injected });
+
+      expect(found, 'the discounts found').to.deep.equal([]);
+      expect((await loadOnItsOwnConnection()).map((kept) => kept.toJSON()), 'every discount kept').to.deep.equal([spices.toJSON()]);
+    });
   });
 });
