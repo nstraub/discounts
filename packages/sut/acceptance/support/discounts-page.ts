@@ -25,6 +25,12 @@ export class DiscountsPage {
     await this.page.waitForFunction((input) => (input as HTMLInputElement | null)?.value === '', item);
   }
 
+  async changeTheRateOf(discount: ExampleDiscount, newRate: string): Promise<void> {
+    const entry = await this.publishedEntryOn(discount);
+    await entry.getByTestId('new-rate').fill(newRate);
+    await entry.getByTestId('change-rate').click();
+  }
+
   async verifyShows(discount: ExampleDiscount): Promise<void> {
     const shown = await this.publishedEntryOn(discount);
     assert.equal(await shown.getByTestId('published-item').textContent(), discount.item);
@@ -44,9 +50,15 @@ export class DiscountsPage {
     assert.equal(await shown.getByTestId('published-rate').textContent(), `${discount.rate}%`);
   }
 
+  async verifyShowsOnceAtTheRate(discount: ExampleDiscount, rate: string): Promise<void> {
+    const shown = await this.publishedEntryOn(discount);
+    assert.equal(await shown.count(), 1, `the page shows the discount on ${discount.item} more than once`);
+    assert.equal(await shown.getByTestId('published-rate').textContent(), `${rate}%`, `the discount on ${discount.item} is not shown at its new rate`);
+  }
+
   private async publishedEntryOn(discount: ExampleDiscount): Promise<Locator> {
     const shown = this.page.getByTestId('published-discount').filter({ hasText: discount.item });
-    await shown.waitFor().catch(() => assert.fail(`the page shows no published discount on ${discount.item}`));
+    await shown.first().waitFor().catch(() => assert.fail(`the page shows no published discount on ${discount.item}`));
     return shown;
   }
 }
