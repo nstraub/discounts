@@ -7,26 +7,9 @@ import { longTextInAnyCharacters, produceDiscount, spicesDiscount } from '@sut/s
 import { type Http, setupSut } from '../support/app';
 import { answersInTurnToBodiesThatAreNotObjects, statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
 import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
-
-type ExampleDiscount = typeof spicesDiscount;
-
-const setupSutWithACouponFor = async (discount: ExampleDiscount = spicesDiscount) => {
-  const sut = await setupSut();
-  const published: { id: string } = (await sut.http.post('/discounts').send(discount)).body;
-  const code: string = (await sut.http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
-  return { ...sut, published, code };
-};
-
-const setupSutWithAnotherCouponOfTheSameDiscount = async () => {
-  const sut = await setupSutWithACouponFor();
-  const other: string = (await sut.http.post(`/discounts/${sut.published.id}/coupons`).send({})).body.token;
-  return { ...sut, other };
-};
+import { redeemAtTheStoreOf, setupSutWithACouponFor, setupSutWithAnotherCouponOfTheSameDiscount } from '../support/redemptions';
 
 const redeemWrittenAsJson = (http: Http, body: string) => http.post('/redemptions').set('Content-Type', 'application/json').send(body);
-
-const redeemAtTheStoreOf = (http: Http, code: string, discount: ExampleDiscount = spicesDiscount) =>
-  http.post('/redemptions').send({ code, storeName: discount.storeName, storeAddress: discount.storeAddress });
 
 describe('POST /redemptions', () => {
   describe('success', () => {
