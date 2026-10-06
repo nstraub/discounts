@@ -137,10 +137,6 @@ describe('POST /discounts', () => {
     });
   });
 
-  describe('empty', () => {
-    it.todo('should answer 400 naming the rate when the rate is only blank space');
-  });
-
   describe('A1 input boundary', () => {
     it.todo('should answer 400 naming the item, the store name and the store address when each is longer than allowed');
   });

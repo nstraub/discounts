@@ -90,5 +90,13 @@ describe('POST /discounts with a piece left out', () => {
       expect(response.status).to.equal(400);
       expect(theFieldsNamedBy(response)).to.deep.equal([['item', 'storeName', 'storeAddress']]);
     });
+    it('should answer 400 naming the rate as missing when the rate is only blank space', async () => {
+      const { http } = await setupSut();
+
+      const response = await http.post('/discounts').send({ ...spicesDiscount, rate: ' \t ' });
+
+      expect(theFieldsNamedBy(response), 'the fields named').to.deep.equal([['rate']]);
+      expect(requestRejection.parse(response.body).missing).to.deep.equal(['rate']);
+    });
   });
 });
