@@ -50,6 +50,16 @@ describe('POST /redemptions', () => {
     });
   });
 
+  describe('A1 input boundary', () => {
+    it('should answer as for a coupon nobody issued when the code is 10 000 characters long, never a 500', async () => {
+      const { http } = await setupSut();
+
+      const response = await redeemAtTheStoreOf(http, 'Z'.repeat(10_000));
+
+      expect(response.status).to.equal(404);
+    });
+  });
+
   describe('A2 injection', () => {
     it('should answer a code written as SQL as for a code nobody issued, every discount and coupon left as it was', async () => {
       const sut = await setupSutWithAnotherCouponOfTheSameDiscount();

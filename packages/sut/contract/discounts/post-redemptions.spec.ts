@@ -126,10 +126,6 @@ describe('POST /redemptions', () => {
     });
   });
 
-  describe('A1 input boundary', () => {
-    it.todo('should answer as for a coupon nobody issued when the code is 10 000 characters long, never a 500');
-  });
-
   describe('A3 handle guessing (no accounts)', () => {
     it('should answer with no coupon token, neither the one redeemed nor another', async () => {
       const { http, code, other: another } = await setupSutWithAnotherCouponOfTheSameDiscount();
