@@ -17,6 +17,7 @@ defineProps<{ discounts: DiscountResponse[] }>();
     <li
       v-for="discount in discounts"
       :key="discount.id"
+      class="flex gap-2"
       data-testid="published-discount"
     >
       <span data-testid="published-item">{{ discount.item.trim() }}</span>
