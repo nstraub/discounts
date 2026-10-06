@@ -14,4 +14,5 @@ export const discountTexts = {
   couponCode: 'Coupon code',
   redeem: 'Redeem',
   theDiscountAppliesTo: 'The discount applies to',
+  store: 'Store',
 };
