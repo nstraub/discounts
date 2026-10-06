@@ -18,6 +18,8 @@ const setupSutCountingTo = (counted: CountResponse) => {
   return sut;
 };
 
+const stephaniesMarketAsPicked = "Stephanie's Market, 8 Orchard Lane";
+
 const stephaniesProduceCounted = { id: 'produce-id', item: stephaniesProduceDiscount.item, rate: stephaniesProduceDiscount.rate, discountedSales: 2 };
 
 const mikesSpicesCounted = { id: 'spices-id', item: spicesDiscount.item, rate: spicesDiscount.rate, discountedSales: 1 };
@@ -46,49 +48,49 @@ describe('Component CountDiscountedSalesForm', () => {
     it('should count the discounted sales of another store when Rodrigo picks another', async () => {
       const { form, discounts } = setupSut();
 
-      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+      await countThroughTheForm(form, stephaniesMarketAsPicked);
 
       expect(discounts.countDiscountedSales).to.have.been.calledWith({ storeName: "Stephanie's Market", storeAddress: '8 Orchard Lane' });
     });
     it('should name the item of each discount counted', async () => {
       const { form } = setupSutCountingTo([stephaniesProduceCounted]);
 
-      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+      await countThroughTheForm(form, stephaniesMarketAsPicked);
 
       expect(whatTheCountShowsFor(form, 'counted-item'), 'the items counted').to.deep.equal(['Organic produce']);
     });
     it('should name the item of every discount counted when several are', async () => {
       const { form } = setupSutCountingTo([mikesSpicesCounted, stephaniesProduceCounted]);
 
-      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+      await countThroughTheForm(form, stephaniesMarketAsPicked);
 
       expect(whatTheCountShowsFor(form, 'counted-item'), 'the items counted').to.deep.equal(['Peruvian spices', 'Organic produce']);
     });
     it('should show the rate of each discount counted', async () => {
       const { form } = setupSutCountingTo([stephaniesProduceCounted]);
 
-      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+      await countThroughTheForm(form, stephaniesMarketAsPicked);
 
       expect(whatTheCountShowsFor(form, 'counted-rate'), 'the rates counted').to.deep.equal(['15%']);
     });
     it('should show the rate of every discount counted when several are', async () => {
       const { form } = setupSutCountingTo([mikesSpicesCounted, stephaniesProduceCounted]);
 
-      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+      await countThroughTheForm(form, stephaniesMarketAsPicked);
 
       expect(whatTheCountShowsFor(form, 'counted-rate'), 'the rates counted').to.deep.equal(['20%', '15%']);
     });
     it('should show the number of discounted sales counted for each discount under its caption', async () => {
       const { form } = setupSutCountingTo([stephaniesProduceCounted]);
 
-      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+      await countThroughTheForm(form, stephaniesMarketAsPicked);
 
       expect(theNumbersCountedUnderTheirCaptions(form), 'the numbers counted').to.deep.equal([`${discountTexts.discountedSales} 2`]);
     });
     it('should show the number counted for every discount when several are', async () => {
       const { form } = setupSutCountingTo([mikesSpicesCounted, stephaniesProduceCounted]);
 
-      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+      await countThroughTheForm(form, stephaniesMarketAsPicked);
 
       expect(theNumbersCountedUnderTheirCaptions(form), 'the numbers counted').to.deep.equal([`${discountTexts.discountedSales} 1`, `${discountTexts.discountedSales} 2`]);
     });
