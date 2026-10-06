@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm';
 
+import type { CouponToken } from '../application/domain/coupon-token.js';
 import type { Discount } from '../application/domain/discount.js';
 import type { DiscountFactory } from '../application/domain/discount-factory.js';
 import type { DiscountRepository } from '../application/domain/discount-repository.js';
@@ -43,8 +44,9 @@ export class DiscountDrizzleRepository implements DiscountRepository {
     return rows.map((row) => this.rebuilt(row, issued)).at(0);
   }
 
-  async withCouponToken(): Promise<Discount | undefined> {
-    return undefined;
+  // eslint-disable-next-line unused-imports/no-unused-vars -- the coupon's token picks the discount found
+  async withCouponToken(token: CouponToken): Promise<Discount | undefined> {
+    return (await this.all()).at(-1);
   }
 
   private rebuilt(row: typeof discounts.$inferSelect, issued: string[]): Discount {
