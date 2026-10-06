@@ -31,6 +31,28 @@ export class DiscountsPage {
     await this.publish(discount);
   }
 
+  async startToPublish(discount: ExampleDiscount): Promise<void> {
+    await this.page.getByTestId('discount-item').fill(discount.item);
+    await this.page.getByTestId('discount-store-name').fill(discount.storeName);
+    await this.page.getByTestId('discount-store-address').fill(discount.storeAddress);
+  }
+
+  async publishAtTheRate(rate: string): Promise<void> {
+    await this.page.getByTestId('discount-rate').fill(rate);
+    await this.page.getByTestId('publish-discount').click();
+  }
+
+  async verifyTellsTheRateIsNotValid(): Promise<void> {
+    const told = this.page.getByRole('status').filter({ hasText: discountTexts.rateNotValid });
+    await told.waitFor().catch(() => assert.fail("Mike's page does not tell him the rate is not valid"));
+  }
+
+  async verifyDoesNotShow(discount: ExampleDiscount): Promise<void> {
+    await this.page.waitForLoadState('networkidle');
+    const shown = this.page.getByTestId('published-discount-text').filter({ hasText: discount.item });
+    assert.equal(await shown.count(), 0, `the page shows the discount on ${discount.item}`);
+  }
+
   private async untilTheDiscountIsKeptAndTheFormCleared(): Promise<void> {
     const item = await this.page.getByTestId('discount-item').elementHandle();
     await this.page.waitForFunction((input) => (input as HTMLInputElement | null)?.value === '', item);

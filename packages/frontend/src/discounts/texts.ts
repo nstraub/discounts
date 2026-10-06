@@ -15,6 +15,7 @@ export const discountTexts = {
   redeem: 'Redeem',
   theDiscountAppliesTo: 'The discount applies to',
   couponAlreadyUsed: 'This coupon has already been used.',
+  rateNotValid: 'The rate must be above 0 % and at most 100 %, with at most one decimal.',
   store: 'Store',
   countDiscountedSales: 'Count discounted sales',
   discountedSales: 'Discounted sales',
