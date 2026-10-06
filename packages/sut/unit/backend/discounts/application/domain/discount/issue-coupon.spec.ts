@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { tokenDrawnAs } from '@backend/app/mocks/coupon-tokens';
 import { CouponIssued } from '@backend/discounts/application/domain/coupon-issued';
+import { produceDiscount } from '@sut/support/example-discounts';
 
 import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
 
@@ -25,6 +26,14 @@ describe('class Discount', () => {
         const [raised] = events.publish.mock.lastCall ?? [];
         expect(raised).to.be.instanceOf(CouponIssued);
         expect(raised).to.deep.include({ id: 'test-uuid', token: '7K3QX9M2PD' });
+      });
+      it('should raise CouponIssued carrying the id of another discount and the token of its coupon', () => {
+        const { events, factory } = setupSut();
+        const discount = factory.reconstitute({ id: 'produce-id', ...produceDiscount, coupons: [] });
+
+        discount.issueCoupon(tokenDrawnAs('R4WZ0BH8NE'));
+
+        expect(events.publish.mock.lastCall?.at(0)).to.deep.include({ id: 'produce-id', token: 'R4WZ0BH8NE' });
       });
     });
 

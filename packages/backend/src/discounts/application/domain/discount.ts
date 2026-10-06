@@ -24,7 +24,7 @@ export class Discount {
 
   issueCoupon(token: CouponToken): void {
     this.coupons = [token];
-    this.events.publish(new CouponIssued('test-uuid', '7K3QX9M2PD'));
+    this.events.publish(new CouponIssued(this.id, token.toJSON()));
   }
 
   toJSON(): { id: string; coupons: string[] } & ReturnType<DiscountDetails['toJSON']> {
