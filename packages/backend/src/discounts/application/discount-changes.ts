@@ -23,7 +23,14 @@ export class DiscountChanges {
 
   async toEachOfTheStore<Answer>(store: Store, change: Change<Answer>): Promise<Answer[]> {
     const [discount] = await this.repository.ofStore(store);
-    return [await this.keptAfter(discount!, change)];
+    return [
+      await this.repository.changing(async (repository) => {
+        const reloaded = (await repository.withId(discount!.toJSON().id))!;
+        const answer = change(reloaded);
+        await repository.save(reloaded);
+        return answer;
+      }),
+    ];
   }
 
   async keptAfter<Answer>(discount: Discount, change: Change<Answer>): Promise<Answer> {

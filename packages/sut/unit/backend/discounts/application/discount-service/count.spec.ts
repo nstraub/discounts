@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { mock } from 'vitest-mock-extended';
 
+import type { DiscountRepository } from '@backend/discounts/application/domain/discount-repository';
 import { DiscountedSalesCounted } from '@backend/discounts/application/domain/discounted-sales-counted';
 import { Store } from '@backend/discounts/application/domain/store';
 import { publishedSpicesDiscount, theStoreOf } from '@sut/support/example-discounts';
@@ -34,6 +36,21 @@ describe('class DiscountService', () => {
       expect(counted.map((discount) => discount.toJSON())).to.deep.equal([
         { id: publishedSpicesDiscount.id, item: publishedSpicesDiscount.item, rate: publishedSpicesDiscount.rate, discountedSales: 1 },
       ]);
+    });
+
+    describe('one change at a time', () => {
+      it('should keep the store\'s discount counted through the repository its change is given', async () => {
+        const { repository, service } = setupSut();
+        const given = mock<DiscountRepository>();
+        given.withId.mockResolvedValue(await repository.withId(publishedSpicesDiscount.id));
+        repository.changing.mockImplementation((work) => work(given));
+
+        await service.count(theSpicesStore);
+
+        expect(given.save.mock.lastCall?.at(0)?.toJSON().coupons, 'the coupons kept through the repository given').to.deep.equal([
+          { token: '7K3QX9M2PD', redeemed: true, counted: true },
+        ]);
+      });
     });
 
     describe('not found', () => {
