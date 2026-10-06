@@ -13,7 +13,7 @@ import { migrateBackwardPast, setupSut } from '../support/migrations';
 
 const theMigration = '0004_add_discount_hook';
 
-const theMigrationsAfterIt = ['0005_create_coupons', '0006_let_a_coupon_be_redeemed'];
+const theMigrationsAfterIt = ['0005_create_coupons', '0006_let_a_coupon_be_redeemed', '0007_let_a_coupon_be_counted'];
 
 describe('the migration that adds the hook to discounts', () => {
   it('should migrate forward from empty, a discount with a hook kept and loaded back', async () => {

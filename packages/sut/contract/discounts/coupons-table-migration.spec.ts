@@ -16,7 +16,7 @@ import {
 import { migrateBackwardPast, setupSut, tableStatus } from '../support/migrations';
 
 const theMigration = '0005_create_coupons';
-const theMigrationsAfterIt = ['0006_let_a_coupon_be_redeemed'];
+const theMigrationsAfterIt = ['0006_let_a_coupon_be_redeemed', '0007_let_a_coupon_be_counted'];
 
 const theCouponLinesPassing = {
   loadedBackAsKept: true,

@@ -23,4 +23,5 @@ export const coupons = app.table('coupons', {
     .notNull()
     .references(() => discounts.id),
   redeemed: boolean('redeemed').notNull().default(false),
+  counted: boolean('counted').notNull().default(false),
 });

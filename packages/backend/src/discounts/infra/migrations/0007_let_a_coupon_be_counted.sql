@@ -1,0 +1,1 @@
+ALTER TABLE "app"."coupons" ADD COLUMN "counted" boolean DEFAULT false NOT NULL;

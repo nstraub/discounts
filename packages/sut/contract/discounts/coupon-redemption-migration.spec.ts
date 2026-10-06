@@ -8,9 +8,11 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { discountRepositoryOn } from '../support/discount-repository';
 import { insertACoupon, insertADiscountWithout } from '../support/discounts-table';
-import { migrateBackward, setupSut } from '../support/migrations';
+import { migrateBackwardPast, setupSut } from '../support/migrations';
 
 const theMigration = '0006_let_a_coupon_be_redeemed';
+
+const theMigrationsAfterIt = ['0007_let_a_coupon_be_counted'];
 
 const keepADiscountWithACouponRedeemed = async (client: pg.Client, databaseUrl: string) => {
   const { repository, keep } = discountRepositoryOn(client, databaseUrl);
@@ -41,7 +43,7 @@ describe('the migration that lets a coupon be redeemed', () => {
     await migrateForward();
     const keptBefore = await keepADiscountWithACouponRedeemed(client, databaseUrl);
 
-    await migrateBackward(client, theMigration);
+    await migrateBackwardPast(client, theMigration, theMigrationsAfterIt);
 
     const backward = await client.query('SELECT * FROM app.coupons');
     expect(backward.rows.map((row) => Object.keys(row)), 'the coupons, backward').to.deep.equal([['id', 'token', 'discount_id']]);
@@ -55,7 +57,7 @@ describe('the migration that lets a coupon be redeemed', () => {
   it('should read back unused, through the repository, a coupon issued before the migration', async () => {
     const { client, databaseUrl, migrateForward } = await setupSut();
     await migrateForward();
-    await migrateBackward(client, theMigration);
+    await migrateBackwardPast(client, theMigration, theMigrationsAfterIt);
     await insertADiscountWithout(client, 'hook');
     await insertACoupon(client, { token: '7K3QX9M2PD', discount_id: 'constraint-id' });
 

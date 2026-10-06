@@ -50,6 +50,13 @@
       "when": 1791262951066,
       "tag": "0006_let_a_coupon_be_redeemed",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791270796652,
+      "tag": "0007_let_a_coupon_be_counted",
+      "breakpoints": true
     }
   ]
 }

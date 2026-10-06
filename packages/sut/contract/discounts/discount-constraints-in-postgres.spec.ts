@@ -90,8 +90,8 @@ describe('the discounts table refusing what Discount refuses', () => {
         "SELECT column_name AS name, data_type AS type, is_nullable AS nullable, column_default AS default FROM information_schema.columns WHERE table_schema = 'app' AND table_name = 'coupons' ORDER BY ordinal_position",
       );
 
-      expect(rows.map(({ name }) => name), 'only whether it was used, with no time and no one').to.deep.equal(['id', 'token', 'discount_id', 'redeemed']);
-      expect(rows.at(-1), 'NOT NULL, false by default, mirrors "a coupon is unused from its issue until redeemed"').to.deep.equal({
+      expect(rows.map(({ name }) => name), 'only whether it was used and counted, with no time and no one').to.deep.equal(['id', 'token', 'discount_id', 'redeemed', 'counted']);
+      expect(rows.find(({ name }) => name === 'redeemed'), 'NOT NULL, false by default, mirrors "a coupon is unused from its issue until redeemed"').to.deep.equal({
         name: 'redeemed',
         type: 'boolean',
         nullable: 'NO',
