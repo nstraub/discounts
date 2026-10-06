@@ -33,7 +33,7 @@ describe('Component ChangeRateForm', () => {
 
       await changeThroughTheForm(form, '12,5');
 
-      expect(vi.mocked(discounts.changeRate).mock.lastCall?.at(1)?.rate).to.equal('12,5');
+      expect(vi.mocked(discounts.changeRate).mock.lastCall?.[1].rate).to.equal('12,5');
     });
 
     describe('empty', () => {
