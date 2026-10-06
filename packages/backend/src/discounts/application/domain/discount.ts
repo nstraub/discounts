@@ -16,7 +16,7 @@ export class Discount {
 
   changeRate(rate: string): void {
     this.details = this.details.withRate(rate);
-    this.events.publish(new DiscountRateChanged('test-uuid', '25'));
+    this.events.publish(new DiscountRateChanged(this.id, rate));
   }
 
   toJSON(): { id: string } & ReturnType<DiscountDetails['toJSON']> {

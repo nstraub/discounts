@@ -5,11 +5,12 @@ import { DiscountDetails } from '@backend/discounts/application/domain/discount-
 import { DiscountFactory } from '@backend/discounts/application/domain/discount-factory';
 import { DiscountRateChanged } from '@backend/discounts/application/domain/discount-rate-changed';
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
-import { spicesDiscount } from '@sut/support/example-discounts';
+import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 const setupSut = () => {
   const events = mock<DomainEventPublisher>();
-  return { events, discount: new DiscountFactory(events).create(new DiscountDetails(spicesDiscount)) };
+  const factory = new DiscountFactory(events);
+  return { events, factory, discount: factory.create(new DiscountDetails(spicesDiscount)) };
 };
 
 describe('class Discount', () => {
@@ -30,6 +31,14 @@ describe('class Discount', () => {
         const [raised] = events.publish.mock.lastCall ?? [];
         expect(raised).to.be.instanceOf(DiscountRateChanged);
         expect(raised).to.deep.include({ id: 'test-uuid', rate: '25' });
+      });
+      it('should raise DiscountRateChanged carrying the id and new rate of another discount changed', () => {
+        const { events, factory } = setupSut();
+        const discount = factory.reconstitute({ id: 'produce-id', ...produceDiscount });
+
+        discount.changeRate('15');
+
+        expect(events.publish.mock.lastCall?.at(0)).to.deep.include({ id: 'produce-id', rate: '15' });
       });
       it.todo('should keep its item, store name and store address when its rate changes');
     });
