@@ -19,6 +19,14 @@ const setupSut = () => {
   return { form, discounts: useDiscountsStore(pinia) };
 };
 
+const setupSutRedeemingTo = (item: string) => {
+  const sut = setupSut();
+  vi.mocked(sut.discounts.redeemCoupon).mockImplementation(async () => {
+    sut.discounts.redemption = { item };
+  });
+  return sut;
+};
+
 const redeemThroughTheForm = async (form: VueWrapper, storeShown: string, code: string): Promise<void> => {
   const picker = form.get<HTMLSelectElement>('select');
   picker.element.selectedIndex = [...picker.element.options].findIndex((option) => option.text.trim() === storeShown);
@@ -46,10 +54,7 @@ describe('Component RedeemCouponForm', () => {
       expect(discounts.redeemCoupon).to.have.been.calledWith({ code: 'R4WZ0-BH8NE', storeName: "Stephanie's Market", storeAddress: '8 Orchard Lane' });
     });
     it('should say the discount applies once the coupon is redeemed', async () => {
-      const { form, discounts } = setupSut();
-      vi.mocked(discounts.redeemCoupon).mockImplementation(async () => {
-        discounts.redemption = { item: spicesDiscount.item };
-      });
+      const { form } = setupSutRedeemingTo(spicesDiscount.item);
 
       await redeemThroughTheForm(form, "Mike's Groceries, 12 Market Street", '7k3qx 9m2pd');
 
