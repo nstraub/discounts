@@ -26,5 +26,11 @@ const publish = async (): Promise<void> => {
     >
       {{ discountTexts.publish }}
     </button>
+    <p
+      v-if="discounts.rateNotValid"
+      role="status"
+    >
+      {{ discountTexts.rateNotValid }}
+    </p>
   </form>
 </template>

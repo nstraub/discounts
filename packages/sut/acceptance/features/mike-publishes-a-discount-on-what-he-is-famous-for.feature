@@ -137,7 +137,6 @@ Feature: Mike publishes a discount on what he is famous for
     When Mike publishes a discount on another item
     Then Sue's coupon still applies at Mike's store
 
-  @wip
   Scenario Outline: Mike gives an invalid rate
     Given Mike tries to publish a discount
     When he gives a rate of <rate>

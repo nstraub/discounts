@@ -140,7 +140,16 @@ describe('Component PublishDiscountForm', () => {
     });
   });
   describe('publishing a discount at a rate that is not valid', () => {
-    it.todo('should tell Mike the rate is not valid when the publish is refused for it');
+    it('should tell Mike the rate is not valid when the publish is refused for it', async () => {
+      const { form, discounts } = setupSut();
+      vi.mocked(discounts.publish).mockImplementation(async () => {
+        discounts.rateNotValid = true;
+      });
+
+      await publishThroughTheForm(form, { ...spicesDiscount, rate: '150' });
+
+      expect(whatTheFormTells(), 'what the form tells').to.contain(discountTexts.rateNotValid);
+    });
     it('should not tell Mike the rate is not valid before a publish is refused for it', async () => {
       const { form } = setupSut();
 

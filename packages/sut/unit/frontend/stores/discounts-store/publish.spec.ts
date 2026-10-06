@@ -42,5 +42,6 @@ describe('Store discounts', () => {
 
       expect(discounts.rateNotValid, 'whether the rate is held as not valid').to.equal(true);
     });
+    it.todo('should no longer hold the rate as not valid once the next discount is published');
   });
 });
