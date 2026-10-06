@@ -1,4 +1,4 @@
-const moreThanOneDecimalPlace = /\.\d{2,}/;
+const moreThanOneDecimalPlace = /[.,]\d{2,}/;
 
 export class DiscountRate {
   constructor(private readonly written: string) {}
