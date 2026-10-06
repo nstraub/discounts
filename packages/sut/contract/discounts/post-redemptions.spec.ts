@@ -1,5 +1,5 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, onTestFinished } from 'vitest';
 
 import { redemptionRequest, redemptionResponse } from '@app/types/discounts';
 import { longTextInAnyCharacters, produceDiscount, spicesDiscount, stephaniesProduceDiscount } from '@sut/support/example-discounts';
@@ -150,6 +150,20 @@ describe('POST /redemptions', () => {
       expect(statusesOfEachPair, 'the statuses answering each coupon used twice at once').to.deep.equal(
         codes.map(() => [201, 409]),
       );
+    });
+  });
+
+  describe('coupons that cannot be read', () => {
+    it('should answer 500, not \'already used\', when the coupons cannot be read', async () => {
+      const { client, http, code } = await setupSutWithACouponFor();
+      await client.query('ALTER TABLE app.coupons RENAME TO coupons_out_of_reach');
+      onTestFinished(async () => {
+        await client.query('ALTER TABLE app.coupons_out_of_reach RENAME TO coupons');
+      });
+
+      const response = await redeemAtTheStoreOf(http, code);
+
+      expect(response.status).to.equal(500);
     });
   });
 
