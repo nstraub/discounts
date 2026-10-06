@@ -1,3 +1,4 @@
+import { CouponAlreadyUsedException } from './coupon-already-used-exception.js';
 import { CouponRedeemed } from './coupon-redeemed.js';
 import type { CouponToken } from './coupon-token.js';
 import type { DomainEventPublisher } from './domain-event-publisher.js';
@@ -11,6 +12,9 @@ export class Coupon {
   ) {}
 
   redeem(discountId: string): void {
+    if (this.redeemed) {
+      throw new CouponAlreadyUsedException();
+    }
     this.redeemed = true;
     this.events.publish(new CouponRedeemed(discountId, this.token.toJSON()));
   }
