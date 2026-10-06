@@ -86,6 +86,11 @@ export class DiscountsPage {
     return this.page.getByTestId('issued-coupon').getByTestId('coupon-code').innerText();
   }
 
+  async getACouponFor(discount: ExampleDiscount): Promise<string> {
+    await this.decideToTry(discount);
+    return this.couponCodeShown();
+  }
+
   async verifyShows(discount: ExampleDiscount): Promise<void> {
     await this.verifyShowsTheDiscount(discount);
     await this.verifyShowsTheStoreOf(discount);

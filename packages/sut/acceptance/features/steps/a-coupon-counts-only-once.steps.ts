@@ -9,8 +9,7 @@ import { openTheTillOnADeviceOfItsOwn } from '../../support/till-page';
 Given("Sue has used her coupon at Stephanie's store", async function (this: PlaywrightWorld) {
   await publishFromSomeoneElsesPage(this, stephaniesProduceDiscount);
   const suesPage = await openSomeoneElsesDiscountsPage(this);
-  await suesPage.decideToTry(this.publishedDiscount);
-  this.couponCode = await suesPage.couponCodeShown();
+  this.couponCode = await suesPage.getACouponFor(this.publishedDiscount);
   this.till = await openTheTillOnADeviceOfItsOwn(this);
   await this.till.redeemAt(this.publishedDiscount, this.couponCode);
   await this.till.verifyTellsTheDiscountAppliesTo(this.publishedDiscount);

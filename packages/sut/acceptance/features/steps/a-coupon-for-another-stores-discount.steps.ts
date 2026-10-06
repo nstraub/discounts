@@ -9,8 +9,7 @@ import { openTheTillOnADeviceOfItsOwn } from '../../support/till-page';
 Given("Sue has a coupon for Mike's discount", async function (this: PlaywrightWorld) {
   await publishFromSomeoneElsesPage(this, spicesDiscount);
   await ownDiscountsPage(this).open();
-  await ownDiscountsPage(this).decideToTry(this.publishedDiscount);
-  this.couponCode = await ownDiscountsPage(this).couponCodeShown();
+  this.couponCode = await ownDiscountsPage(this).getACouponFor(this.publishedDiscount);
 });
 
 When("Sue tries to use it at Stephanie's store", async function (this: PlaywrightWorld) {
