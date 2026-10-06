@@ -33,4 +33,7 @@ describe('Store discounts', () => {
       expect(restApi.post).to.have.been.calledWith('/discounts', spicesDiscountWithItsHook);
     });
   });
+  describe('publishing a discount at a rate that is not valid', () => {
+    it.todo('should hold that the rate is not valid when the publish is refused for it');
+  });
 });

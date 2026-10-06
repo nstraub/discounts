@@ -137,4 +137,8 @@ describe('Component PublishDiscountForm', () => {
       });
     });
   });
+  describe('publishing a discount at a rate that is not valid', () => {
+    it.todo('should tell Mike the rate is not valid when the publish is refused for it');
+    it.todo('should not tell Mike the rate is not valid before a publish is refused for it');
+  });
 });

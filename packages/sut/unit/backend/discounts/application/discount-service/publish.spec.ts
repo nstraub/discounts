@@ -49,4 +49,9 @@ describe('class DiscountService', () => {
       expect(answered).to.equal(published);
     });
   });
+  describe('publishing a discount at a rate its rules refuse', () => {
+    it.todo('should report the rate as not valid');
+    it.todo('should keep nothing when the rate is refused');
+    it.todo('should announce DiscountPublicationRejected for the rate refused');
+  });
 });

@@ -108,4 +108,7 @@ describe('GET /discounts', () => {
   describe('discounts kept before their rules', () => {
     it.todo('should list every other discount when one kept before the rules would be refused by them');
   });
+  describe('a rate kept before the rate rules', () => {
+    it.todo('should list a discount kept before the rate rules at a rate they refuse, as written, matching the response schema');
+  });
 });

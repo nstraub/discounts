@@ -81,4 +81,28 @@ describe('class Discount', () => {
       it.todo('should refuse a rate written as 1e2, 0x14 or Infinity, its rejection naming the rate as not valid');
     });
   });
+  describe('publishing a discount at a rate its rules refuse', () => {
+    describe('the rejection', () => {
+      it.todo('should raise DiscountPublicationRejected carrying the rate and that it is not valid');
+      it.todo('should not raise DiscountPublished when its rate is refused');
+    });
+
+    describe('boundary', () => {
+      it.todo('should accept a rate of 20, a whole number above 0 and at most 100');
+      it.todo('should accept a rate of 12.5, with one decimal place');
+      it.todo('should accept a rate of 100, the highest a rate may be');
+      it.todo('should accept a rate of 0.1, the lowest a rate may be');
+      it.todo('should refuse a rate of 0, its rejection naming the rate as not valid');
+      it.todo('should refuse a negative rate such as -10, its rejection naming the rate as not valid');
+      it.todo('should refuse a rate of 100.1, just above 100, its rejection naming the rate as not valid');
+      it.todo('should refuse a rate of 150, its rejection naming the rate as not valid');
+      it.todo('should refuse a rate of 12.25, with two decimal places, its rejection naming the rate as not valid');
+    });
+
+    describe('type', () => {
+      it.todo('should refuse a rate that is not a number, such as a fifth, its rejection naming the rate as not valid');
+      it.todo('should refuse a rate of 12,25, two decimal places after a decimal comma, its rejection naming the rate as not valid');
+      it.todo('should refuse a rate of 0,0, zero written with a decimal comma, its rejection naming the rate as not valid');
+    });
+  });
 });
