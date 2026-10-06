@@ -119,6 +119,7 @@ describe('POST /redemptions', () => {
         await redeemWrittenAsJson(http, '{"code": "7K3QX9M2PD",'),
         await redeemAtTheStoreOf(http, code),
         await redeemAtTheStoreOf(http, code, stephaniesProduceDiscount),
+        await redeemAtTheStoreOf(http, 'ZZZZZZZZZZ'),
       ];
 
       expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
