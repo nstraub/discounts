@@ -12,6 +12,13 @@ const setupSut = async () => {
   return { client, restApi: new FetchRestApi(await app.getUrl()) };
 };
 
+const setupSutWithACoupon = async () => {
+  const { restApi } = await setupSut();
+  const published = await restApi.post<{ id: string }>('/discounts', spicesDiscount);
+  const { token } = await restApi.post<{ token: string }>(`/discounts/${published.id}/coupons`, {});
+  return { restApi, token };
+};
+
 const refusalOf = (answer: Promise<unknown>): Promise<unknown> => answer.then(
   () => 'resolved',
   (refusal: unknown) => refusal,
@@ -60,9 +67,7 @@ describe('class FetchRestApi', () => {
       expect(outcome).to.equal('POST /nowhere answered 404');
     });
     it('should reject an answer of 422 with an exception of its own', async () => {
-      const { restApi } = await setupSut();
-      const published = await restApi.post<{ id: string }>('/discounts', spicesDiscount);
-      const { token } = await restApi.post<{ token: string }>(`/discounts/${published.id}/coupons`, {});
+      const { restApi, token } = await setupSutWithACoupon();
 
       const refusal = await refusalOf(restApi.post('/redemptions', { code: token, ...theStoreOf(stephaniesProduceDiscount) }));
 
