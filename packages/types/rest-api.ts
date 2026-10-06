@@ -26,9 +26,7 @@ export class FetchRestApi implements RestApi {
 
   async patch(path: string, body: unknown): Promise<void> {
     const response = await this.sendAsJson('PATCH', path, body);
-    if (!response.ok) {
-      throw new RestApiException(`PATCH ${path} answered ${response.status}`);
-    }
+    this.refuseANotOkAnswer(`PATCH ${path}`, response);
   }
 
   private sendAsJson(method: string, path: string, body: unknown): Promise<Response> {
@@ -40,9 +38,13 @@ export class FetchRestApi implements RestApi {
   }
 
   private async bodyOfAnOkAnswer<Body>(request: string, response: Response): Promise<Body> {
+    this.refuseANotOkAnswer(request, response);
+    return (await response.json()) as Body;
+  }
+
+  private refuseANotOkAnswer(request: string, response: Response): void {
     if (!response.ok) {
       throw new RestApiException(`${request} answered ${response.status}`);
     }
-    return (await response.json()) as Body;
   }
 }
