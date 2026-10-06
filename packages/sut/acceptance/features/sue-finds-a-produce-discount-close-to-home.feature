@@ -46,3 +46,18 @@ Feature: Sue finds a produce discount close to home
   Scenario: Someone looks with a screen reader
     When someone using a screen reader looks for a new store with fresh produce
     Then they hear each discount with its store
+
+  @wip
+  Scenario: Sue finds a store close to home
+    Given Mike's store is within walking distance of Sue's home
+    When Sue looks for a new store with fresh produce
+    Then she finds Mike's store
+    And she sees where it is
+    And she sees the discount it offers
+
+  # Where a store is, not its name, is what tells two stores of the same name apart.
+  @todo
+  Scenario: Sue tells apart two stores with the same name by where they are
+    Given two stores with the same name at different addresses have published discounts on produce
+    When Sue looks for a new store with fresh produce
+    Then she sees where each of them is, on its own discount
