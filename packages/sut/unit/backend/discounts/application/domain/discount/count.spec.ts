@@ -1,9 +1,30 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { publishedSpicesDiscount } from '@sut/support/example-discounts';
+
+import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
+
+const threeRedeemedCoupons = [
+  { token: '7K3QX9M2PD', redeemed: true },
+  { token: 'R4WZ0BH8NE', redeemed: true },
+  { token: 'C9D2F6H8JK', redeemed: true },
+];
+
+const setupSut = ({ kept = publishedSpicesDiscount, coupons = threeRedeemedCoupons } = {}) => {
+  const { events, factory } = aSpicesDiscountWithItsEvents();
+  return { events, discount: factory.reconstitute({ ...kept, coupons }) };
+};
 
 describe('class Discount', () => {
   describe('counting its discounted sales', () => {
     describe('the count', () => {
-      it.todo('should count three sales when three of its coupons were redeemed since its last count');
+      it('should count three sales when three of its coupons were redeemed since its last count', () => {
+        const { discount } = setupSut({ coupons: threeRedeemedCoupons });
+
+        const counted = discount.count();
+
+        expect(counted.toJSON().discountedSales).to.equal(3);
+      });
       it.todo('should raise DiscountedSalesCounted carrying its id and the number of sales counted');
     });
 
