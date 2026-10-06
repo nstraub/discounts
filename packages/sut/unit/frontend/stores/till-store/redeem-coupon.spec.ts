@@ -123,7 +123,13 @@ describe('Store till', () => {
 
       expect(till.answer, 'the answer the till holds').not.to.be.instanceOf(CouponAlreadyUsed);
     });
-    it.todo('should no longer hold a coupon as not valid once the next coupon is redeemed');
+    it('should no longer hold a coupon as not valid once the next coupon is redeemed', async () => {
+      const { till } = await setupSutAfterARefusalOf(new NotFoundException('POST /redemptions answered 404'));
+
+      await till.redeemCoupon(theNextCodeAtTheSpicesStore);
+
+      expect(till.answer, 'the answer the till holds').not.to.be.instanceOf(CouponNotValid);
+    });
   });
   describe('redeeming with no store said', () => {
     it('should hold that Stephanie is to say which store she is at', () => {
