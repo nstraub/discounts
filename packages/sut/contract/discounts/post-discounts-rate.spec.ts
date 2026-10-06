@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { requestRejection } from '@app/types/discounts';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
@@ -12,7 +11,7 @@ describe('POST /discounts with a rate written another way', () => {
 
       const response = await http.post('/discounts').send({ ...spicesDiscount, rate: Number(spicesDiscount.rate) });
 
-      expect([response.status, requestRejection.parse(response.body).fields]).to.deep.equal([400, ['rate']]);
+      expect([response.status, response.body.fields]).to.deep.equal([400, ['rate']]);
     });
   });
 
