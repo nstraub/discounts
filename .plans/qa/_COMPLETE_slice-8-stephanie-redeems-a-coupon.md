@@ -83,7 +83,7 @@ included ("A coupon nobody issued").
 | 1 — a code of 10 000 characters answered as for a coupon nobody issued, never a 500 | `contract/discounts/post-redemptions.spec.ts` | `@todo` "Stephanie takes a code that cannot be a coupon's"; built with "A coupon nobody issued" |
 | 1 — the same answer to a malformed code and to a well-formed one nobody issued | the same file | the same `@todo` scenario; built with "A coupon nobody issued" |
 | 1 — codes tried from one source throttled | the same file | `@todo` "Someone tries code after code at the till"; an open risk, listed with the throttling of publishing and of getting coupons |
-| 1 — a coupon redeemed once when used twice at the same moment | the same file | `@todo` "Sue's coupon is used at two tills at the same moment"; built with "A coupon counts only once", the first refusal of a second use; the developer tunes the stress until the red is reliable |
+| 1 — a coupon redeemed once when used twice at the same moment | the same file | `@todo` "Sue's coupon is used at two tills at the same moment"; built with "A coupon counts only once", the first refusal of a second use; the stress is tuned until the red is reliable |
 | 1 — the answer carries the rate the coupon applies at | the same file | `@todo` "Stephanie is told the rate the coupon applies at"; open: which rate applies when the rate changes after the coupon was got |
 | 1 — the till shows the rate the coupon applies at | `unit/frontend/discounts/components/redeem-coupon-form/redeem.spec.ts` | the same `@todo` scenario |
 | 1 — Stephanie told to say which store she is at when none is picked, nothing redeemed | the same file | `@todo` "Stephanie does not say which store she is at"; settled: she is told to say which store she is at and the coupon stays unused, built with "A coupon for another store's discount", the first scenario where the store decides; until then the store is a required field of the form |
@@ -158,6 +158,6 @@ is another store" are the acceptance-level record of lines built above.
 10. Wire types appear only in the controller layer.
 11. No identity: a redemption records no one and no time.
 
-## Dependencies (the developer installs them)
+## Dependencies
 
 None new: the property line uses `fast-check`, already a dependency of `packages/sut`.
