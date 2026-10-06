@@ -4,6 +4,7 @@ import type { DiscountResponse } from '@app/types/discounts';
 import { discountTexts } from '../texts';
 
 import ChangeRateForm from './ChangeRateForm.vue';
+import GetCouponButton from './GetCouponButton.vue';
 
 defineProps<{ discounts: DiscountResponse[] }>();
 
@@ -42,6 +43,7 @@ const textIdOf = (discount: DiscountResponse): string => `published-discount-${d
         :discount="discount"
         :named-by="textIdOf(discount)"
       />
+      <GetCouponButton />
     </li>
   </ul>
 </template>

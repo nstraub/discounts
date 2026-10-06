@@ -6,6 +6,8 @@ import type { PlaywrightWorld } from './playwright-world';
 
 type ExampleDiscount = { item: string; rate: string; storeName: string; storeAddress: string };
 
+const twoGroupsOfFiveCrockfordCharacters = /^[0-9A-HJKMNP-TV-Z]{5} [0-9A-HJKMNP-TV-Z]{5}$/;
+
 export class DiscountsPage {
   constructor(private readonly page: Page) {}
 
@@ -41,6 +43,19 @@ export class DiscountsPage {
 
   private async untilTheEntryShowsTheRate(entry: Locator, rate: string): Promise<void> {
     await entry.getByTestId('published-rate').filter({ hasText: `${rate}%` }).first().waitFor();
+  }
+
+  async decideToTry(discount: ExampleDiscount): Promise<void> {
+    const entry = await this.publishedEntryOn(discount);
+    await entry.getByTestId('get-coupon').click();
+  }
+
+  async verifyShowsACouponToUseAt(discount: ExampleDiscount): Promise<void> {
+    const coupon = this.page.getByTestId('issued-coupon');
+    await coupon.waitFor().catch(() => assert.fail(`Sue's page shows no coupon to use at ${discount.storeName}`));
+    assert.match(await coupon.getByTestId('coupon-code').innerText(), twoGroupsOfFiveCrockfordCharacters);
+    const store = await coupon.getByTestId('coupon-store').innerText();
+    assert.ok(store.endsWith(discount.storeName), `Sue's coupon is not to use at ${discount.storeName}: "${store}"`);
   }
 
   async verifyShows(discount: ExampleDiscount): Promise<void> {
