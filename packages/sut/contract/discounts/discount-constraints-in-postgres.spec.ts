@@ -100,6 +100,16 @@ describe('the discounts table refusing what Discount refuses', () => {
     });
   });
   describe('a count of a discount\'s sales', () => {
-    it.todo('should trace every constraint on counting a discount\'s sales to a rule of Discount, keeping no time and no one with it');
+    it('should trace every constraint on counting a discount\'s sales to a rule of Discount, keeping no time and no one with it', async () => {
+      const { client } = await setupSut();
+
+      const { rows } = await client.query(
+        "SELECT column_name AS name, data_type AS type, is_nullable AS nullable, column_default AS default FROM information_schema.columns WHERE table_schema = 'app' AND table_name = 'coupons' AND column_name = 'counted'",
+      );
+
+      expect(rows, 'NOT NULL, false by default, mirrors "a coupon redeemed is a sale until it is counted"').to.deep.equal([
+        { name: 'counted', type: 'boolean', nullable: 'NO', default: 'false' },
+      ]);
+    });
   });
 });
