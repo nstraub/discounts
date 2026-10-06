@@ -142,8 +142,9 @@ is npm's DefinitelyTyped scope and would shadow it), one module per file through
 `"@app/types": "workspace:*"` and imports it as a package, without an extension:
 `import type { RestApi } from '@app/types/rest-api'`. Today it holds `rest-api` (the `RestApi`
 abstraction, with `get`, `put`, `post` and `patch`, and `FetchRestApi`), `rest-api-refusals` (the
-refusals `FetchRestApi` throws, such as `UnprocessableContentException` for a 422), `discounts` (the
-request and response schemas) and `greeting` (the wire type). It is not a path alias: the
+refusals `FetchRestApi` throws: `UnprocessableContentException` for a 422 and `BadRequestException` for a 400,
+which carries the `missing` and `fields` of the body), `request-rejection` (the `requestRejection` error
+schema), `discounts` (the request and response schemas) and `greeting` (the wire type). It is not a path alias: the
 backend runs its compiled output, and Node resolves the package through `node_modules`
 and strips the `.ts` types on the symlink's real path.
 
@@ -166,31 +167,37 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   `all`, `withId`) and `DomainEventPublisher`. `Discount.publish()` and `Discount.changeRate()` raise
   their events through the port.
 - **`src/discounts/infra/`:** `discounts.controller.ts` (`POST /discounts` answers 201 with a
-  `Location`; `PATCH /discounts/:id`, which answers 204 and changes nothing for an id nobody published;
+  `Location`; `PATCH /discounts/:id`, which answers 204, or 404 for an id nobody published;
   `GET /discounts`), `parsed-by.ts` (`ParsedBy`, the zod pipe that parses a request; a
-  failure is a 400 `requestRejection`, and there is no exception filter),
+  failure is a 400 `requestRejection`, listing in `missing` the fields the request leaves out, and there
+  is no exception filter), `refused-publish.ts` (answers a refused publish: 400 with `missing`, or 400
+  `fields: ['rate']`) and `missing-discount.ts` (answers `NoSuchDiscountException` with a 404),
   `discount-drizzle-repository.ts`, `event-emitter-domain-event-publisher.ts` (the adapter over
   EventEmitter2), `discounts.module.ts` (the wiring). The request and response schemas
-  (`publishDiscountRequest`, `discountResponse`, `publishedDiscountsResponse`, `requestRejection
-  {statusCode, message, fields?}`) are in `@app/types/discounts`.
+  (`publishDiscountRequest`, `discountResponse`, `publishedDiscountsResponse`) are in
+  `@app/types/discounts`; `requestRejection {statusCode, message, fields?, missing?}` is in
+  `@app/types/request-rejection`.
 - **The hook** is a discount's optional free text: absent from `DiscountDetails` when there is none,
   optional on the wire, a nullable `hook` column in the database (migration `0004`, lossy down); the
   repository maps a null column to an absent hook.
 - **Coupons** are part of the `Discount` aggregate: `issueCoupon(token)` adds a `CouponToken`
-  (value object, `drawnFrom(random)`; ten Crockford base32 characters) and raises `CouponIssued`; there
+  (value object, `drawnFrom(random)`; ten Crockford base32 characters) through `Coupons`, which raises
+  `CouponIssued`; there
   is no coupon repository and no coupon port. `DiscountService` takes the random source, which
   `discounts.module.ts` wires as `crypto.getRandomValues`. `POST /discounts/:id/coupons` answers the
-  coupon through `couponResponse`. They are kept in the `coupons` table (migration `0005`, lossy down),
+  coupon through `couponResponse`, or 404 for an id nobody published. They are kept in the `coupons` table (migration `0005`, lossy down),
   written and read with their discount (`infra/coupon-rows.ts`).
 - **Redeeming:** `Coupon` is an entity inside the aggregate that owns single use (`redeem()` raises
   `CouponRedeemed`); `Discount.redeemCoupon(token, store)` refuses a coupon of another store (`Store.equals`:
   name and address exactly) and answers with the item. The discount's coupons live in `Coupons`, a
-  collection inside the aggregate; `DiscountEvents` builds and publishes the events `Discount` raises. `CouponToken.read(code)`
+  collection inside the aggregate. Each entity raises the events of what it owns through the event-publisher
+  port: `Coupons` raises `CouponIssued` and `DiscountedSalesCounted`, `Coupon` its own, `Discount` the rest;
+  there is no class that raises events for the others (ADR 0009). `CouponToken.read(code)`
   normalises a typed code. `DiscountService.redeemCoupon(code)` loads the discount through
   `DiscountRepository.withCouponToken`. `infra/redemptions.controller.ts` serves `POST /redemptions`
   (201 `{ item }`; 422 for another store's coupon; 409 already used; 400 for a missing or blank store). Migration `0006` adds `coupons.redeemed` (lossy down).
-- **Counting:** `Discount.count()` counts the coupons redeemed since the last count, marks them
-  counted (`Coupon` holds `redeemed` and `counted`) and raises `DiscountedSalesCounted`.
+- **Counting:** `Discount.count()` has `Coupons` count the coupons redeemed since the last count and mark
+  them counted (`Coupon` holds `redeemed` and `counted`); `Coupons` raises `DiscountedSalesCounted`.
   `DiscountService.count(store)` goes through `DiscountChanges` (`application/discount-changes.ts`),
   the unit of work every use case shares: load through the repository port, tell, save, one discount
   per save. `DiscountRepository.ofStore` finds a store's discounts by name and address.
@@ -203,9 +210,13 @@ The backend's source is `packages/backend/src/`. It has one bounded context, `sr
   stays outside `changing`, last write winning.
 - **The rate** is text end to end (column, schema, domain, page), kept exactly as written
   (migration `0003_rate_as_written`). It is
-  checked only on publishing: `DiscountRate` (above 0, at most 100, at most one decimal) through
-  `Discount.publish(keep)`, which keeps nothing and raises `DiscountPublicationRejected` when the rate
-  is not valid; `POST /discounts` then answers 400 with `fields: ['rate']`. A kept rate is never
+  checked only on publishing: `DiscountDetails.whenPublishable` through `Discount.publish(keep)` checks that
+  the item, rate, store name and store address are present (blank text is not), then `DiscountRate` (above
+  0, at most 100, at most one decimal). A discount refused keeps nothing and raises
+  `DiscountPublicationRejected`. A piece left out, or blank, answers 400 with `fields` and `missing` naming
+  it (`PiecesMissingException`); a field absent from the body is refused by `ParsedBy` as missing, with no
+  event, while a field of the wrong type is in `fields` only; a rate not valid answers 400 with
+  `fields: ['rate']` and nothing missing. A kept rate is never
   re-checked. `contract/support/discounts-table.ts` has `insertADiscountRow`, which inserts a row
   without the rule, for rates kept before it.
 - **`src/discounts/infra/database.module.ts`:** the one connection pool, exported as the Drizzle
@@ -230,7 +241,9 @@ first slice.
   of the statically served app keeps its route: the discounts page is `#/`, the walking skeleton's
   greeting `#/walking-skeleton`.
 - **State:** Pinia stores in `src/stores/`; the till store holds one answer, an object of
-  `discounts/till-answers.ts` that tells its own caption.
+  `discounts/till-answers.ts` that tells its own caption; the discounts store holds one publish answer the
+  same way, an object of `discounts/publish-answers.ts` (nothing told, rate not valid, pieces missing)
+  that tells the form's caption and each piece's, which `CaptionedInput` shows beside its field as `told`.
 - **HTTP:** every backend call goes through `RestApi` in `packages/types`.
 - **Browser capabilities:** services in `src/*/services/`.
 - **UI copy:** a `texts` module per feature.
@@ -272,7 +285,10 @@ first slice.
   `aDiscountKeptBeforeAsReadAfterMigratingForward`, for a discount kept before a migration. A new
   migration joins `theMigrationsAfterIt` in each earlier migration spec; otherwise the migrator
   silently skips an earlier migration that a spec ran backward: today those are the lists in the
-  table, rate, hook, coupons and coupon-count migration specs. A random source in a spec is `aSourceDrawing(token)`
+  table, rate, hook, coupons and coupon-count migration specs. `anIdNoDiscountHas` (`@sut/support/example-discounts`) is the id of the 404 specs;
+  `publicationRejectionsHeardBy` (`contract/support/publication-rejections.ts`) listens for the events a
+  refused publish raises; the publish form's component specs arrange it with `publish-discount-form-of-an-app.ts`
+  (`unit/frontend/discounts/components/publish-discount-form/`). A random source in a spec is `aSourceDrawing(token)`
   (`@backend/app/mocks/random-sources`); `couponForTheSpicesDiscount`, `stephaniesProduceDiscount` are
   among the shared examples; `contract/support/discounts-table.ts` has `insertACoupon` and
   `migrations.ts` has `migrateBackwardPast`. The stores a spec redeems at are `atTheSpicesStore` and
