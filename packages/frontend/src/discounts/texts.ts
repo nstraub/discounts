@@ -7,5 +7,6 @@ export const discountTexts = {
   publish: 'Publish',
   newRate: 'New rate (%)',
   changeRate: 'Change rate',
+  getCoupon: 'Get a coupon',
   nothingPublished: 'No discount is published yet.',
 };

@@ -43,7 +43,10 @@ const textIdOf = (discount: DiscountResponse): string => `published-discount-${d
         :discount="discount"
         :named-by="textIdOf(discount)"
       />
-      <GetCouponButton />
+      <GetCouponButton
+        :discount="discount"
+        :named-by="textIdOf(discount)"
+      />
     </li>
   </ul>
 </template>
