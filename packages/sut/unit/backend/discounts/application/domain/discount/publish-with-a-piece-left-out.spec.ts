@@ -65,8 +65,32 @@ describe('class Discount', () => {
       });
     });
 
+    describe('blank', () => {
+      const onlyBlankSpace = ' \t ';
+
+      it('should refuse an item made only of blank space, its rejection naming the item as missing', async () => {
+        const events = await refusedWith({ ...spicesDiscount, item: onlyBlankSpace });
+
+        expect(lastRejectionOf(events)).to.deep.include({ reason: 'missing', pieces: ['item'] });
+      });
+      it('should refuse a store name made only of blank space, its rejection naming the store name as missing', async () => {
+        const events = await refusedWith({ ...spicesDiscount, storeName: onlyBlankSpace });
+
+        expect(lastRejectionOf(events)).to.deep.include({ reason: 'missing', pieces: ['storeName'] });
+      });
+      it('should refuse a store address made only of blank space, its rejection naming the store address as missing', async () => {
+        const events = await refusedWith({ ...spicesDiscount, storeAddress: onlyBlankSpace });
+
+        expect(lastRejectionOf(events)).to.deep.include({ reason: 'missing', pieces: ['storeAddress'] });
+      });
+    });
+
     describe('combination', () => {
-      it.todo('should name at once an item and a store address both made only of blank space as missing');
+      it('should name at once an item and a store address both made only of blank space as missing', async () => {
+        const events = await refusedWith({ ...spicesDiscount, item: '  ', storeAddress: '\n' });
+
+        expect(lastRejectionOf(events)).to.deep.include({ reason: 'missing', pieces: ['item', 'storeAddress'] });
+      });
     });
   });
 });

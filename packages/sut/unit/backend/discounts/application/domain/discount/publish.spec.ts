@@ -19,12 +19,6 @@ describe('class Discount', () => {
       });
     });
 
-    describe('empty', () => {
-      it.todo('should refuse an item made only of blank space, its rejection naming the item as missing');
-      it.todo('should refuse a store name made only of blank space, its rejection naming the store name as missing');
-      it.todo('should refuse a store address made only of blank space, its rejection naming the store address as missing');
-    });
-
     describe('boundary', () => {
       it.todo('should refuse an item longer than allowed');
       it.todo('should refuse a store name longer than allowed');
