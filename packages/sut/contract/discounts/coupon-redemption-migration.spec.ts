@@ -1,12 +1,10 @@
-import { isDeepStrictEqual } from 'node:util';
-
 import type pg from 'pg';
 import { describe, expect, it } from 'vitest';
 
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
-import { discountRepositoryOn } from '../support/discount-repository';
+import { discountRepositoryOn, isKeptAndLoadedBackOnEmptiedTables } from '../support/discount-repository';
 import { insertACoupon, insertADiscountWithout } from '../support/discounts-table';
 import { migrateBackwardPast, setupSut } from '../support/migrations';
 
@@ -23,12 +21,8 @@ const keepADiscountWithACouponRedeemed = async (client: pg.Client, databaseUrl: 
   return kept;
 };
 
-const theRedeemedCouponLoadedBackAsKept = async (client: pg.Client, databaseUrl: string) => {
-  await client.query('TRUNCATE app.discounts, app.coupons');
-  const kept = await keepADiscountWithACouponRedeemed(client, databaseUrl);
-  const loaded = await discountRepositoryOn(client, databaseUrl).loadOnItsOwnConnection();
-  return loaded.some((discount) => isDeepStrictEqual(discount.toJSON(), kept.toJSON()));
-};
+const theRedeemedCouponLoadedBackAsKept = (client: pg.Client, databaseUrl: string) =>
+  isKeptAndLoadedBackOnEmptiedTables(client, databaseUrl, keepADiscountWithACouponRedeemed);
 
 describe('the migration that lets a coupon be redeemed', () => {
   it('should migrate forward from empty, the redeemed-coupon round-trip lines passing on the result', async () => {
