@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
+
 import { setupSut } from './discounts-store-of-an-app';
 
 describe('Store discounts', () => {
@@ -15,10 +17,7 @@ describe('Store discounts', () => {
       });
       it('should hold every discount published', async () => {
         const { restApi, discounts } = setupSut();
-        const everyDiscount = [
-          { id: 'spices-id', item: 'Peruvian spices', rate: '20', storeName: "Mike's Groceries", storeAddress: '12 Market Street' },
-          { id: 'produce-id', item: 'Fresh produce', rate: '10', storeName: "Mike's Groceries", storeAddress: '12 Market Street' },
-        ];
+        const everyDiscount = [publishedSpicesDiscount, publishedProduceDiscount];
         restApi.get.mockResolvedValue(everyDiscount);
 
         await discounts.load();
