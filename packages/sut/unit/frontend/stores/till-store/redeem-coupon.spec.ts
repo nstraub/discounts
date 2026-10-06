@@ -14,6 +14,15 @@ const setupSutRefusing = (refusal: Error) => {
   return sut;
 };
 
+const theNextCodeAtTheSpicesStore = { ...aCodeAtTheSpicesStore, code: 'R4WZ0BH8NE' };
+
+const setupSutAfterARefusalOf = async (refusal: Error) => {
+  const sut = setupSut();
+  sut.restApi.post.mockRejectedValueOnce(refusal).mockResolvedValueOnce({ item: spicesDiscount.item });
+  await sut.till.redeemCoupon(aCodeAtTheSpicesStore);
+  return sut;
+};
+
 describe('Store till', () => {
   describe('redeeming a coupon', () => {
     it('should hand the code as typed and the store picked over to be redeemed', async () => {
@@ -62,12 +71,9 @@ describe('Store till', () => {
       expect(till.answer, 'the answer the till holds').to.be.instanceOf(CouponAlreadyUsed);
     });
     it('should no longer hold a coupon as already used once the next coupon is redeemed', async () => {
-      const { restApi, till } = setupSut();
-      const atTheSpicesStore = { storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress };
-      restApi.post.mockRejectedValueOnce(new Error('POST /redemptions answered 409')).mockResolvedValueOnce({ item: spicesDiscount.item });
-      await till.redeemCoupon({ code: '7K3QX9M2PD', ...atTheSpicesStore });
+      const { till } = await setupSutAfterARefusalOf(new Error('POST /redemptions answered 409'));
 
-      await till.redeemCoupon({ code: 'R4WZ0BH8NE', ...atTheSpicesStore });
+      await till.redeemCoupon(theNextCodeAtTheSpicesStore);
 
       expect(till.answer, 'the answer the till holds').not.to.be.instanceOf(CouponAlreadyUsed);
     });
@@ -95,11 +101,9 @@ describe('Store till', () => {
       expect(till.answer, 'the answer the till holds').not.to.be.instanceOf(CouponAlreadyUsed);
     });
     it('should no longer hold a coupon as not for the store picked once the next coupon is redeemed', async () => {
-      const { restApi, till } = setupSut();
-      restApi.post.mockRejectedValueOnce(new UnprocessableContentException('POST /redemptions answered 422')).mockResolvedValueOnce({ item: spicesDiscount.item });
-      await till.redeemCoupon(aCodeAtTheSpicesStore);
+      const { till } = await setupSutAfterARefusalOf(new UnprocessableContentException('POST /redemptions answered 422'));
 
-      await till.redeemCoupon({ ...aCodeAtTheSpicesStore, code: 'R4WZ0BH8NE' });
+      await till.redeemCoupon(theNextCodeAtTheSpicesStore);
 
       expect(till.answer, 'the answer the till holds').not.to.be.instanceOf(CouponNotForThisStore);
     });
