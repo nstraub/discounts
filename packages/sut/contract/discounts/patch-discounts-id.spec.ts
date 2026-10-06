@@ -1,8 +1,20 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { spicesDiscount } from '@sut/support/example-discounts';
+
+import { setupSut } from '../support/app';
 
 describe('PATCH /discounts/:id', () => {
   describe('success', () => {
-    it.todo('should answer 204 with no body when the rate is changed');
+    it('should answer 204 with no body when the rate is changed', async () => {
+      const { http } = await setupSut();
+      const published = await http.post('/discounts').send(spicesDiscount);
+
+      const response = await http.patch(published.headers.location).send({ rate: '25' });
+
+      expect(response.status).to.equal(204);
+      expect(response.text).to.equal('');
+    });
     it.todo('should list the discount once, at its new rate, after the change');
     it.todo('should publish DiscountRateChanged on the application event emitter for the discount changed');
   });

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Patch, Post, Res } from '@nestjs/common';
 
 import { publishDiscountRequest, type PublishDiscountRequest } from '@app/types/discounts';
 
@@ -20,6 +20,10 @@ export class DiscountsController {
     response.location(`/discounts/${published.id}`);
     return published;
   }
+
+  @Patch(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async changeRate(): Promise<void> {}
 
   @Get()
   async published() {
