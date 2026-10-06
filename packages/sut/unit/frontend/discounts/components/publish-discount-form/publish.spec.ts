@@ -25,6 +25,10 @@ const publishThroughTheForm = async (form: VueWrapper, discount: typeof spicesDi
   await form.get('[data-testid="publish-discount"]').trigger('click');
 };
 
+const typeTheHook = async (hook: string): Promise<void> => {
+  await new DOMWrapper(getByRole(document.body, 'textbox', { name: discountTexts.hook })).setValue(hook);
+};
+
 describe('Component PublishDiscountForm', () => {
   describe('publishing a discount', () => {
     it('should publish the item, rate, store name and store address as Mike gave them', async () => {
@@ -60,7 +64,7 @@ describe('Component PublishDiscountForm', () => {
     });
     it('should clear every field once the discount is published', async () => {
       const { form } = setupSut();
-      await new DOMWrapper(getByRole(document.body, 'textbox', { name: discountTexts.hook })).setValue(spicesDiscountWithItsHook.hook);
+      await typeTheHook(spicesDiscountWithItsHook.hook);
 
       await publishThroughTheForm(form, spicesDiscount);
 
@@ -108,7 +112,7 @@ describe('Component PublishDiscountForm', () => {
   describe('publishing a discount with a hook', () => {
     it('should publish the hook as Stephanie gave it', async () => {
       const { form, discounts } = setupSut();
-      await new DOMWrapper(getByRole(document.body, 'textbox', { name: discountTexts.hook })).setValue(spicesDiscountWithItsHook.hook);
+      await typeTheHook(spicesDiscountWithItsHook.hook);
 
       await publishThroughTheForm(form, spicesDiscount);
 
@@ -125,7 +129,7 @@ describe('Component PublishDiscountForm', () => {
     describe('empty', () => {
       it('should publish a hook of only blank space as no hook', async () => {
         const { form, discounts } = setupSut();
-        await new DOMWrapper(getByRole(document.body, 'textbox', { name: discountTexts.hook })).setValue('   ');
+        await typeTheHook('   ');
 
         await publishThroughTheForm(form, spicesDiscount);
 
