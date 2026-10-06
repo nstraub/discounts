@@ -136,7 +136,14 @@ describe('class Discount', () => {
 
         expect(lastRejectionOf(events)).to.include({ rate: '12,25', reason: 'not valid' });
       });
-      it.todo('should refuse a rate of 0,0, zero written with a decimal comma, its rejection naming the rate as not valid');
+      it('should refuse a rate of 0,0, zero written with a decimal comma, its rejection naming the rate as not valid', () => {
+        const { events, discountAt } = setupSut();
+        const discount = discountAt('0,0');
+
+        discount.publish();
+
+        expect(lastRejectionOf(events)).to.include({ rate: '0,0', reason: 'not valid' });
+      });
     });
   });
 });
