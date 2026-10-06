@@ -5,6 +5,7 @@ import { produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut
 import { testDatabaseUrl } from '@sut/support/test-database';
 
 import { keepADiscountWithASaleCounted, setupSut } from '../support/discount-repository';
+import { insertADiscountRow } from '../support/discounts-table';
 
 describe('a discount kept in PostgreSQL', () => {
   it('should save a discount and load it back equal, in a separate transaction, its events excepted (not persisted)', async () => {
@@ -98,7 +99,17 @@ describe('a discount kept in PostgreSQL', () => {
     });
 
     describe('state', () => {
-      it.todo('should read back as written the rates published before the rate rules');
+      it('should read back as written the rates published before the rate rules', async () => {
+        const { client, loadOnItsOwnConnection } = await setupSut();
+        const ratesTheRulesRefuse = ['a fifth', '150', '12.25', '0'];
+        for (const rate of ratesTheRulesRefuse) {
+          await insertADiscountRow(client, { ...spicesDiscount, id: `kept-at-${rate}`, rate });
+        }
+
+        const loaded = await loadOnItsOwnConnection();
+
+        expect(loaded.map((kept) => kept.toJSON().rate)).to.have.members(ratesTheRulesRefuse);
+      });
     });
   });
   describe('beside another discount', () => {
