@@ -5,35 +5,39 @@ import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { setupSut } from '../support/app';
 
+type Http = Awaited<ReturnType<typeof setupSut>>['http'];
+
+const publishTheSpicesDiscount = async (http: Http): Promise<{ id: string }> => (await http.post('/discounts').send(spicesDiscount)).body;
+
 describe('PATCH /discounts/:id', () => {
   describe('success', () => {
     it('should answer 204 with no body when the rate is changed', async () => {
       const { http } = await setupSut();
-      const published = await http.post('/discounts').send(spicesDiscount);
+      const published = await publishTheSpicesDiscount(http);
 
-      const response = await http.patch(`/discounts/${published.body.id}`).send({ rate: '25' });
+      const response = await http.patch(`/discounts/${published.id}`).send({ rate: '25' });
 
       expect(response.status).to.equal(204);
       expect(response.text).to.equal('');
     });
     it('should list the discount once, at its new rate, after the change', async () => {
       const { http } = await setupSut();
-      const published = await http.post('/discounts').send(spicesDiscount);
+      const published = await publishTheSpicesDiscount(http);
 
-      await http.patch(`/discounts/${published.body.id}`).send({ rate: '25' });
+      await http.patch(`/discounts/${published.id}`).send({ rate: '25' });
 
       const listed = await http.get('/discounts');
-      expect(listed.body, 'the discounts listed after the change').to.deep.equal([{ ...published.body, rate: '25' }]);
+      expect(listed.body, 'the discounts listed after the change').to.deep.equal([{ ...published, rate: '25' }]);
     });
     it('should publish DiscountRateChanged on the application event emitter for the discount changed', async () => {
       const { app, http } = await setupSut();
       const changed: unknown[] = [];
       app.get(EventEmitter2).on('discount.rate-changed', (event: { id: string; rate: string }) => changed.push({ id: event.id, rate: event.rate }));
-      const published = await http.post('/discounts').send(spicesDiscount);
+      const published = await publishTheSpicesDiscount(http);
 
-      await http.patch(`/discounts/${published.body.id}`).send({ rate: '25' });
+      await http.patch(`/discounts/${published.id}`).send({ rate: '25' });
 
-      expect(changed).to.deep.equal([{ id: published.body.id, rate: '25' }]);
+      expect(changed).to.deep.equal([{ id: published.id, rate: '25' }]);
     });
   });
 
