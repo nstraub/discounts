@@ -36,8 +36,12 @@ const count = async (): Promise<void> => {
       {{ discountTexts.countDiscountedSales }}
     </button>
     <ul v-if="discounts.counted">
-      <li data-testid="counted-discount">
-        <span data-testid="counted-item">Organic produce</span>
+      <li
+        v-for="discount in discounts.counted"
+        :key="discount.id"
+        data-testid="counted-discount"
+      >
+        <span data-testid="counted-item">{{ discount.item }}</span>
       </li>
     </ul>
   </form>

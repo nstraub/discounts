@@ -21,6 +21,8 @@ const setupSutCountingTo = (counted: CountResponse) => {
 
 const stephaniesProduceCounted = { id: 'produce-id', item: stephaniesProduceDiscount.item, rate: stephaniesProduceDiscount.rate, discountedSales: 3 };
 
+const mikesSpicesCounted = { id: 'spices-id', item: spicesDiscount.item, rate: spicesDiscount.rate, discountedSales: 1 };
+
 const whatTheCountShowsFor = (form: VueWrapper, testId: string) => form.findAll(`[data-testid="${testId}"]`).map((shown) => shown.text());
 
 const countThroughTheForm = async (form: VueWrapper, storeShown: string): Promise<void> => {
@@ -52,6 +54,13 @@ describe('Component CountDiscountedSalesForm', () => {
       await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
 
       expect(whatTheCountShowsFor(form, 'counted-item'), 'the items counted').to.deep.equal(['Organic produce']);
+    });
+    it('should name the item of every discount counted when several are', async () => {
+      const { form } = setupSutCountingTo([mikesSpicesCounted, stephaniesProduceCounted]);
+
+      await countThroughTheForm(form, "Stephanie's Market, 8 Orchard Lane");
+
+      expect(whatTheCountShowsFor(form, 'counted-item'), 'the items counted').to.deep.equal(['Peruvian spices', 'Organic produce']);
     });
     it.todo('should show the rate of each discount counted');
     it.todo('should show the number of discounted sales counted for each discount under its caption');
