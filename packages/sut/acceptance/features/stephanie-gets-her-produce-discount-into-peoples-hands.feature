@@ -85,3 +85,63 @@ Feature: Stephanie gets her produce discount into people's hands
     When a change to its rate also carries something else to say about it
     Then people can see the new rate
     And they still see that the produce comes from a new supplier
+
+  @wip
+  Scenario: Sue decides to try Stephanie's produce
+    Given Sue has found Stephanie's discount on produce
+    When Sue decides to try it
+    Then she gets a coupon to use at Stephanie's till
+
+  @todo
+  Scenario: Sue's coupon says where to use it and what it is for
+    Given Sue has found Stephanie's discount on produce
+    When Sue decides to try it
+    Then her coupon shows the address of Stephanie's store
+    And it shows the item it is for
+
+  @todo
+  Scenario: Sue decides to try the same discount twice
+    Given Sue has got a coupon for Stephanie's discount
+    When Sue decides to try it again
+    Then she gets a second coupon, different from the first
+
+  @todo
+  Scenario: Sue's decision to try a discount arrives twice
+    Given Sue has found Stephanie's discount on produce
+    When Sue decides to try it and her decision arrives twice
+    Then she gets one coupon
+
+  # How Sue brings her coupon to the till is a question for Sue that is still open.
+  @todo
+  Scenario: Sue still has her coupon when she comes back to the page
+    Given Sue has got a coupon for Stephanie's discount
+    When Sue looks for a new store with fresh produce again
+    Then she still sees her coupon
+
+  @todo
+  Scenario: Sue cannot get a coupon right now
+    Given Sue has found Stephanie's discount on produce
+    And coupons cannot be given right now
+    When Sue decides to try it
+    Then she is told she could not get a coupon and to try again
+    And no coupon is given
+
+  @todo
+  Scenario: A coupon is asked for a discount that does not exist
+    When a coupon is asked for a discount that does not exist
+    Then it is told there is no such discount
+    And no coupon is given
+
+  # The code is all a coupon is, so whoever sees it can use it.
+  @todo
+  Scenario: Nobody else sees Sue's coupon
+    Given Sue has got a coupon for Stephanie's discount
+    When someone else looks for a new store with fresh produce
+    Then they do not see Sue's coupon
+
+  # Anyone can get a coupon without an account, so nothing stands in the way of taking coupons by
+  # the thousand but a limit on speed.
+  @todo
+  Scenario: Someone takes coupons far faster than anyone would
+    When someone gets coupons far faster than anyone deciding to try a discount would
+    Then they are slowed down
