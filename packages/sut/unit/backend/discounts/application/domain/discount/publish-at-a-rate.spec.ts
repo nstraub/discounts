@@ -30,7 +30,7 @@ describe('class Discount', () => {
         }
 
         expect(events.publish.mock.calls.map(([event]) => event)).to.deep.equal(
-          computersNotations.map((rate) => new DiscountPublicationRejected(rate, 'not valid')),
+          computersNotations.map((rate) => new DiscountPublicationRejected(rate, 'not valid', ['rate'])),
         );
       });
       it('should refuse a rate written in a way not yet accepted', async () => {
@@ -44,7 +44,7 @@ describe('class Discount', () => {
         }
 
         expect(events.publish.mock.calls.map(([event]) => event)).to.deep.equal(
-          waysNotYetAccepted.map((rate) => new DiscountPublicationRejected(rate, 'not valid')),
+          waysNotYetAccepted.map((rate) => new DiscountPublicationRejected(rate, 'not valid', ['rate'])),
         );
         expect(refusals).to.deep.equal(waysNotYetAccepted.map(() => new RateNotValidException()));
       });
@@ -59,7 +59,7 @@ describe('class Discount', () => {
 
         await expect(discountAt(aRateItsRulesRefuse).publish(keep)).rejects.to.be.instanceOf(RateNotValidException);
 
-        expect(lastRejectionOf(events)).to.deep.equal(new DiscountPublicationRejected(aRateItsRulesRefuse, 'not valid'));
+        expect(lastRejectionOf(events)).to.deep.equal(new DiscountPublicationRejected(aRateItsRulesRefuse, 'not valid', ['rate']));
       });
       it('should not raise DiscountPublished when its rate is refused', async () => {
         const { events, keep, discountAt } = setupSut();

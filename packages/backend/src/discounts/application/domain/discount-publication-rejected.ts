@@ -4,5 +4,6 @@ export class DiscountPublicationRejected {
   constructor(
     readonly rate: string,
     readonly reason: string,
+    readonly pieces: readonly string[],
   ) {}
 }

@@ -14,8 +14,8 @@ export class DiscountEvents {
     this.events.publish(new DiscountPublished(discount));
   }
 
-  publicationRejected(rate: string, reason: string): void {
-    this.events.publish(new DiscountPublicationRejected(rate, reason));
+  publicationRejected(rate: string, reason: string, pieces: readonly string[]): void {
+    this.events.publish(new DiscountPublicationRejected(rate, reason, pieces));
   }
 
   rateChanged(discountId: string, rate: string): void {

@@ -1,3 +1,4 @@
+import { PiecesMissingException } from './pieces-missing-exception.js';
 import { Store } from './store.js';
 
 export class DiscountDetails {
@@ -5,6 +6,15 @@ export class DiscountDetails {
 
   withRate(rate: string): DiscountDetails {
     return new DiscountDetails({ ...this.details, rate });
+  }
+
+  whenComplete<Published>(complete: () => Published, refused: (rate: string, missing: readonly string[]) => void): Published {
+    if (this.details.item === '') {
+      const missing = ['item', 'rate', 'storeName', 'storeAddress'];
+      refused(this.details.rate, missing);
+      throw new PiecesMissingException(missing);
+    }
+    return complete();
   }
 
   store(): Store {

@@ -71,7 +71,7 @@ describe('class DiscountService', () => {
 
       await expect(service.publish(spicesDetailsAtARateItsRulesRefuse)).rejects.to.be.instanceOf(RateNotValidException);
 
-      expect(events.publish).to.have.been.calledWith(new DiscountPublicationRejected(aRateItsRulesRefuse, 'not valid'));
+      expect(events.publish).to.have.been.calledWith(new DiscountPublicationRejected(aRateItsRulesRefuse, 'not valid', ['rate']));
     });
   });
   describe('publishing a discount with a piece left out', () => {

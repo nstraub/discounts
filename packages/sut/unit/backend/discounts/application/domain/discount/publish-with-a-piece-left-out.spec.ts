@@ -1,9 +1,23 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { DiscountPublicationRejected } from '@backend/discounts/application/domain/discount-publication-rejected';
+import { PiecesMissingException } from '@backend/discounts/application/domain/pieces-missing-exception';
+
+import { lastRejectionOf, setupSut } from './publishing-a-discount';
 
 describe('class Discount', () => {
   describe('publishing a discount with a piece left out', () => {
     describe('the rejection', () => {
-      it.todo('should raise DiscountPublicationRejected naming each piece left out as missing');
+      it('should raise DiscountPublicationRejected naming each piece left out as missing', async () => {
+        const { events, keep, discountWith } = setupSut();
+        const everyPieceLeftOut = discountWith({ item: '', rate: '', storeName: '', storeAddress: '' });
+
+        await expect(everyPieceLeftOut.publish(keep)).rejects.to.be.instanceOf(PiecesMissingException);
+
+        expect(lastRejectionOf(events)).to.deep.equal(
+          new DiscountPublicationRejected('', 'missing', ['item', 'rate', 'storeName', 'storeAddress']),
+        );
+      });
       it.todo('should not raise DiscountPublished when a piece is left out');
     });
 

@@ -18,10 +18,11 @@ export class Discount {
   ) {}
 
   async publish(keep: (discount: Discount) => Promise<void>): Promise<void> {
-    await new DiscountRate(this.details.toJSON().rate).whenValid(async () => {
+    const publishAtAValidRate = () => new DiscountRate(this.details.toJSON().rate).whenValid(async () => {
       await keep(this);
       this.events.published(this.toJSON());
-    }, (rate) => this.events.publicationRejected(rate, 'not valid'));
+    }, (rate) => this.events.publicationRejected(rate, 'not valid', ['rate']));
+    await this.details.whenComplete(publishAtAValidRate, (rate, missing) => this.events.publicationRejected(rate, 'missing', missing));
   }
 
   changeRate(rate: string): void {
