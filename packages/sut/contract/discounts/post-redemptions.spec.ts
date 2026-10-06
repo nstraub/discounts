@@ -51,7 +51,15 @@ describe('POST /redemptions', () => {
 
       expect(redeemed).to.deep.equal([{ id: published.id, token: code }]);
     });
-    it.todo('should keep the coupon redeemed and its discount\'s other coupons unused');
+    it('should keep the coupon redeemed and its discount\'s other coupons unused', async () => {
+      const { client, http, published, code } = await setupSutWithACouponFor();
+      const other: string = (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
+
+      await redeemAtTheStoreOf(http, code);
+
+      const kept = await client.query('SELECT token, redeemed FROM app.coupons');
+      expect(kept.rows, 'each coupon kept, redeemed or unused').to.have.deep.members([{ token: code, redeemed: true }, { token: other, redeemed: false }]);
+    });
     it.todo('should redeem a coupon whose code is sent in lower case, in two groups');
   });
 
