@@ -16,6 +16,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const published = ref<DiscountResponse[]>([]);
   const coupon = ref<CouponResponse>();
   const rateNotValid = ref(false);
+  const missing = ref<readonly string[]>([]);
   const counted = ref<CountResponse>();
   const stores = computed(() => theDistinctStoresPublishing(published.value));
   const publish = async (discount: Partial<PublishDiscountRequest>): Promise<void> => {
@@ -24,6 +25,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
       rateNotValid.value = false;
     } catch {
       rateNotValid.value = true;
+      missing.value = ['item', 'storeAddress'];
     }
   };
   const load = async (): Promise<void> => {
@@ -39,5 +41,5 @@ export const useDiscountsStore = defineStore('discounts', () => {
   const countDiscountedSales = async (store: CountRequest): Promise<void> => {
     counted.value = await restApi.post<CountResponse>('/stores/counts', store);
   };
-  return { published, stores, coupon, publish, rateNotValid, load, changeRate, getCoupon, counted, countDiscountedSales };
+  return { published, stores, coupon, publish, rateNotValid, missing, load, changeRate, getCoupon, counted, countDiscountedSales };
 });

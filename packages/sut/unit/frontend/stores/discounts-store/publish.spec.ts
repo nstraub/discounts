@@ -55,7 +55,14 @@ describe('Store discounts', () => {
     });
   });
   describe('publishing a discount with a piece left out', () => {
-    it.todo('should hold which pieces are missing as the refusal lists them');
+    it('should hold which pieces are missing as the refusal lists them', async () => {
+      const { restApi, discounts } = setupSut();
+      restApi.post.mockRejectedValue(new BadRequestException('POST /discounts answered 400', ['item', 'storeAddress']));
+
+      await discounts.publish({ rate: '20', storeName: spicesDiscount.storeName });
+
+      expect(discounts.missing, 'the pieces held as missing').to.deep.equal(['item', 'storeAddress']);
+    });
     it.todo('should not hold the rate as not valid when the refusal lists it as missing');
     it.todo('should not hold the rate as not valid when the refusal lists only other pieces as missing');
     it.todo('should no longer hold any piece as missing once the next discount is published');
