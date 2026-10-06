@@ -5,7 +5,9 @@ import { spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-
 
 import { setupSut } from './discounts-store-of-an-app';
 
-const aRefusalOfTheRate = new BadRequestException('POST /discounts answered 400', []);
+const aRefusalListingAsMissing = (pieces: string[]) => new BadRequestException('POST /discounts answered 400', pieces);
+
+const aRefusalOfTheRate = aRefusalListingAsMissing([]);
 
 describe('Store discounts', () => {
   describe('publishing a discount', () => {
@@ -57,7 +59,7 @@ describe('Store discounts', () => {
   describe('publishing a discount with a piece left out', () => {
     it('should hold which pieces are missing as the refusal lists them', async () => {
       const { restApi, discounts } = setupSut();
-      restApi.post.mockRejectedValue(new BadRequestException('POST /discounts answered 400', ['item', 'storeAddress']));
+      restApi.post.mockRejectedValue(aRefusalListingAsMissing(['item', 'storeAddress']));
 
       await discounts.publish({ rate: '20', storeName: spicesDiscount.storeName });
 
@@ -65,7 +67,7 @@ describe('Store discounts', () => {
     });
     it('should hold other pieces as missing when the refusal lists others', async () => {
       const { restApi, discounts } = setupSut();
-      restApi.post.mockRejectedValue(new BadRequestException('POST /discounts answered 400', ['rate']));
+      restApi.post.mockRejectedValue(aRefusalListingAsMissing(['rate']));
 
       await discounts.publish({ item: spicesDiscount.item, storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
 
