@@ -16,8 +16,8 @@ export const useTillStore = defineStore('till', () => {
       redemption.value = await restApi.post<RedemptionResponse>('/redemptions', request);
       couponAlreadyUsed.value = false;
     } catch (refusal) {
-      couponAlreadyUsed.value = true;
       couponNotForThisStore.value = refusal instanceof UnprocessableContentException;
+      couponAlreadyUsed.value = !couponNotForThisStore.value;
     }
   };
   return { redemption, couponAlreadyUsed, couponNotForThisStore, redeemCoupon };
