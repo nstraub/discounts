@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { DiscountedSalesCounted } from '@backend/discounts/application/domain/discounted-sales-counted';
 import { publishedSpicesDiscount } from '@sut/support/example-discounts';
 
 import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
@@ -17,7 +18,13 @@ describe('class DiscountService', () => {
 
       expect(repository.save.mock.lastCall?.at(0)?.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true, counted: true }]);
     });
-    it.todo('should announce DiscountedSalesCounted once the count is kept');
+    it('should announce DiscountedSalesCounted for the discount counted', async () => {
+      const { events, service } = setupSut();
+
+      await service.count(theSpicesStore);
+
+      expect(events.publish).to.have.been.calledWith(new DiscountedSalesCounted(publishedSpicesDiscount.id, 1));
+    });
     it.todo('should answer with the discount\'s id, item and rate and the number of sales counted');
 
     describe('not found', () => {
