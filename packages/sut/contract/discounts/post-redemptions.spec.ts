@@ -5,7 +5,8 @@ import { redemptionResponse, requestRejection } from '@app/types/discounts';
 import { produceDiscount, spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, setupSut } from '../support/app';
-import { statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
+import { answersInTurnToBodiesThatAreNotObjects, statusesAnsweringBodiesThatAreNotObjects } from '../support/bodies-that-are-not-objects';
+import { bodiesNotMatchingTheErrorSchema } from '../support/error-schema';
 
 type ExampleDiscount = typeof spicesDiscount;
 
@@ -103,7 +104,17 @@ describe('POST /redemptions', () => {
 
       expect(response.status).to.equal(400);
     });
-    it.todo('should answer every error with a body matching the error schema');
+    it('should answer every error with a body matching the error schema', async () => {
+      const { http } = await setupSut();
+      const errors = [
+        await http.post('/redemptions').send({}),
+        await redeemAtTheStoreOf(http, 1234567890 as unknown as string),
+        ...(await answersInTurnToBodiesThatAreNotObjects((body) => redeemWrittenAsJson(http, body))),
+        await redeemWrittenAsJson(http, '{"code": "7K3QX9M2PD",'),
+      ];
+
+      expect(bodiesNotMatchingTheErrorSchema(errors)).to.deep.equal([]);
+    });
   });
 
   describe('A1 input boundary', () => {
