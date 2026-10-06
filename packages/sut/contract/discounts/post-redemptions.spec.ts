@@ -60,7 +60,15 @@ describe('POST /redemptions', () => {
       const kept = await client.query('SELECT token, redeemed FROM app.coupons');
       expect(kept.rows, 'each coupon kept, redeemed or unused').to.have.deep.members([{ token: code, redeemed: true }, { token: other, redeemed: false }]);
     });
-    it.todo('should redeem a coupon whose code is sent in lower case, in two groups');
+    it('should redeem a coupon whose code is sent in lower case, in two groups', async () => {
+      const { http, code } = await setupSutWithACouponFor();
+      const asReadAloud = `${code.slice(0, 5)} ${code.slice(5)}`.toLowerCase();
+
+      const response = await redeemAtTheStoreOf(http, asReadAloud);
+
+      expect(response.status).to.equal(201);
+      expect(response.body).to.deep.equal({ item: spicesDiscount.item });
+    });
   });
 
   describe('strictness', () => {
