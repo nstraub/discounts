@@ -14,6 +14,12 @@ const till = useTillStore();
   >
     {{ discountTexts.couponAlreadyUsed }}
   </p>
+  <p
+    v-else-if="till.couponNotForThisStore"
+    role="status"
+  >
+    {{ discountTexts.couponNotForYourStore }}
+  </p>
   <DiscountApplies
     v-else-if="till.redemption"
     :redemption="till.redemption"

@@ -100,7 +100,6 @@ Feature: Stephanie takes the coupon at the till
     Then Sue's coupon counts as used
     And people can see the new rate
 
-  @wip
   Scenario: A coupon for another store's discount
     Given Sue has a coupon for Mike's discount
     When Sue tries to use it at Stephanie's store
