@@ -24,6 +24,8 @@ export const couponResponse = z.object({ token: z.string(), storeName: z.string(
 
 export type CouponResponse = z.infer<typeof couponResponse>;
 
+export const redemptionResponse = z.object({ item: z.string() });
+
 export const requestRejection = z.object({
   statusCode: z.number(),
   message: z.string(),

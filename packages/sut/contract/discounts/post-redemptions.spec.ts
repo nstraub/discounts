@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { redemptionResponse } from '@app/types/discounts';
 import { spicesDiscount } from '@sut/support/example-discounts';
 
 import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
@@ -23,7 +24,14 @@ describe('POST /redemptions', () => {
       expect(response.status).to.equal(201);
       expect(response.body).to.deep.equal({ item: spicesDiscount.item });
     });
-    it.todo('should answer with a body matching the redemption response schema');
+    it('should answer with a body matching the redemption response schema', async () => {
+      const { http } = await setupSut();
+      const code = await aCouponForTheSpicesDiscount(http);
+
+      const response = await redeemAtTheSpicesStore(http, code);
+
+      expect(redemptionResponse.safeParse(response.body).error).to.equal(undefined);
+    });
     it.todo('should publish CouponRedeemed on the application event emitter for the coupon redeemed');
     it.todo('should keep the coupon redeemed and its discount\'s other coupons unused');
     it.todo('should redeem a coupon whose code is sent in lower case, in two groups');
