@@ -1,4 +1,4 @@
-import type { PublishDiscountRequest } from '@app/types/discounts';
+import type { ChangeRateRequest, PublishDiscountRequest } from '@app/types/discounts';
 
 export const nothingTyped = () => ({ item: '', rate: '', storeName: '', storeAddress: '' });
 
@@ -7,4 +7,11 @@ export const discountToPublish = ({ rate, ...others }: ReturnType<typeof nothing
     return others;
   }
   return { ...others, rate };
+};
+
+export const changeToMake = (newRate: string): Partial<ChangeRateRequest> => {
+  if (newRate === '') {
+    return {};
+  }
+  return { rate: newRate };
 };

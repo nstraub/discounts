@@ -5,6 +5,7 @@ import type { DiscountResponse } from '@app/types/discounts';
 
 import { useDiscountsStore } from '../../stores/discounts-store';
 import { discountTexts } from '../texts';
+import { changeToMake } from '../typed-discount';
 
 import CaptionedInput from './CaptionedInput.vue';
 
@@ -14,11 +15,7 @@ const discounts = useDiscountsStore();
 const newRate = ref('');
 
 const changeRate = async (): Promise<void> => {
-  if (newRate.value === '') {
-    await discounts.changeRate(props.discount.id, {});
-    return;
-  }
-  await discounts.changeRate(props.discount.id, { rate: newRate.value });
+  await discounts.changeRate(props.discount.id, changeToMake(newRate.value));
 };
 </script>
 
