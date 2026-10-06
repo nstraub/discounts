@@ -1,8 +1,28 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { spicesDiscount } from '@sut/support/example-discounts';
+
+import { type Http, publishTheSpicesDiscount, setupSut } from '../support/app';
+
+const aCouponForTheSpicesDiscount = async (http: Http): Promise<string> => {
+  const published = await publishTheSpicesDiscount(http);
+  return (await http.post(`/discounts/${published.id}/coupons`).send({})).body.token;
+};
+
+const redeemAtTheSpicesStore = (http: Http, code: string) =>
+  http.post('/redemptions').send({ code, storeName: spicesDiscount.storeName, storeAddress: spicesDiscount.storeAddress });
 
 describe('POST /redemptions', () => {
   describe('success', () => {
-    it.todo('should answer 201 with the item of the discount the coupon is for');
+    it('should answer 201 with the item of the discount the coupon is for', async () => {
+      const { http } = await setupSut();
+      const code = await aCouponForTheSpicesDiscount(http);
+
+      const response = await redeemAtTheSpicesStore(http, code);
+
+      expect(response.status).to.equal(201);
+      expect(response.body).to.deep.equal({ item: spicesDiscount.item });
+    });
     it.todo('should answer with a body matching the redemption response schema');
     it.todo('should publish CouponRedeemed on the application event emitter for the coupon redeemed');
     it.todo('should keep the coupon redeemed and its discount\'s other coupons unused');

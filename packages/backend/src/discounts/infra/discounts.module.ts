@@ -9,10 +9,11 @@ import { DiscountDrizzleRepository } from './discount-drizzle-repository.js';
 import { DiscountsController } from './discounts.controller.js';
 import { EventEmitterDomainEventPublisher } from './event-emitter-domain-event-publisher.js';
 import { GreetingController } from './greeting.controller.js';
+import { RedemptionsController } from './redemptions.controller.js';
 
 @Module({
   imports: [DatabaseModule, EventEmitterModule.forRoot()],
-  controllers: [GreetingController, DiscountsController],
+  controllers: [GreetingController, DiscountsController, RedemptionsController],
   providers: [
     {
       provide: DiscountFactory,
