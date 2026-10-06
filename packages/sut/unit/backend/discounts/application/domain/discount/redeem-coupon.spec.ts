@@ -5,11 +5,13 @@ import { publishedSpicesDiscount } from '@sut/support/example-discounts';
 
 import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
 
+const setupSut = ({ kept = publishedSpicesDiscount, coupons = [{ token: '7K3QX9M2PD', redeemed: false }] } = {}) =>
+  aSpicesDiscountWithItsEvents().factory.reconstitute({ ...kept, coupons });
+
 describe('class Discount', () => {
   describe('redeeming one of its coupons', () => {
     it('should redeem its coupon with the token given', () => {
-      const { factory } = aSpicesDiscountWithItsEvents();
-      const discount = factory.reconstitute({ ...publishedSpicesDiscount, coupons: [{ token: '7K3QX9M2PD', redeemed: false }] });
+      const discount = setupSut();
 
       discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
 
@@ -17,8 +19,7 @@ describe('class Discount', () => {
     });
 
     it('should answer with the item of the discount the coupon redeemed is for', () => {
-      const { factory } = aSpicesDiscountWithItsEvents();
-      const discount = factory.reconstitute({ ...publishedSpicesDiscount, coupons: [{ token: '7K3QX9M2PD', redeemed: false }] });
+      const discount = setupSut();
 
       const redeemed = discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
 
@@ -27,9 +28,7 @@ describe('class Discount', () => {
 
     describe('combination', () => {
       it('should leave its other coupons unused when one is redeemed', () => {
-        const { factory } = aSpicesDiscountWithItsEvents();
-        const coupons = [{ token: '7K3QX9M2PD', redeemed: false }, { token: 'R4WZ0BH8NE', redeemed: false }];
-        const discount = factory.reconstitute({ ...publishedSpicesDiscount, coupons });
+        const discount = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: false }, { token: 'R4WZ0BH8NE', redeemed: false }] });
 
         discount.redeemCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
 
