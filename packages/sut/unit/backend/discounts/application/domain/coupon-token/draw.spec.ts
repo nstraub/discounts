@@ -15,11 +15,10 @@ const anEvenSourceCyclingThroughEveryByte = (): RandomSource => {
   return (values) => values.map(() => next++ % 256);
 };
 
-const timesEachCharacterIsDrawn = (tokens: CouponToken[]) =>
-  Map.groupBy(tokens.flatMap((token) => [...token.toJSON()]), (character) => character)
-    .entries()
-    .map(([character, drawn]) => [character, drawn.length] as const)
-    .toArray();
+const timesEachCharacterIsDrawn = (tokens: CouponToken[]) => {
+  const drawn = Map.groupBy(tokens.flatMap((token) => [...token.toJSON()]), (character) => character);
+  return new Map(drawn.entries().map(([character, times]) => [character, times.length]));
+};
 
 describe('class CouponToken', () => {
   describe('drawing a token from a random source', () => {
@@ -35,7 +34,7 @@ describe('class CouponToken', () => {
       const tokens = Array.from({ length: 128 }, () => CouponToken.drawnFrom(random));
 
       const everyCharacterFortyTimes = [...'0123456789ABCDEFGHJKMNPQRSTVWXYZ'].map((character) => [character, 40] as const);
-      expect(new Map(timesEachCharacterIsDrawn(tokens))).to.deep.equal(new Map(everyCharacterFortyTimes));
+      expect(timesEachCharacterIsDrawn(tokens)).to.deep.equal(new Map(everyCharacterFortyTimes));
     });
     it('should draw another token from other random values', () => {
       const token = CouponToken.drawnFrom(aSourceGiving(10, 11, 12, 13, 14, 15, 16, 17, 18, 19));
