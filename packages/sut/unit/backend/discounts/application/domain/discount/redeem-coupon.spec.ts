@@ -17,7 +17,15 @@ describe('class Discount', () => {
     });
 
     describe('combination', () => {
-      it.todo('should leave its other coupons unused when one is redeemed');
+      it('should leave its other coupons unused when one is redeemed', () => {
+        const { factory } = aSpicesDiscountWithItsEvents();
+        const coupons = [{ token: '7K3QX9M2PD', redeemed: false }, { token: 'R4WZ0BH8NE', redeemed: false }];
+        const discount = factory.reconstitute({ ...publishedSpicesDiscount, coupons });
+
+        discount.redeemCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
+
+        expect(discount.toJSON().coupons.at(0)).to.deep.equal({ token: '7K3QX9M2PD', redeemed: false });
+      });
     });
   });
 });
