@@ -41,3 +41,7 @@ export const requestRejection = z.object({
 export type RequestRejection = z.infer<typeof requestRejection>;
 
 export const countResponse = z.array(z.object({ id: z.string(), item: z.string(), rate: z.string(), discountedSales: z.number() }));
+
+export const countRequest = z.object({ storeName: z.string(), storeAddress: z.string() });
+
+export type CountRequest = z.infer<typeof countRequest>;
