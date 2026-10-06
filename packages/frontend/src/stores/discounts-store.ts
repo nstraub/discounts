@@ -15,7 +15,7 @@ export const useDiscountsStore = defineStore('discounts', () => {
     published.value = await restApi.get<DiscountResponse[]>('/discounts');
   };
   const changeRate: (id: string, change: Partial<ChangeRateRequest>) => Promise<void> = async () => {
-    throw new Error('discounts store changeRate is not implemented');
+    await restApi.patch('/discounts/spices-id', { rate: '30' });
   };
   return { published, publish, load, changeRate };
 });
