@@ -56,7 +56,7 @@ C4Component
     Component(countView, "CountView", "Vue view (#/count)", "The count page: loads the published discounts, offers the count form and shows the counted discounts")
     Component(countForm, "CountDiscountedSalesForm", "Vue component", "The store, picked from the stores that publish, and a button to count its discounted sales")
     Component(counted, "CountedDiscounts", "Vue component", "One entry per discount counted: item, rate and the number of discounted sales")
-    Component(answer, "TillAnswer", "Vue component", "Shows what the till's answer tells: the discount applies, the coupon has already been used, it is not for the store, or no store was said")
+    Component(answer, "TillAnswer", "Vue component", "Shows what the till's answer tells: the discount applies, the coupon has already been used, it is not valid, it is not for the store, or no store was said")
     Component(tillStore, "till store", "Pinia", "redeemCoupon() and noStoreSaid(); holds the one till answer, an object of till-answers.ts that tells its own caption")
     Component(applies, "DiscountApplies", "Vue component", "Says the discount applies to the item redeemed")
     Component(issuedCoupon, "IssuedCoupon", "Vue component", "Shows the coupon just issued: the store to use it at and its code as two groups of five")
@@ -67,19 +67,21 @@ C4Component
   Container_Boundary(backend, "Backend (NestJS)") {
     Component(controller, "DiscountsController", "NestJS controller", "POST /discounts answers 201 with Location; PATCH /discounts/:id answers 204, or 404 for an id no discount has; POST /discounts/:id/coupons answers the coupon, or 404 for an id no discount has; GET /discounts lists")
     Component(storeCounts, "StoreCountsController", "NestJS controller", "POST /stores/counts answers 201 with each discount counted")
-    Component(redemptions, "RedemptionsController", "NestJS controller", "POST /redemptions answers 201 with the item, 422 for a coupon of another store, 409 when it has already been used and 400 when the store is missing or blank")
-    Component(refusedPublish, "refused-publish.ts", "Infra module", "Answers a refused publish: pieces left out are a 400 with fields and missing, a rate not valid a 400 with fields ['rate']; any other failure is rethrown")
-    Component(missingDiscount, "missing-discount.ts", "Infra module", "Answers NoSuchDiscountException with a 404 requestRejection; any other failure is rethrown")
+    Component(redemptions, "RedemptionsController", "NestJS controller", "POST /redemptions answers 201 with the item, 422 for a coupon of another store, 404 for a code nobody issued, 409 when it has already been used and 400 when the code or the store is missing or blank")
+    Component(answeredRefusals, "answered-refusals.ts", "Infra module", "answeredWith(refusal class, its rejection) pairs a domain refusal with the requestRejection it is answered with; answerFrom(list) answers the first that matches and rethrows any other failure")
+    Component(refusedPublish, "refused-publish.ts", "Infra module", "A list for answerFrom: pieces left out are a 400 with fields and missing, a rate not valid a 400 with fields ['rate']")
+    Component(missingDiscount, "missing-discount.ts", "Infra module", "A list for answerFrom: NoSuchDiscountException is a 404 'There is no such discount'")
+    Component(refusedRedemption, "refused-redemption.ts", "Infra module", "A list for answerFrom: a coupon of another store is a 422, a code nobody issued a 404 'No coupon has this code', a coupon already used a 409")
     Component(parsedBy, "ParsedBy", "Nest pipe, zod", "Parses the request against the shared schema; a failure is a 400 requestRejection, which lists in missing the fields the request leaves out")
     Component(service, "DiscountService", "Application service", "publish(), changeRate(), issueCoupon(), redeemCoupon(code, store), count(store) and published()")
-    Component(changes, "DiscountChanges", "Application collaborator", "The unit of work: runs issuing, redeeming and counting through the repository's changing(work): load, tell, save in one transaction")
+    Component(changes, "DiscountChanges", "Application collaborator", "The unit of work: runs issuing, redeeming and counting through the repository's changing(work): load, tell, save in one transaction; finds the discount through one lookup builder taking the find and the refusal, theOneWithId (NoSuchDiscountException) or theOneThatIssued (NoCouponHasTheCodeException)")
     Component(factory, "DiscountFactory", "Domain factory", "create() gives a new identity; reconstitute() rebuilds a kept discount")
     Component(discount, "Discount", "Aggregate", "Holds its id and DiscountDetails (item, rate, store name, store address, optional hook); redeemCoupon(token, store) refuses a coupon of another store (Store.equals: name and address exactly) and raises CouponRedemptionRejected; publish(keep) asks its details whether it can be published: a discount with a piece left out or a rate that is not valid keeps nothing and raises DiscountPublicationRejected, otherwise it keeps the discount and raises DiscountPublished; changeRate() raises DiscountRateChanged; issueCoupon() and count() go through Coupons; redeemCoupon(token) redeems the coupon")
     Component(details, "DiscountDetails", "Value object", "whenPublishable(): first that item, rate, store name and store address are all present (empty or blank text is not), then the rate; raises PiecesMissingException with the pieces left out")
     Component(rate, "DiscountRate", "Value object", "The rule of a rate on publishing: above 0 and at most 100, at most one decimal")
     Component(publicationRejected, "DiscountPublicationRejected", "Domain event", "Raised when a discount is refused: the rate, the reason ('missing' or 'not valid') and the pieces refused")
     Component(event, "DiscountPublished", "Domain event", "Carries the discount as published")
-    Component(token, "CouponToken", "Value object", "Ten characters of Crockford base32: drawnFrom(random) for a new one, read(code) for a typed one (case, O, I, L and spacing normalised)")
+    Component(token, "CouponToken", "Value object", "Ten characters of Crockford base32: drawnFrom(random) for a new one, read(code) for a typed one (case, O, I, L and spacing normalised; anything not written as a token, by length or alphabet, is refused with NoCouponHasTheCodeException)")
     Component(issued, "IssuedCoupon", "Domain value", "A coupon token and the name of the store it is for")
     Component(coupons, "Coupons", "Collection in the aggregate", "The discount's coupons: issues one and raises CouponIssued, finds by token and hands over the redemption, counts since the last count and raises DiscountedSalesCounted; publishes through the port; no repository")
     Component(coupon, "Coupon", "Entity in the aggregate", "A token, whether it was redeemed and whether it was counted; owns single use; redeem() raises CouponRedeemed, and a second redeem() raises CouponRedemptionRejected and refuses")
@@ -125,6 +127,10 @@ C4Component
   Rel(discount, details, "Asks whether it can be published")
   Rel(controller, refusedPublish, "Answers a refused publish through")
   Rel(controller, missingDiscount, "Answers a missing discount through")
+  Rel(redemptions, refusedRedemption, "Answers a refused redemption through")
+  Rel(refusedPublish, answeredRefusals, "Is a list for")
+  Rel(missingDiscount, answeredRefusals, "Is a list for")
+  Rel(refusedRedemption, answeredRefusals, "Is a list for")
   Rel(store, publishAnswers, "Holds the answer of")
   Rel(fields, publishAnswers, "Asks what the answer tells of each piece")
   Rel(store, redemptions, "POST /redemptions", "JSON over HTTP")
@@ -305,8 +311,8 @@ redeemed once (ADR 0005). `Coupon.redeem()` raises `CouponRedeemed`; `Discount.r
 refuses a coupon of another store, finds its coupon through `Coupons` and redeems it, and answers with the item. The service reads the typed code with
 `CouponToken.read` (any case; O read as 0, I and L as 1; a space or two groups), loads the discount
 that issued it through the one Discount repository (`withCouponToken`), redeems, saves, and answers
-`201 { item }` at `POST /redemptions`. The request carries the code and the till's store (name and
-address, neither missing nor blank: a `400` otherwise); the discount compares it with its own store, exactly
+`201 { item }` at `POST /redemptions`. The request carries the code and the till's store (code, name and
+address, none missing nor blank: a `400` otherwise); the discount compares it with its own store, exactly
 (`Store.equals`), and a coupon of another store is refused with `422` (below). Migration `0006` adds
 `coupons.redeemed` (boolean, not null, default false; its down drops the column and loses which
 coupons were redeemed). The till is the page `#/till`: it offers the stores that publish a discount,
@@ -328,8 +334,8 @@ sequenceDiagram
   Form->>Store: redeemCoupon(request)
   Store->>Controller: POST /redemptions
   Controller->>Service: redeemCoupon(code, store)
-  Service->>Service: CouponToken.read(code)
-  Service->>Repository: withCouponToken(token)
+  Service->>Service: CouponToken.read(code) (404 'No coupon has this code' when it is not written as a token)
+  Service->>Repository: withCouponToken(token) (the same 404 when no discount issued it)
   Service->>Discount: redeemCoupon(token, store)
   Discount->>Discount: Store.equals(its own store) (422, CouponRedemptionRejected 'not for this store', when it differs)
   Discount->>Coupon: redeem() through Coupons
@@ -402,10 +408,31 @@ till shows "This coupon has already been used.", not "the discount applies".
 A coupon redeemed at another store than its discount's is not redeemed: `Discount` raises
 `CouponRedemptionRejected` with the reason 'not for this store' and refuses, `POST /redemptions` answers
 `422`, and the till shows "This coupon is not for your store." A used coupon tried at another store is
-refused as not for that store. The web app's `FetchRestApi` turns a `422` into an
-`UnprocessableContentException` (`@app/types/rest-api-refusals`). The till store holds one answer at a
-time, an object of `till-answers.ts` (the discount applies with its item, already used, not for this store,
-no store said), each telling its own caption from the page's texts; `TillAnswer.vue` shows it.
+refused as not for that store. The web app's `FetchRestApi` turns a refused answer into the refusal for its
+status, found by `theRefusalFor(status)` in `@app/types/rest-api-refusals`: each refusal of its own
+(`UnprocessableContentException` for `422`, `NotFoundException` for `404`) names the status it is thrown
+for in a static `status`, and any other status is a plain `RestApiException`. The till store pairs each
+refusal with the answer it gets in the list `answersToRefusals` (`422`: not for this store; `404`: not
+valid), and any other failure is told as already used. It holds one answer at a time, an object of
+`till-answers.ts` (the discount applies with its item, already used, not valid, not for this store, no
+store said), each telling its own caption from the page's texts; `TillAnswer.vue` shows it.
+
+A code nobody issued is not a discount missing, and is refused as a family of its own (ADR 0010).
+`CouponToken.read` refuses a code that is not written as a token (wrong length or alphabet, after O, I and
+L are read as digits) and `DiscountChanges.theOneThatIssued` refuses a code no discount holds, both with
+`NoCouponHasTheCodeException`; nothing is changed and no event is raised. `POST /redemptions` answers
+`404` with the message "No coupon has this code", a malformed code and a well-formed one alike. A blank
+code is a `400` from `ParsedBy`. The `409` is answered only for `CouponAlreadyUsedException`; a failure that
+no list knows is not a refusal and answers `500`. The till shows "This coupon is not valid." and does not
+say the discount applies, and its code input is `required`.
+
+Each family of refusals is answered by a list in `infra/`, not by a chain of `instanceof`:
+`answered-refusals.ts` holds `answeredWith(refusal class, its rejection)`, which pairs a refusal with the
+`requestRejection` it is answered with, and `answerFrom(list)`, which answers with the first that matches
+and rethrows anything else. `refused-publish.ts`, `missing-discount.ts` and `refused-redemption.ts` are each
+such a list. In the application layer, `DiscountChanges` finds a discount through one builder taking the
+find and the refusal: `theOneWithId` (exported; `changeRate` outside `changing` uses it too, refusing with
+`NoSuchDiscountException`) and `theOneThatIssued` (`NoCouponHasTheCodeException`).
 
 Issuing, redeeming and counting each run through `DiscountRepository.changing(work)`: the Drizzle
 adapter runs the work in one database transaction with a transaction-bound repository, and `withId`
