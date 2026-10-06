@@ -1,12 +1,11 @@
 import { Body, ConflictException, Controller, HttpStatus, Inject, Post } from '@nestjs/common';
 
-import { redemptionRequest, redemptionResponse, type RequestRejection } from '@app/types/discounts';
+import { redemptionRequest, redemptionResponse, type RedemptionRequest, type RequestRejection } from '@app/types/discounts';
 
 import { DiscountService } from '../application/discount-service.js';
+import { Store } from '../application/domain/store.js';
 
 import { ParsedBy } from './parsed-by.js';
-
-const theCodeOfARedemption = redemptionRequest.pick({ code: true });
 
 const alreadyUsed: RequestRejection = { statusCode: HttpStatus.CONFLICT, message: 'This coupon has already been used' };
 
@@ -15,9 +14,9 @@ export class RedemptionsController {
   constructor(@Inject(DiscountService) private readonly discounts: DiscountService) {}
 
   @Post()
-  async redeem(@Body(new ParsedBy(theCodeOfARedemption)) request: { code: string }) {
+  async redeem(@Body(new ParsedBy(redemptionRequest)) { code, ...store }: RedemptionRequest) {
     try {
-      const redeemed = await this.discounts.redeemCoupon(request.code);
+      const redeemed = await this.discounts.redeemCoupon(code, new Store(store));
       return redemptionResponse.parse(redeemed.toJSON());
     } catch {
       throw new ConflictException(alreadyUsed);

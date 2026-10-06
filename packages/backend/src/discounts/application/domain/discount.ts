@@ -1,4 +1,5 @@
 import type { CountedSales } from './counted-sales.js';
+import { CouponNotForThisStoreException } from './coupon-not-for-this-store-exception.js';
 import type { CouponToken } from './coupon-token.js';
 import type { Coupons } from './coupons.js';
 import type { DiscountDetails } from './discount-details.js';
@@ -6,6 +7,7 @@ import type { DiscountEvents } from './discount-events.js';
 import { DiscountRate } from './discount-rate.js';
 import type { IssuedCoupon } from './issued-coupon.js';
 import { RedeemedCoupon } from './redeemed-coupon.js';
+import type { Store } from './store.js';
 
 export class Discount {
   constructor(
@@ -33,7 +35,10 @@ export class Discount {
     return issued;
   }
 
-  redeemCoupon(token: CouponToken): RedeemedCoupon {
+  redeemCoupon(token: CouponToken, store: Store): RedeemedCoupon {
+    if (store.toJSON().storeName !== this.details.toJSON().storeName) {
+      throw new CouponNotForThisStoreException();
+    }
     this.coupons.redeem(token, this.id);
     return new RedeemedCoupon(this.details.toJSON().item);
   }

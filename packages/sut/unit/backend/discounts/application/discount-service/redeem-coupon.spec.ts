@@ -7,6 +7,7 @@ import { CouponRedemptionRejected } from '@backend/discounts/application/domain/
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import type { DiscountRepository } from '@backend/discounts/application/domain/discount-repository';
 import { spicesDiscount } from '@sut/support/example-discounts';
+import { atTheSpicesStore } from '@sut/support/example-stores';
 
 import { aServiceOverAKeptDiscount } from './a-service-over-a-kept-discount';
 
@@ -17,21 +18,21 @@ describe('class DiscountService', () => {
     it('should keep the discount that owns the coupon with the coupon redeemed', async () => {
       const { repository, service } = setupSut();
 
-      await service.redeemCoupon('7K3QX9M2PD');
+      await service.redeemCoupon('7K3QX9M2PD', atTheSpicesStore);
 
       expect(repository.save.mock.lastCall?.at(0)?.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true, counted: false }]);
     });
     it('should announce CouponRedeemed for the coupon redeemed', async () => {
       const { events, service } = setupSut();
 
-      await service.redeemCoupon('7K3QX9M2PD');
+      await service.redeemCoupon('7K3QX9M2PD', atTheSpicesStore);
 
       expect(events.publish).to.have.been.calledWith(new CouponRedeemed('spices-id', '7K3QX9M2PD'));
     });
     it('should answer with the item of the discount the coupon is for', async () => {
       const { service } = setupSut();
 
-      const redeemed = await service.redeemCoupon('7K3QX9M2PD');
+      const redeemed = await service.redeemCoupon('7K3QX9M2PD', atTheSpicesStore);
 
       expect(redeemed.toJSON()).to.deep.equal({ item: spicesDiscount.item });
     });
@@ -40,7 +41,7 @@ describe('class DiscountService', () => {
       it('should redeem the coupon whose code is typed in lower case, in two groups', async () => {
         const { repository, service } = setupSut();
 
-        await service.redeemCoupon('7k3qx 9m2pd');
+        await service.redeemCoupon('7k3qx 9m2pd', atTheSpicesStore);
 
         const [kept] = repository.save.mock.lastCall?.at(0)?.toJSON().coupons ?? [];
         expect(kept, 'the coupon of the code typed').to.deep.equal({ token: '7K3QX9M2PD', redeemed: true, counted: false });
@@ -54,7 +55,7 @@ describe('class DiscountService', () => {
         given.withCouponToken.mockResolvedValue(await repository.withCouponToken(CouponToken.read('7K3QX9M2PD')));
         repository.changing.mockImplementation((work) => work(given));
 
-        await service.redeemCoupon('7K3QX9M2PD');
+        await service.redeemCoupon('7K3QX9M2PD', atTheSpicesStore);
 
         expect(given.save.mock.lastCall?.at(0)?.toJSON().coupons, 'the coupons kept through the repository given').to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true, counted: false }]);
       });
@@ -68,12 +69,12 @@ describe('class DiscountService', () => {
     it('should report that the coupon has already been used', async () => {
       const { service } = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: true, counted: false }] });
 
-      await expect(service.redeemCoupon('7K3QX9M2PD')).rejects.to.be.instanceOf(CouponAlreadyUsedException);
+      await expect(service.redeemCoupon('7K3QX9M2PD', atTheSpicesStore)).rejects.to.be.instanceOf(CouponAlreadyUsedException);
     });
     it('should announce CouponRedemptionRejected for the coupon already used', async () => {
       const { events, service } = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: true, counted: false }] });
 
-      await expect(service.redeemCoupon('7K3QX9M2PD')).rejects.to.be.instanceOf(CouponAlreadyUsedException);
+      await expect(service.redeemCoupon('7K3QX9M2PD', atTheSpicesStore)).rejects.to.be.instanceOf(CouponAlreadyUsedException);
 
       expect(events.publish).to.have.been.calledWith(new CouponRedemptionRejected('spices-id', '7K3QX9M2PD', 'already used'));
     });

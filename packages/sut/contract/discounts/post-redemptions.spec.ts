@@ -66,8 +66,8 @@ describe('POST /redemptions', () => {
 
   describe('strictness', () => {
     it('should keep the redemption request schema no stricter than any text for a code and a store\'s name and address', async () => {
-      const { http, code } = await setupSutWithACouponFor();
       const atAStoreInAnyText = { storeName: longTextInAnyCharacters.storeName, storeAddress: longTextInAnyCharacters.storeAddress };
+      const { http, code } = await setupSutWithACouponFor({ ...spicesDiscount, ...atAStoreInAnyText });
 
       const response = await http.post('/redemptions').send({ code, ...atAStoreInAnyText });
 

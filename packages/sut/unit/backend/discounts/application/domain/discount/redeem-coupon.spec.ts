@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { CouponAlreadyUsedException } from '@backend/discounts/application/domain/coupon-already-used-exception';
+import { CouponNotForThisStoreException } from '@backend/discounts/application/domain/coupon-not-for-this-store-exception';
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
-import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
+import { Store } from '@backend/discounts/application/domain/store';
+import { publishedProduceDiscount, publishedSpicesDiscount, stephaniesProduceDiscount, theStoreOf } from '@sut/support/example-discounts';
+import { atTheSpicesStore } from '@sut/support/example-stores';
 
 import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
 
@@ -14,7 +17,7 @@ describe('class Discount', () => {
     it('should redeem its coupon with the token given', () => {
       const discount = setupSut();
 
-      discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+      discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atTheSpicesStore);
 
       expect(discount.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: true, counted: false }]);
     });
@@ -22,14 +25,14 @@ describe('class Discount', () => {
     it('should answer with the item of the discount the coupon redeemed is for', () => {
       const discount = setupSut();
 
-      const redeemed = discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+      const redeemed = discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atTheSpicesStore);
 
       expect(redeemed.toJSON()).to.deep.equal({ item: publishedSpicesDiscount.item });
     });
     it('should answer with the item of another discount when one of its coupons is redeemed', () => {
       const discount = setupSut({ kept: publishedProduceDiscount });
 
-      const redeemed = discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+      const redeemed = discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), new Store(theStoreOf(publishedProduceDiscount)));
 
       expect(redeemed.toJSON()).to.deep.equal({ item: publishedProduceDiscount.item });
     });
@@ -38,7 +41,7 @@ describe('class Discount', () => {
       it('should leave its other coupons unused when one is redeemed', () => {
         const discount = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: false, counted: false }, { token: 'R4WZ0BH8NE', redeemed: false, counted: false }] });
 
-        discount.redeemCoupon(CouponToken.keptAs('R4WZ0BH8NE'));
+        discount.redeemCoupon(CouponToken.keptAs('R4WZ0BH8NE'), atTheSpicesStore);
 
         expect(discount.toJSON().coupons.at(0)).to.deep.equal({ token: '7K3QX9M2PD', redeemed: false, counted: false });
       });
@@ -49,13 +52,18 @@ describe('class Discount', () => {
       const asTheyWere = [{ token: '7K3QX9M2PD', redeemed: true, counted: false }, { token: 'R4WZ0BH8NE', redeemed: false, counted: false }];
       const discount = setupSut({ coupons: asTheyWere });
 
-      expect(() => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'))).to.throw(CouponAlreadyUsedException);
+      expect(() => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atTheSpicesStore)).to.throw(CouponAlreadyUsedException);
       expect(discount.toJSON().coupons).to.deep.equal(asTheyWere);
     });
   });
   describe('redeeming one of its coupons at a store', () => {
     it.todo('should redeem its coupon at its own store, the name and address it was published with');
-    it.todo('should refuse its coupon at another store, the coupon staying unused');
+    it('should refuse its coupon at another store, the coupon staying unused', () => {
+      const discount = setupSut();
+
+      expect(() => discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), new Store(theStoreOf(stephaniesProduceDiscount)))).to.throw(CouponNotForThisStoreException);
+      expect(discount.toJSON().coupons).to.deep.equal([{ token: '7K3QX9M2PD', redeemed: false, counted: false }]);
+    });
     it.todo('should raise CouponRedemptionRejected carrying its id, the coupon\'s token and that the coupon is not for that store');
     it.todo('should not raise CouponRedeemed when its coupon is refused at another store');
 

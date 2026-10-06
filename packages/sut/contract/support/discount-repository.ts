@@ -11,6 +11,7 @@ import { DiscountFactory } from '@backend/discounts/application/domain/discount-
 import type { DomainEventPublisher } from '@backend/discounts/application/domain/domain-event-publisher';
 import { DiscountDrizzleRepository } from '@backend/discounts/infra/discount-drizzle-repository';
 import { spicesDiscount } from '@sut/support/example-discounts';
+import { atTheSpicesStore } from '@sut/support/example-stores';
 import { resetTestDatabase, testDatabaseUrl } from '@sut/support/test-database';
 
 import { connectToTestDatabase } from './test-database';
@@ -54,7 +55,7 @@ export const keepADiscountWithACouponRedeemed = async (client: pg.Client, databa
   const { repository, keep } = discountRepositoryOn(client, databaseUrl);
   const kept = await keep(spicesDiscount);
   kept.issueCoupon(CouponToken.keptAs('7K3QX9M2PD'));
-  kept.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+  kept.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atTheSpicesStore);
   await repository.save(kept);
   return kept;
 };

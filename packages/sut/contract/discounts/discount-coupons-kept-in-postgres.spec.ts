@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import type { Discount } from '@backend/discounts/application/domain/discount';
 import { spicesDiscount } from '@sut/support/example-discounts';
+import { atTheSpicesStore } from '@sut/support/example-stores';
 import { testDatabaseUrl } from '@sut/support/test-database';
 
 import { keepADiscountWithASaleCounted, setupSut } from '../support/discount-repository';
@@ -26,7 +27,7 @@ const theFirstCouponLoadedBackAfter = async (sut: Awaited<ReturnType<typeof setu
 
 const theSecondCoupon = CouponToken.keptAs('R4WZ0BH8NE');
 
-const redeemTheSecondCoupon = (found: Discount) => found.redeemCoupon(theSecondCoupon);
+const redeemTheSecondCoupon = (found: Discount) => found.redeemCoupon(theSecondCoupon, atTheSpicesStore);
 
 describe('a discount kept in PostgreSQL', () => {
   describe('with its coupons', () => {
@@ -53,7 +54,7 @@ describe('a discount kept in PostgreSQL', () => {
     it('should save a discount with a redeemed coupon and load it back equal, in a separate transaction', async () => {
       const sut = await setupSut();
       const discount = await keepWithACouponIssued(sut);
-      discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+      discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atTheSpicesStore);
 
       await sut.repository.save(discount);
 
@@ -65,7 +66,7 @@ describe('a discount kept in PostgreSQL', () => {
       const sut = await setupSut();
       await sut.repository.save(await keepWithACouponIssued(sut));
 
-      const loaded = await savedAgainAfter(sut, (found) => found.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD')));
+      const loaded = await savedAgainAfter(sut, (found) => found.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atTheSpicesStore));
 
       expect(loaded?.toJSON().coupons.at(0)?.redeemed, 'the coupon loaded back, redeemed').to.equal(true);
     });
@@ -82,7 +83,7 @@ describe('a discount kept in PostgreSQL', () => {
     it('should keep a redeemed coupon redeemed when another coupon is issued and the discount is saved again', async () => {
       const sut = await setupSut();
       const discount = await keepWithACouponIssued(sut);
-      discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+      discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atTheSpicesStore);
       await sut.repository.save(discount);
 
       const loaded = await theFirstCouponLoadedBackAfter(sut, (found) => found.issueCoupon(theSecondCoupon));
@@ -95,7 +96,7 @@ describe('a discount kept in PostgreSQL', () => {
       const sut = await setupSut();
       const discount = await keepADiscountWithASaleCounted(sut.client, testDatabaseUrl);
       discount.issueCoupon(theSecondCoupon);
-      discount.redeemCoupon(theSecondCoupon);
+      discount.redeemCoupon(theSecondCoupon, atTheSpicesStore);
 
       await sut.repository.save(discount);
 

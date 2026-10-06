@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import { DiscountedSalesCounted } from '@backend/discounts/application/domain/discounted-sales-counted';
 import { publishedProduceDiscount, publishedSpicesDiscount } from '@sut/support/example-discounts';
+import { atTheSpicesStore } from '@sut/support/example-stores';
 
 import { aSpicesDiscountWithItsEvents } from './a-spices-discount';
 
@@ -51,7 +52,7 @@ describe('class Discount', () => {
         const coupons = [...threeRedeemedCoupons.slice(0, 2), { token: 'C9D2F6H8JK', redeemed: false, counted: false }];
         const { discount } = setupSut({ coupons });
         discount.count();
-        discount.redeemCoupon(CouponToken.keptAs('C9D2F6H8JK'));
+        discount.redeemCoupon(CouponToken.keptAs('C9D2F6H8JK'), atTheSpicesStore);
 
         const counted = discount.count();
 
@@ -60,7 +61,7 @@ describe('class Discount', () => {
       it('should count a coupon issued before its last count and redeemed after it', () => {
         const { discount } = setupSut({ coupons: [{ token: '7K3QX9M2PD', redeemed: false, counted: false }] });
         discount.count();
-        discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'));
+        discount.redeemCoupon(CouponToken.keptAs('7K3QX9M2PD'), atTheSpicesStore);
 
         const counted = discount.count();
 

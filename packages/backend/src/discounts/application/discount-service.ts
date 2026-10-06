@@ -39,9 +39,9 @@ export class DiscountService {
     return this.changes.toTheOneWithId(id, (found) => found.issueCoupon(CouponToken.drawnFrom(this.random)));
   }
 
-  async redeemCoupon(code: string): Promise<RedeemedCoupon> {
+  async redeemCoupon(code: string, store: Store): Promise<RedeemedCoupon> {
     const token = CouponToken.read(code);
-    return this.changes.toTheOneThatIssued(token, (found) => found.redeemCoupon(token));
+    return this.changes.toTheOneThatIssued(token, (found) => found.redeemCoupon(token, store));
   }
 
   async count(store: Store): Promise<CountedSales[]> {

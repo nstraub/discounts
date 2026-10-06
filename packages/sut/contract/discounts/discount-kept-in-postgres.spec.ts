@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { CouponToken } from '@backend/discounts/application/domain/coupon-token';
 import { produceDiscount, spicesDiscount, spicesDiscountWithItsHook } from '@sut/support/example-discounts';
+import { atTheSpicesStore } from '@sut/support/example-stores';
 import { testDatabaseUrl } from '@sut/support/test-database';
 
 import { keepADiscountWithASaleCounted, setupSut } from '../support/discount-repository';
@@ -119,7 +120,7 @@ describe('a discount kept in PostgreSQL', () => {
       const redeemedSinceTheCount = CouponToken.keptAs('R4WZ0BH8NE');
       earlier.issueCoupon(redeemedSinceTheCount);
       earlier.issueCoupon(CouponToken.keptAs('3HJN5VQ8WT'));
-      earlier.redeemCoupon(redeemedSinceTheCount);
+      earlier.redeemCoupon(redeemedSinceTheCount, atTheSpicesStore);
       await repository.save(earlier);
 
       await keep(produceDiscount);
