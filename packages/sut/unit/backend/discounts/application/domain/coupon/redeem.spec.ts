@@ -75,7 +75,14 @@ describe('class Coupon', () => {
       const { discountId, token } = events.publish.mock.lastCall?.at(0) as CouponRedemptionRejected;
       expect({ discountId, token }).to.deep.equal({ discountId: publishedProduceDiscount.id, token: couponForTheProduceDiscount.token });
     });
-    it.todo('should not raise CouponRedeemed again when its second redemption is refused');
+    it('should not raise CouponRedeemed again when its second redemption is refused', () => {
+      const { events, coupon } = setupSut({ redeemed: true });
+
+      expect(() => coupon.redeem('spices-id')).to.throw(CouponAlreadyUsedException);
+
+      const raised = events.publish.mock.calls.map(([event]) => event);
+      expect(raised.filter((event) => event instanceof CouponRedeemed), 'the CouponRedeemed raised').to.deep.equal([]);
+    });
 
     describe('state', () => {
       it.todo('should refuse a second redemption once its first has been counted');
