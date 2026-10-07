@@ -13,7 +13,7 @@ that has ended") are not in the file yet.
 Files read: `AGENTS.md`, `.plans/stephanie-comeback-epic.md`, `.plans/_IN_PROGRESS_discounts-plan.md`,
 `.plans/qa/_COMPLETE_slice-3-mike-raises-a-discount.md`,
 `.plans/qa/_COMPLETE_slice-4-stephanie-tells-people-what-is-new-about-her-produce.md`,
-`.plans/qa/_COMPLETE_slice-5-mike-lowers-a-discount.md`, `.plans/qa/slice-7-sue-decides-to-try-stephanies-produce.md`
+`.plans/qa/_COMPLETE_slice-5-mike-lowers-a-discount.md`, `.plans/qa/_COMPLETE_slice-7-sue-decides-to-try-stephanies-produce.md`
 with its outline and its scenarios, the feature of story 1, `packages/sut/cucumber.js`, the step patterns under
 `packages/sut/acceptance/features/steps/`, the method names of `acceptance/support/discounts-page.ts` and
 `acceptance/support/playwright-world.ts`, the exports of `packages/sut/support/example-discounts.ts`, the

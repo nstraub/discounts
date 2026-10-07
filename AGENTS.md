@@ -2,8 +2,8 @@
 
 Authoritative guide for AI agents (Claude Code, Junie, Copilot, etc.) working in this
 repository. Load this before starting any task. `app` is a scaffold for building a web
-application test-first: a backend, a frontend, shared types and a test suite, set up and
-empty. What it does comes from the epics and stories the team is given. It is built on
+application test-first: a backend, a frontend, shared types and a test suite.
+What it does comes from the epics and stories the team is given. It is built on
 Node 26 and Yarn 4. Everything in the repository — identifiers, test names, commit
 subjects, comments, plans — is written in **English**.
 
@@ -332,8 +332,8 @@ first slice.
 ## 9. Working process
 
 - **Commits, interactive and autonomous sessions:** skills
-  `committing-one-unit-per-commit`, `working-autonomously-in-a-worktree`. In this project the worktree is made by the
-  project's setup script, `scripts/prepare-worktree.sh <branch>`: it creates
+  `committing-one-unit-per-commit`, `working-autonomously` (on `main` by default). When a worktree is named, it is
+  made by the project's setup script, `scripts/prepare-worktree.sh <branch>`: it creates
   `.claude/worktrees/<branch-with-dashes>/` from `origin/<base>` (from the main checkout's
   branch while origin has none), copies the env files and `.claude/settings.local.json`,
   installs dependencies and the git hooks.
@@ -350,9 +350,8 @@ first slice.
 ## 10. Working with the team
 
 Features are built by the user-scope `dev-team` agent team (`claude --agent dev-team`;
-design in `~/.claude/briefs/_COMPLETE_agent-team-development.md`, agents in
-`~/.claude/agents/`). The orchestrator is the only role that talks to the user; it
-dispatches `qa` (red-test outline), `developer` (TDD, ops and toolchain work included),
+agents in `~/.claude/agents/`). The orchestrator is the only role that talks to the user; it
+dispatches `analyst` (epics, stories, scenarios and the slice plan), `qa` (red-test outline), `developer` (TDD, ops and toolchain work included),
 `refactorer`, `reviewer`, `documenter` and `decider`, and makes every commit in interactive
 mode; in autonomous mode the developer commits its own units. The session's mode (interactive, autonomous in a worktree, or autonomous on
 `main`) is set per checkout.
