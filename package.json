@@ -1,6 +1,8 @@
 {
   "name": "app",
   "version": "0.1.0",
+  "description": "A neighbourhood-discounts web app, built test-first by an AI development team as its internal benchmark",
+  "license": "GPL-3.0-only",
   "private": true,
   "type": "module",
   "workspaces": [
